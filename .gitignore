@@ -150,3 +150,9 @@ vite.config.ts.timestamp-*
 
 # Contexto local de trabajo
 context.md
+
+# Archify (candidatos y receipts)
+.archify/
+
+# macOS
+.DS_Store
