@@ -28,3 +28,11 @@
 ## Al agregar un endpoint
 
 Usa la skill `new-endpoint`.
+
+## Ahorro de tokens
+
+- Cambia con `Edit` por fragmentos; `Write` solo para archivos nuevos.
+- Corre solo los tests del archivo o regla tocados (filtra por archivo al correr Japa), no toda la suite en cada cambio. La suite completa se corre al cerrar la tarea.
+- Reporta el resultado en una línea (pasa o falla) y solo los errores relevantes.
+- No imprimas migraciones, modelos ni validators que acabas de escribir.
+- No agregues tests que no cubran una regla de negocio del README, ni comentarios que repitan el código.

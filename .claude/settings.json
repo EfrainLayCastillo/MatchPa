@@ -30,7 +30,6 @@
       "Read(**/.env.local)",
       "Read(**/.env.production)",
       "Edit(**/.env)",
-      "Edit(**/.env.local)",
       "Edit(**/.env.production)"
     ]
   },

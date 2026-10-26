@@ -29,3 +29,12 @@ No lances agentes para tareas pequeñas que se resuelven en la sesión principal
 - Hora: timestamps en UTC; las reglas por día se evalúan en `America/Panama`.
 - `backend/` y `frontend/` ya contienen un `CLAUDE.md`: al generar el proyecto con `create-adonisjs` o `create-next-app`, hazlo en una carpeta temporal y mueve el resultado, porque esos CLIs rechazan carpetas con archivos.
 - Diagramas con la skill `archify`; el de arquitectura vive en `docs/arquitectura.html`.
+
+## Ahorro de tokens
+
+- Cambia archivos con `Edit`, solo el fragmento que cambia. Reescribir un archivo completo con `Write` solo si es nuevo.
+- Después de cambiar, corre el check mínimo del paquete tocado y reporta solo el resultado: pasa o falla, y las líneas de error relevantes. No pegues la salida completa.
+- En comandos con salida larga, limita la salida (`| tail -n 20`, `-q`, `--silent`).
+- No vuelvas a imprimir archivos o diffs que acabas de escribir.
+- No agregues comentarios que repitan el código, ni tests que no cubran una regla del README.
+- No corras navegador, capturas ni E2E: el usuario los ejecuta. Tampoco `next build` completo salvo para cerrar una entrega.

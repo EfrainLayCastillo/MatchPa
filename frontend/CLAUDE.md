@@ -26,6 +26,14 @@
 
 ## Verificación
 
-- `next-dev-loop` para confirmar cambios en el dev server.
-- `webapp-testing` (Playwright) para flujos completos a 375px.
-- `web-design-guidelines` para revisar accesibilidad antes de cerrar una pantalla.
+- `web-design-guidelines` para revisar accesibilidad al cerrar una pantalla.
+- `next-dev-loop` y `webapp-testing` existen, pero las corre el usuario para ahorrar tokens: no las ejecutes tú.
+- Flujos a 375px: los prueba el usuario con Playwright; tú entregas la pantalla lista para probar.
+
+## Ahorro de tokens
+
+- Cambia con `Edit` por fragmentos; `Write` solo para archivos nuevos.
+- Verifica solo lo tocado: `npx tsc --noEmit` y `npx eslint <archivos>`. Reporta una línea con el resultado y los errores relevantes.
+- No corras navegador, capturas ni E2E: el usuario los ejecuta. No hagas `next build` salvo para cerrar una entrega.
+- No imprimas componentes ni hooks que acabas de escribir.
+- No agregues comentarios que repitan el código.
