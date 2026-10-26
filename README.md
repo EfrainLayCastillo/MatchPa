@@ -42,6 +42,10 @@ La cancha ya está reservada (empresa, # de cancha, hora), el partido es de 4 y 
 - No puedes unirte a tu propio partido ni tener dos solicitudes activas en el mismo.
 - Al salir de `open`, las solicitudes pendientes pasan a `cancelled`.
 - Duración: 90 o 120 minutos.
+- **Sin solapamientos:** un jugador no puede tener dos partidos abiertos o completos que se crucen en horario. Cuenta tanto los que organiza como los que tiene aceptados. Aplica al pedir unirse, al recibir una invitación y al aceptar.
+- **Máximo 7 por día:** un jugador no puede tener más de 7 partidos el mismo día (hora de Panamá), contando los que organiza y los que tiene aceptados.
+- Un organizador con partido abierto o completo no puede sumarse a otro que se cruce en horario.
+- `updatedAt` cambia cuando cambia el partido (edición, cierre, llenado o liberación de un puesto).
 
 | Estado | UI | Cuándo |
 |---|---|---|
@@ -73,7 +77,7 @@ Una sola entidad, `match_requests`, con `kind`:
 - URL: `matchpa.net/partidos/<code>`, con `code` aleatorio de 8 caracteres (no el `id`, para evitar enumeración).
 - Se muestra al publicar y en el detalle.
 - Ver no requiere cuenta. Unirse sí: login → onboarding → vuelve al partido y envía la solicitud.
-- Sin teléfonos en la vista pública; el botón de WhatsApp solo aparece con sesión.
+- El WhatsApp del organizador solo lo reciben el propio organizador y los jugadores aceptados, y solo mientras el partido está `open` o `full`. Si el partido expiró o se cerró, la API no lo devuelve y el botón no aparece.
 - Si el partido no está `open`, muestra su estado en vez del botón de unirse.
 - Botón Compartir con `navigator.share`; fallback a "Copiar link" y `wa.me/?text=`.
 - Vista previa Open Graph dinámica (`generateMetadata` + `opengraph-image`): empresa, fecha, hora, categoría y puestos.
@@ -82,6 +86,9 @@ Una sola entidad, `match_requests`, con `kind`:
 
 - Una por jugador por fecha (hoy o futura), con rango de horas.
 - Empresa opcional; vacía = cualquiera.
+- **Horarios cada 30 minutos**, mostrados en formato de 12 horas (`8:30 a. m.`). El fin del día se guarda como `24:00` y se muestra como `12:00 a. m.`.
+- Hoy, `Desde` no puede ser antes de la próxima media hora (redondeada hacia arriba). Si ya no quedan horas hoy, no se puede guardar. La API valida lo mismo.
+- Un jugador comprometido ese día (organiza o tiene una solicitud aceptada en un partido abierto o completo) no aparece en la lista de disponibles de ese día.
 - El jugador la quita o expira al terminar el día (`date < hoy` en hora de Panamá).
 
 ### Categorías
@@ -111,9 +118,9 @@ Código y BD en inglés (`snake_case`); UI en español.
 
 | Tabla | Columnas |
 |---|---|
-| `users` | `id`, `full_name`, `email` (único), `password` (nullable), `google_id` (nullable, único), `avatar_url`, `phone`, `category` (1–7), `gender` (`male`/`female`), timestamps |
+| `users` | `id`, `full_name`, `email` (único), `password` (nullable), `google_id` (nullable, único), `avatar_url`, `whatsapp_encrypted` (texto cifrado, nullable), `category` (1–7), `gender` (`male`/`female`), timestamps |
 | `companies` | `id`, `name`, `slug` (único), `phone`, `location_label`, `maps_url`, `website` |
-| `availabilities` | `id`, `user_id`, `date`, `from_time`, `to_time`, `company_id` (nullable), timestamps. Único (`user_id`, `date`) |
+| `availabilities` | `id`, `user_id`, `date`, `from_time`, `to_time` (puede ser `24:00`), `company_id` (nullable), timestamps. Único (`user_id`, `date`) |
 | `matches` | `id`, `code` (único), `organizer_id`, `company_id`, `court_number`, `starts_at` (timestamptz), `duration_minutes`, `category`, `type` (`male`/`female`/`mixed`), `max_players` (4–6), `status` (`open`/`full`/`closed`), `closed_at`, timestamps |
 | `match_guests` | `id`, `match_id`, `name`, `category`, `gender` |
 | `match_requests` | `id`, `match_id`, `user_id`, `kind`, `status`, timestamps. Único parcial (`match_id`, `user_id`) con `status IN ('pending','accepted')` |
@@ -132,6 +139,8 @@ Timestamps en UTC. Las reglas por día se evalúan en `America/Panama` (UTC-5).
 | Auth | AdonisJS Auth (sesión con cookie) + Ally (Google) |
 | Base de datos | PostgreSQL |
 | Tiempo real | AdonisJS Transmit (SSE) |
+| Caché de datos | TanStack Query: revalida al entrar y se invalida con eventos en vivo |
+| Cifrado | Servicio de cifrado de AdonisJS (`APP_KEY`) para datos sensibles |
 | PWA | `app/manifest.ts` + service worker solo para push |
 | Push | Web Push con VAPID (`web-push`) |
 | 3D (fase 2) | React Three Fiber + drei |
@@ -163,7 +172,8 @@ Las URLs son visibles para el usuario, así que van en español.
 | `/lobby` | Sí | Selector de fecha y pestañas **Partidos** / **Jugadores**. Botón fijo "Estoy disponible" (bottom sheet) |
 | `/partidos/nuevo` | Sí | Publicar partido |
 | `/partidos/[code]` | Para actuar | Detalle público. El organizador gestiona solicitudes, invita, saca y cierra; el jugador puede salirse |
-| `/perfil` | Sí | Editar perfil y push |
+| `/perfil` | Sí | Editar categoría, género y WhatsApp, activar/desactivar push |
+| `/mis-partidas` | Sí | Partidos que organizas o juegas, con estado y filtros por empresa y orden (por defecto, última actualización) |
 
 Ambas pestañas del lobby se ordenan por cercanía a tu categoría. **Partidos** filtra por empresa, tipo y hora; **Jugadores** por empresa y horario, y al tocar uno aparece "Ey Pa, ¿juegas?".
 
@@ -282,6 +292,15 @@ Tests del backend: `node ace test`. Prioridad: transiciones de estado, cálculo 
 
 En producción frontend y API comparten sitio (`matchpa.net` / `api.matchpa.net`) para que la cookie de sesión funcione (`SameSite=Lax`), con CORS con credenciales.
 
+### Datos de prueba
+
+```bash
+node ace db:seed --files database/seeders/user_seeder.ts   # Ana y Beto, contraseña secret123
+node ace migration:fresh --seed                             # borra todo y vuelve a cargar (solo local)
+```
+
+Los seeders usan `updateOrCreate`, así que se pueden correr varias veces.
+
 ### Variables de entorno
 
 | Backend (`.env`) | Ejemplo |
@@ -305,18 +324,28 @@ En producción frontend y API comparten sitio (`matchpa.net` / `api.matchpa.net`
 
 ---
 
+## Seguridad y datos sensibles
+
+- **WhatsApp cifrado:** el número se guarda con el servicio de cifrado de AdonisJS (llave `APP_KEY`). Solo acepta números: dígitos, `+`, espacios, paréntesis y guiones, entre 7 y 15 dígitos. Se normaliza antes de guardarse.
+- **Uso único:** el número sirve solo para que el organizador de un partido en el que juegas te escriba por WhatsApp. No aparece en listas, notificaciones ni vistas públicas.
+- **Sesión:** cookie `httpOnly`, `SameSite=Lax`, y `secure` en producción. CORS solo acepta el origen de `FRONTEND_URL`, con credenciales.
+- **Límite de intentos:** registro y login aceptan 10 peticiones por minuto por IP; después responden 429.
+- **Correo único:** se valida antes de insertar, y si hay una carrera la violación de la base responde 422 con el mismo mensaje, sin SQL.
+- **Google:** no se vincula automáticamente a una cuenta con contraseña del mismo correo, porque los correos no se verifican al registrarse.
+- **Errores:** en producción no se muestran detalles internos; en el frontend, los errores de servidor muestran un mensaje genérico.
+
 ## Brandbook
 
-Deportivo, urbano y de alto contraste: lima neón sobre verde azulado profundo, tipografía bold enorme, acentos manuscritos y fotografía B/N con grano.
+Deportivo, urbano y fresco: lima brillante sobre verde profundo, con turquesa como acento y fondo marfil. Tipografía bold enorme, acentos manuscritos y fotografía con grano.
 
-| Color | Hex (aprox.) | Uso |
-|---|---|---|
-| Lima MatchPa | `#C8F526` | Principal, botones, fondos de impacto |
-| Verde azulado | `#0B4A55` | Fondos oscuros, texto sobre lima |
-| Marfil | `#F7F6F0` | Fondo claro |
-| Carbón | `#1A1A1A` | Texto, fotografía B/N |
+| Color | Hex | RGB | Uso |
+|---|---|---|---|
+| Marfil | `#f5f0f0` | 245, 240, 240 | Fondo claro |
+| Lima | `#e6fa50` | 230, 250, 80 | Principal: botones, estados disponibles, fondos de impacto |
+| Turquesa | `#50c8c8` | 80, 200, 200 | Acento: chips y datos secundarios |
+| Verde profundo | `#003c3c` | 0, 60, 60 | Texto sobre marfil, fondos oscuros, texto sobre lima |
 
-> Colores aproximados; ajustar al definir los tokens.
+Los colores vienen de una paleta de referencia visual. El logo de esa referencia no se usa. Los tonos de superficie (tarjetas, bordes, texto secundario) son derivados de estos cuatro.
 
 - **Tipografía:** títulos en grotesca bold (Bricolage Grotesque o Archivo), acentos en script (Yellowtail), texto en Inter.
 - **Logo:** **Match** en bold + **Pa** en script.
@@ -407,17 +436,20 @@ Ambos hooks no hacen nada hasta que `backend/` y `frontend/` tengan `package.jso
 
 ### MVP
 
-- [ ] Setup: monorepo, PostgreSQL en Docker, migraciones, seed de empresas
-- [ ] Auth con Google y registro, onboarding
-- [ ] Publicar partido y listarlo en el lobby
-- [ ] Pedir unirse y aprobación
-- [ ] Link público con vista previa en WhatsApp
-- [ ] Disponibilidad y pestaña de jugadores
-- [ ] Invitaciones
-- [ ] Salir, sacar, cerrar y expirar
-- [ ] Tiempo real con Transmit
-- [ ] PWA + Web Push con modal opt-in
-- [ ] Botón `wa.me` al organizador
+- [x] Setup: monorepo, PostgreSQL en Docker, migraciones, seed de empresas
+- [x] Auth con Google y registro, onboarding
+- [x] Publicar partido y listarlo en el lobby
+- [x] Pedir unirse y aprobación
+- [x] Link público con vista previa en WhatsApp
+- [x] Disponibilidad y pestaña de jugadores
+- [x] Invitaciones
+- [x] Salir, sacar, cerrar y expirar
+- [x] Tiempo real con Transmit
+- [x] PWA + Web Push con modal opt-in
+- [x] Botón `wa.me` al organizador (solo jugadores aceptados, partido abierto o completo)
+- [x] Límites: 7 partidos por día y sin solapamientos
+- [x] WhatsApp cifrado y visibilidad restringida
+- [x] Mis partidas con orden y filtro por empresa
 
 ### Después
 

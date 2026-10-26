@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { DetailSkeleton } from "@/components/matchpa/skeletons";
 import { MatchEdit } from "@/components/match/match-edit";
 import { SessionGate } from "@/components/matchpa/session-gate";
 
@@ -8,7 +9,7 @@ interface EditMatchPageProps {
 
 export default function EditMatchPage({ params }: EditMatchPageProps) {
   return (
-    <Suspense fallback={<p className="p-6 text-sm text-muted-foreground">Cargando…</p>}>
+    <Suspense fallback={<DetailSkeleton />}>
       <EditContent params={params} />
     </Suspense>
   );

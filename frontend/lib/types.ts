@@ -69,6 +69,13 @@ export interface MatchRequest {
   user: MatchPlayer;
 }
 
+export interface MyRequest {
+  id: number;
+  kind: RequestKind;
+  status: RequestStatus;
+  match: { code: string; startsAt: string; courtNumber: number; companyName: string };
+}
+
 export interface Match {
   id: number;
   code: string;
@@ -76,6 +83,7 @@ export interface Match {
   company: Company;
   courtNumber: number;
   startsAt: string;
+  updatedAt: string | null;
   durationMinutes: 90 | 120;
   category: Category;
   type: MatchType;

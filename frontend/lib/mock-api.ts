@@ -1,7 +1,7 @@
 // In-memory stand-in for the AdonisJS API, enabled with NEXT_PUBLIC_MOCK_API=true.
 // It mirrors the README contract so screens can be built before the backend exists.
 import { ApiError } from "./errors";
-import { panamaDateKey } from "./format";
+import { dateKey } from "./panamaFormatDate";
 
 import type {
   Availability,
@@ -21,6 +21,7 @@ type Method = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
 interface StoredMatch {
   id: number;
+  updatedAt: string;
   code: string;
   organizerId: number;
   companyId: number;
@@ -75,7 +76,7 @@ const users: (User & { password: string })[] = [
 ];
 
 const availabilities = new Map<number, Availability[]>();
-const today = panamaDateKey();
+const today = dateKey(new Date());
 availabilities.set(2, [{ date: today, fromTime: "17:00", toTime: "21:00", companyId: 1 }]);
 availabilities.set(3, [{ date: today, fromTime: "18:00", toTime: "22:00", companyId: null }]);
 availabilities.set(4, [{ date: today, fromTime: "16:00", toTime: "20:00", companyId: 2 }]);
@@ -88,11 +89,12 @@ const matches: StoredMatch[] = [
     organizerId: 2,
     companyId: 1,
     courtNumber: 3,
-    startsAt: at(panamaDateKey(new Date(Date.now() + 86_400_000)), "18:00"),
+    startsAt: at(dateKey(new Date(Date.now() + 86_400_000)), "18:00"),
     durationMinutes: 90,
     category: 4,
     type: "mixed",
     maxPlayers: 4,
+    updatedAt: new Date().toISOString(),
     closed: false,
     guests: [{ id: 1, name: "Efrain Lay", category: 4, gender: "male" }],
     requests: [],
@@ -182,6 +184,7 @@ function viewOf(match: StoredMatch): Match {
     company: companies.find((c) => c.id === match.companyId)!,
     courtNumber: match.courtNumber,
     startsAt: match.startsAt,
+    updatedAt: match.updatedAt,
     durationMinutes: match.durationMinutes,
     category: match.category,
     type: match.type,
@@ -208,7 +211,7 @@ function requireOrganizer(match: StoredMatch) {
 
 function openMatchesFor(date: string, companyId?: number, type?: MatchType) {
   return matches
-    .filter((m) => panamaDateKey(new Date(m.startsAt)) === date)
+    .filter((m) => dateKey(new Date(m.startsAt)) === date)
     .filter((m) => companyId === undefined || m.companyId === companyId)
     .filter((m) => type === undefined || m.type === type)
     .map(viewOf)
@@ -295,6 +298,7 @@ export async function mockRequest<T>(method: Method, fullPath: string, body?: un
       category: input.category as Match["category"],
       type: input.type as MatchType,
       maxPlayers: Number(input.maxPlayers),
+      updatedAt: new Date().toISOString(),
       closed: false,
       guests: (input.guests as Omit<Match["guests"][number], "id">[]).map((g, i) => ({ id: i + 1, ...g })),
       requests: [],
@@ -311,6 +315,7 @@ export async function mockRequest<T>(method: Method, fullPath: string, body?: un
       companyId: Number(input.companyId),
       courtNumber: Number(input.courtNumber),
       startsAt: String(input.startsAt),
+      updatedAt: new Date().toISOString(),
       durationMinutes: input.durationMinutes as 90 | 120,
       category: input.category as Match["category"],
       type: input.type as MatchType,
@@ -323,6 +328,7 @@ export async function mockRequest<T>(method: Method, fullPath: string, body?: un
     const match = findMatch(m[1]);
     requireOrganizer(match);
     match.closed = true;
+    match.updatedAt = new Date().toISOString();
     match.requests.forEach((r) => r.status === "pending" && (r.status = "cancelled"));
     return viewOf(match);
   });
@@ -367,6 +373,24 @@ export async function mockRequest<T>(method: Method, fullPath: string, body?: un
       fail(422, "No quedan puestos disponibles");
     }
     return { id: r.id, kind: r.kind, status: r.status, user: playerOf(r.userId) };
+  });
+  on(/^GET \/me\/match-requests$/, () => {
+    const user = requireMe();
+    return matches.flatMap((match) =>
+      match.requests
+        .filter((r) => r.userId === user.id && r.status === "pending")
+        .map((r) => ({
+          id: r.id,
+          kind: r.kind,
+          status: r.status,
+          match: {
+            code: match.code,
+            startsAt: match.startsAt,
+            courtNumber: match.courtNumber,
+            companyName: companies.find((c) => c.id === match.companyId)!.name,
+          },
+        })),
+    );
   });
   on(/^GET \/me\/matches$/, () => {
     const user = requireMe();

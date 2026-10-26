@@ -1,21 +1,21 @@
 "use client";
 
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { DateField } from "@/components/matchpa/date-field";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PushPrompt } from "@/components/matchpa/push-prompt";
 import { api, ApiError } from "@/lib/api";
-import { CATEGORIES, GENDER_LABELS, panamaDateKey, panamaTime, shortCategory, TYPE_LABELS } from "@/lib/format";
+import { CATEGORIES, GENDER_LABELS, shortCategory, TYPE_LABELS } from "@/lib/format";
+import { dateKey, formatClock, formatClock12, todayKey } from "@/lib/panamaFormatDate";
 import { shouldAskForPush } from "@/lib/push";
 import { useSession } from "@/lib/session";
 import type { Category, Company, Gender, Match, MatchType, NewMatchInput } from "@/lib/types";
-import { ShareMatch } from "./share-match";
 
 interface GuestDraft {
   name: string;
@@ -23,12 +23,15 @@ interface GuestDraft {
   gender: Gender;
 }
 
-export function MatchForm({ match }: { match?: Match }) {
+function MatchFormBody({ match }: { match?: Match }) {
   const { user } = useSession();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const inviteeId = match ? null : Number(searchParams.get("invitar")) || null;
+  const inviteeName = searchParams.get("nombre");
   const [companies, setCompanies] = useState<Company[]>([]);
-  const [date, setDate] = useState(() => (match ? panamaDateKey(new Date(match.startsAt)) : panamaDateKey()));
-  const [time, setTime] = useState(() => (match ? panamaTime(match.startsAt) : "18:00"));
+  const [date, setDate] = useState(() => (match ? dateKey(new Date(match.startsAt)) : todayKey()));
+  const [time, setTime] = useState(() => (match ? formatClock(match.startsAt) : "18:00"));
   const [duration, setDuration] = useState<"90" | "120">(match ? (String(match.durationMinutes) as "90" | "120") : "90");
   const [companyId, setCompanyId] = useState(match ? String(match.company.id) : "");
   const [courtNumber, setCourtNumber] = useState(match ? String(match.courtNumber) : "");
@@ -40,8 +43,10 @@ export function MatchForm({ match }: { match?: Match }) {
   );
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  const [published, setPublished] = useState<Match | null>(null);
-  const [pushOpen, setPushOpen] = useState(false);
+  const [created, setCreated] = useState<Match | null>(null);
+  const [step, setStep] = useState(0);
+  // The publish button sits where "Siguiente" was; it stays disabled briefly so a second tap can't publish by accident.
+  const [publishReady, setPublishReady] = useState(false);
 
   const seatsForGuests = Number(maxPlayers) - 1;
 
@@ -66,8 +71,21 @@ export function MatchForm({ match }: { match?: Match }) {
     };
   }
 
+  function goNext() {
+    if (!companyId) return setError("Elige la empresa de la cancha");
+    if (!courtNumber) return setError("Indica el número de cancha");
+    setError(null);
+    setStep(1);
+    setPublishReady(false);
+    window.setTimeout(() => setPublishReady(true), 1000);
+  }
+
   async function submit(event: React.FormEvent) {
     event.preventDefault();
+    if (step === 0) return goNext();
+    // Only the explicit publish button may create the match.
+    const submitter = (event.nativeEvent as SubmitEvent).submitter;
+    if (!submitter?.hasAttribute("data-publish")) return;
     if (!companyId) return setError("Elige la empresa de la cancha");
     if (!courtNumber) return setError("Indica el número de cancha");
     if (guests.some((guest) => guest.name.trim() === "")) return setError("Pon el nombre de cada jugador");
@@ -80,8 +98,13 @@ export function MatchForm({ match }: { match?: Match }) {
         router.push(`/partidos/${updated.code}`);
         return;
       }
-      setPublished(await api.createMatch(buildInput()));
-      if (shouldAskForPush()) setPushOpen(true);
+      const published = await api.createMatch(buildInput());
+      if (inviteeId) await api.invite(published.code, inviteeId).catch(() => null);
+      if (shouldAskForPush()) {
+        setCreated(published);
+        return;
+      }
+      router.push(`/partidos/${published.code}`);
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "No se pudo publicar el partido");
     } finally {
@@ -89,22 +112,15 @@ export function MatchForm({ match }: { match?: Match }) {
     }
   }
 
-  if (published) {
-    const company = companies.find((c) => c.id === published.company.id) ?? published.company;
-    const summary = `Partido de pádel en ${company.name}, cancha ${published.courtNumber}. Faltan ${published.spotsLeft} puestos.`;
+  if (created) {
     return (
       <div className="space-y-4">
-        <div>
-          <p className="font-script text-3xl text-brand-teal dark:text-brand-lime">¡Listo!</p>
-          <p className="text-sm text-muted-foreground">Tu partido ya está en el lobby. Compártelo para completar los puestos.</p>
-        </div>
-        <ShareMatch code={published.code} summary={summary} />
-        <Button asChild variant="outline" className="w-full">
-          <Link href={`/partidos/${published.code}`}>Ver partido</Link>
-        </Button>
+        <p className="font-script text-3xl text-brand-teal dark:text-brand-lime">¡Listo!</p>
         <PushPrompt
-          open={pushOpen}
-          onOpenChange={setPushOpen}
+          open
+          onOpenChange={(open) => {
+            if (!open) router.push(`/partidos/${created.code}`);
+          }}
           reason="Te avisamos cuando alguien pida unirse a tu partido."
         />
       </div>
@@ -113,13 +129,32 @@ export function MatchForm({ match }: { match?: Match }) {
 
   return (
     <form onSubmit={submit} className="space-y-6">
+      {inviteeId ? (
+        <p className="rounded-xl bg-brand-lime/40 p-3 text-sm">
+          Al publicar le enviaremos la invitación a <strong>{inviteeName}</strong>.
+        </p>
+      ) : null}
+      <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Paso {step + 1} de 2</p>
+
+      {step === 0 ? (
       <Section title="Cuándo y dónde">
         <div className="grid grid-cols-2 gap-3">
           <Field label="Fecha" htmlFor="date">
-            <Input id="date" type="date" value={date} min={panamaDateKey()} onChange={(e) => setDate(e.target.value)} required />
+            <DateField id="date" value={date} min={todayKey()} onChange={setDate} />
           </Field>
           <Field label="Hora" htmlFor="time">
-            <Input id="time" type="time" value={time} onChange={(e) => setTime(e.target.value)} required />
+            <Select value={time} onValueChange={setTime}>
+              <SelectTrigger id="time" className="w-full" aria-label="Hora">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {timeOptions(time).map((option) => (
+                  <SelectItem key={option} value={option}>
+                    {formatClock12(option)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </Field>
         </div>
         <div className="grid grid-cols-2 gap-3">
@@ -149,7 +184,10 @@ export function MatchForm({ match }: { match?: Match }) {
           </Select>
         </Field>
       </Section>
+      ) : null}
 
+      {step === 1 ? (
+      <>
       <Section title="El partido">
         <Field label="Categoría">
           <Select value={category.toString()} onValueChange={(value) => setCategory(Number(value) as Category)}>
@@ -234,12 +272,27 @@ export function MatchForm({ match }: { match?: Match }) {
           Agregar jugador
         </Button>
       </Section>
+      </>
+      ) : null}
 
       {error ? <p role="alert" className="text-sm text-destructive">{error}</p> : null}
 
-      <Button type="submit" size="lg" disabled={busy} className="h-12 w-full text-base font-bold">
-        {busy ? "Guardando…" : match ? "Guardar cambios" : "Publicar partido"}
-      </Button>
+      <div className="flex gap-2">
+        {step === 1 ? (
+          <Button type="button" variant="outline" size="lg" className="h-12 flex-1" onClick={() => setStep(0)}>
+            Atrás
+          </Button>
+        ) : null}
+        {step === 0 ? (
+          <Button type="button" size="lg" className="h-12 flex-1 font-bold" onClick={goNext}>
+            Siguiente
+          </Button>
+        ) : (
+          <Button type="submit" data-publish size="lg" disabled={busy || !publishReady} className="h-12 flex-1 font-bold">
+            {busy ? "Guardando…" : match ? "Guardar cambios" : "Publicar partido"}
+          </Button>
+        )}
+      </div>
     </form>
   );
 }
@@ -260,4 +313,19 @@ function Field({ label, htmlFor, children }: { label: string; htmlFor?: string; 
       {children}
     </div>
   );
+}
+
+/** Each visit to the publish page carries a new `n`, so the form starts clean instead of reusing a kept-alive instance. */
+export function MatchForm({ match }: { match?: Match }) {
+  const visit = useSearchParams().get("n") ?? "edit";
+  return <MatchFormBody key={visit} match={match} />;
+}
+
+/** Every half hour of the day, plus the current value when it is off the grid (an edited match). */
+function timeOptions(current: string): string[] {
+  const halfHours = Array.from({ length: 48 }, (_, i) => {
+    const hours = String(Math.floor(i / 2)).padStart(2, "0");
+    return `${hours}:${i % 2 === 0 ? "00" : "30"}`;
+  });
+  return halfHours.includes(current) ? halfHours : [current, ...halfHours].sort();
 }

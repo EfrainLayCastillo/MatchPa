@@ -13,6 +13,11 @@ export default class HttpExceptionHandler extends ExceptionHandler {
    * response to the client
    */
   async handle(error: unknown, ctx: HttpContext) {
+    if (isUniqueViolation(error)) {
+      return ctx.response
+        .status(422)
+        .send({ errors: [{ field: 'email', message: 'Ya existe una cuenta con este correo' }] })
+    }
     return super.handle(error, ctx)
   }
 
@@ -25,4 +30,9 @@ export default class HttpExceptionHandler extends ExceptionHandler {
   async report(error: unknown, ctx: HttpContext) {
     return super.report(error, ctx)
   }
+}
+
+/** PostgreSQL 23505: a unique constraint was violated (e.g. a race on a duplicate email). */
+function isUniqueViolation(error: unknown): boolean {
+  return typeof error === 'object' && error !== null && 'code' in error && error.code === '23505'
 }

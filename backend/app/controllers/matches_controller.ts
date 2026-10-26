@@ -19,13 +19,13 @@ export default class MatchesController {
   async index({ auth, request }: HttpContext) {
     const viewer = auth.getUserOrFail()
     const { date, companyId, type } = await request.validateUsing(matchFiltersValidator)
-    const { start, end } = panamaDayBounds(date)
-
     const matches = await matchQuery()
       .where('status', 'open')
-      .where('starts_at', '>', DateTime.now().toSQL()!)
-      .where('starts_at', '>=', start.toSQL()!)
-      .where('starts_at', '<', end.toSQL()!)
+      .where('starts_at', '>', DateTime.now().toUTC().toSQL()!)
+      .if(date, (query) => {
+        const { start, end } = panamaDayBounds(date!)
+        query.where('starts_at', '>=', start.toSQL()!).where('starts_at', '<', end.toSQL()!)
+      })
       .if(companyId, (query) => query.where('company_id', companyId!))
       .if(type, (query) => query.where('type', type!))
       .orderBy('starts_at')

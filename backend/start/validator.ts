@@ -12,7 +12,7 @@
 */
 
 import { DateTime } from 'luxon'
-import { VineDate } from '@vinejs/vine'
+import vine, { SimpleMessagesProvider, VineDate } from '@vinejs/vine'
 
 declare module '@vinejs/vine/types' {
   interface VineGlobalTransforms {
@@ -21,3 +21,7 @@ declare module '@vinejs/vine/types' {
 }
 
 VineDate.transform((value) => DateTime.fromJSDate(value))
+
+vine.messagesProvider = new SimpleMessagesProvider({
+  'database.unique': 'Ya existe una cuenta con este correo',
+})

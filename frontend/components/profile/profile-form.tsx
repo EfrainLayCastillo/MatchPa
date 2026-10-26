@@ -29,6 +29,8 @@ export function ProfileForm({ mode }: ProfileFormProps) {
   async function save(event: React.FormEvent) {
     event.preventDefault();
     if (!gender) return setError("Elige tu género");
+    const digits = phone.replace(/\D/g, "");
+    if (digits.length < 7 || digits.length > 15) return setError("Escribe un número de WhatsApp válido");
     setBusy(true);
     setError(null);
     setSaved(false);
@@ -79,8 +81,8 @@ export function ProfileForm({ mode }: ProfileFormProps) {
 
       <div className="space-y-1.5">
         <Label htmlFor="phone">Teléfono (WhatsApp)</Label>
-        <Input id="phone" type="tel" inputMode="tel" autoComplete="tel" placeholder="+507 6000-0000" value={phone} onChange={(e) => setPhone(e.target.value)} required />
-        <p className="text-xs text-muted-foreground">Los organizadores lo usan para escribirte por WhatsApp.</p>
+        <Input id="phone" type="tel" inputMode="tel" autoComplete="tel" placeholder="+507 6000-0000" value={phone} onChange={(e) => setPhone(e.target.value.replace(/[^\d+\s()-]/g, ""))} maxLength={25} required />
+        <p className="text-xs text-muted-foreground">Se guarda cifrado. Solo lo usamos para que el organizador de un partido en el que juegas pueda escribirte por WhatsApp.</p>
       </div>
 
       {error ? <p role="alert" className="text-sm text-destructive">{error}</p> : null}

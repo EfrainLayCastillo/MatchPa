@@ -1,7 +1,5 @@
 import type { Category, Gender, MatchStatus, MatchType } from "./types";
 
-export const PANAMA_TZ = "America/Panama";
-
 const CATEGORY_LABELS: Record<Category, string> = {
   1: "1ra",
   2: "2da",
@@ -48,54 +46,6 @@ export function byCategoryDistance(mine: Category | null) {
 
 function distance(category: Category, mine: Category | null): number {
   return mine === null ? 0 : Math.abs(category - mine);
-}
-
-/** YYYY-MM-DD in Panama time, the key used by availabilities and the date selector. */
-export function panamaDateKey(date: Date = new Date()): string {
-  return new Intl.DateTimeFormat("en-CA", {
-    timeZone: PANAMA_TZ,
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(date);
-}
-
-export function nextDateKeys(days: number): string[] {
-  const today = new Date();
-  return Array.from({ length: days }, (_, i) =>
-    panamaDateKey(new Date(today.getTime() + i * 86_400_000)),
-  );
-}
-
-export function dayLabel(dateKey: string): string {
-  if (dateKey === panamaDateKey()) return "Hoy";
-  const date = new Date(`${dateKey}T12:00:00-05:00`);
-  return new Intl.DateTimeFormat("es-PA", {
-    timeZone: PANAMA_TZ,
-    weekday: "short",
-    day: "numeric",
-  }).format(date);
-}
-
-export function formatMatchTime(startsAt: string): string {
-  const date = new Date(startsAt);
-  const day = panamaDateKey(date) === panamaDateKey() ? "Hoy" : dayLabel(panamaDateKey(date));
-  const time = new Intl.DateTimeFormat("es-PA", {
-    timeZone: PANAMA_TZ,
-    hour: "numeric",
-    minute: "2-digit",
-  }).format(date);
-  return `${day} · ${time}`;
-}
-
-/** HH:MM in Panama time, the value an `<input type="time">` expects. */
-export function panamaTime(iso: string): string {
-  return new Intl.DateTimeFormat("en-GB", {
-    timeZone: PANAMA_TZ,
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-  }).format(new Date(iso));
 }
 
 export function formatDuration(minutes: 90 | 120): string {

@@ -22,7 +22,7 @@ export function serializeUser(user: User) {
     fullName: user.fullName,
     email: user.email,
     avatarUrl: user.avatarUrl,
-    phone: user.phone,
+    phone: user.whatsapp,
     category: user.category,
     gender: user.gender,
   }
@@ -44,6 +44,12 @@ function serializeRequest(request: MatchRequest) {
 /** Expects `company`, `organizer`, `guests`, `requests` (with `user`) preloaded. */
 export function serializeMatch(match: Match, viewer: User | null) {
   const isOrganizer = viewer?.id === match.organizerId
+  // The organizer's WhatsApp is for the organizer and the players who joined, nobody else.
+  const isLive = ['open', 'full'].includes(effectiveStatus(match))
+  const canSeeWhatsapp =
+    isLive &&
+    viewer !== null &&
+    (isOrganizer || match.requests.some((r) => r.userId === viewer.id && r.status === 'accepted'))
   const accepted = match.requests.filter((request) => request.status === 'accepted')
   const mine = viewer
     ? match.requests.find(
@@ -58,11 +64,12 @@ export function serializeMatch(match: Match, viewer: User | null) {
     organizer: {
       id: match.organizer.id,
       fullName: match.organizer.fullName,
-      phone: viewer ? match.organizer.phone : null,
+      phone: canSeeWhatsapp ? match.organizer.whatsapp : null,
     },
     company: serializeCompany(match.company),
     courtNumber: match.courtNumber,
     startsAt: match.startsAt.toISO(),
+    updatedAt: match.updatedAt?.toISO() ?? null,
     durationMinutes: match.durationMinutes,
     category: match.category,
     type: match.type,

@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { api, ApiError } from "@/lib/api";
-import { dayLabel } from "@/lib/format";
+import { earliestSlotToday, formatClock12, formatDay, halfHourTimes, todayKey } from "@/lib/panamaFormatDate";
 import type { Availability, Company } from "@/lib/types";
 
 const ANY_COMPANY = "any";
@@ -24,7 +24,7 @@ interface AvailabilitySheetProps {
 export function AvailabilitySheet(props: AvailabilitySheetProps) {
   return (
     <Sheet open={props.open} onOpenChange={props.onOpenChange}>
-      <SheetContent side="bottom" className="rounded-t-2xl pb-6">
+      <SheetContent side="bottom" className="rounded-t-2xl px-5 pb-6">
         {props.open ? <AvailabilityForm {...props} /> : null}
       </SheetContent>
     </Sheet>
@@ -32,8 +32,18 @@ export function AvailabilitySheet(props: AvailabilitySheetProps) {
 }
 
 function AvailabilityForm({ dateKey, current, companies, onOpenChange, onSaved }: AvailabilitySheetProps) {
-  const [fromTime, setFromTime] = useState(current?.fromTime ?? "18:00");
-  const [toTime, setToTime] = useState(current?.toTime ?? "21:00");
+  // Today, nothing before the next half hour is bookable.
+  const earliest = dateKey === todayKey() ? earliestSlotToday() : "00:00";
+  const noSlotsLeft = earliest === null;
+  const initialFrom = laterOf(current?.fromTime.slice(0, 5) ?? "18:00", earliest ?? "23:30");
+  const [fromTime, setFromTime] = useState(initialFrom);
+  const [toTime, setToTime] = useState(laterOf(current?.toTime.slice(0, 5) ?? "21:00", endAfter(initialFrom)));
+  const fromOptions = earliest ? halfHourTimes(fromTime).filter((t) => t >= earliest) : [];
+
+  function changeFrom(next: string) {
+    setFromTime(next);
+    if (toTime <= next) setToTime(endAfter(next));
+  }
   const [companyId, setCompanyId] = useState(current?.companyId?.toString() ?? ANY_COMPANY);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -67,19 +77,41 @@ function AvailabilityForm({ dateKey, current, companies, onOpenChange, onSaved }
 
   return (
     <>
-      <SheetHeader className="px-0 text-left">
-        <SheetTitle>Estoy disponible · {dayLabel(dateKey)}</SheetTitle>
+      <SheetHeader className="text-left">
+        <SheetTitle>Estoy disponible · {formatDay(dateKey)}</SheetTitle>
         <SheetDescription>Aparecerás en el pool de jugadores para ese día.</SheetDescription>
       </SheetHeader>
 
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-1.5">
           <Label htmlFor="from">Desde</Label>
-          <Input id="from" type="time" value={fromTime} onChange={(e) => setFromTime(e.target.value)} />
+          <Select value={fromTime} onValueChange={changeFrom}>
+            <SelectTrigger id="from" className="w-full" aria-label="Desde">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+                {fromOptions.map((option) => (
+                  <SelectItem key={option} value={option}>
+                    {formatClock12(option)}
+                  </SelectItem>
+                ))}
+            </SelectContent>
+          </Select>
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="to">Hasta</Label>
-          <Input id="to" type="time" value={toTime} onChange={(e) => setToTime(e.target.value)} />
+          <Select value={toTime} onValueChange={setToTime}>
+            <SelectTrigger id="to" className="w-full" aria-label="Hasta">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+                {endTimes(toTime).filter((t) => t > fromTime).map((option) => (
+                  <SelectItem key={option} value={option}>
+                    {formatClock12(option)}
+                  </SelectItem>
+                ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
@@ -100,18 +132,37 @@ function AvailabilityForm({ dateKey, current, companies, onOpenChange, onSaved }
         </Select>
       </div>
 
+      {noSlotsLeft ? <p role="alert" className="text-sm font-medium text-destructive">Por hoy ya no puede haber disponibilidad. Elige otro día.</p> : null}
       {error ? <p role="alert" className="text-sm text-destructive">{error}</p> : null}
 
-      <SheetFooter className="px-0">
+      <SheetFooter>
         {current ? (
           <Button variant="outline" onClick={leave} disabled={busy}>
             Salir del pool
           </Button>
         ) : null}
-        <Button onClick={save} disabled={busy} className="w-full sm:w-auto">
+        <Button onClick={save} disabled={busy || noSlotsLeft} className="w-full sm:w-auto">
           Guardar disponibilidad
         </Button>
       </SheetFooter>
     </>
   );
+}
+
+function laterOf(a: string, b: string): string {
+  return a > b ? a : b;
+}
+
+/** The first half hour after `from`, used as a default end time. */
+function endAfter(from: string): string {
+  return endTimes().find((t) => t > from) ?? END_OF_DAY;
+}
+
+/** End-of-day is stored as 24:00 and shown as 12:00 a. m. */
+const END_OF_DAY = "24:00";
+
+function endTimes(current?: string): string[] {
+  const grid = [...halfHourTimes(), END_OF_DAY];
+  if (!current || grid.includes(current)) return grid;
+  return [current, ...grid].sort();
 }

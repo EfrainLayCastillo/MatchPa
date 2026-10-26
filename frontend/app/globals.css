@@ -10,7 +10,7 @@
   --color-brand-lime: var(--brand-lime);
   --color-brand-teal: var(--brand-teal);
   --color-brand-ivory: var(--brand-ivory);
-  --color-brand-charcoal: var(--brand-charcoal);
+  --color-brand-turquoise: var(--brand-turquoise);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
   --color-popover: var(--popover);
@@ -38,50 +38,50 @@
 }
 
 :root {
-  --brand-lime: #c8f526;
-  --brand-teal: #0b4a55;
-  --brand-ivory: #f7f6f0;
-  --brand-charcoal: #1a1a1a;
-  --background: #f7f6f0;
-  --foreground: #1a1a1a;
+  --brand-lime: #e6fa50;
+  --brand-teal: #003c3c;
+  --brand-ivory: #f5f0f0;
+  --brand-turquoise: #50c8c8;
+  --background: #f5f0f0;
+  --foreground: #003c3c;
   --card: #ffffff;
-  --card-foreground: #1a1a1a;
+  --card-foreground: #003c3c;
   --popover: #ffffff;
-  --popover-foreground: #1a1a1a;
-  --primary: #c8f526;
-  --primary-foreground: #0b4a55;
-  --secondary: #e7e6dd;
-  --secondary-foreground: #0b4a55;
-  --muted: #ecebe3;
-  --muted-foreground: #5c5f5b;
-  --accent: #e4f7a8;
-  --accent-foreground: #0b4a55;
+  --popover-foreground: #003c3c;
+  --primary: #e6fa50;
+  --primary-foreground: #003c3c;
+  --secondary: #ebe6e6;
+  --secondary-foreground: #003c3c;
+  --muted: #ece7e7;
+  --muted-foreground: #5f6b6b;
+  --accent: #f1fcc0;
+  --accent-foreground: #003c3c;
   --destructive: #c2410c;
-  --border: #d9d8cf;
-  --input: #d9d8cf;
-  --ring: #0b4a55;
+  --border: #d6d0d0;
+  --input: #d6d0d0;
+  --ring: #003c3c;
   --radius: 0.75rem;
 }
 
 .dark {
-  --background: #0b4a55;
-  --foreground: #f7f6f0;
-  --card: #093c46;
-  --card-foreground: #f7f6f0;
-  --popover: #093c46;
-  --popover-foreground: #f7f6f0;
-  --primary: #c8f526;
-  --primary-foreground: #0b4a55;
-  --secondary: #125a67;
-  --secondary-foreground: #f7f6f0;
-  --muted: #125a67;
-  --muted-foreground: #b9c9cc;
-  --accent: #125a67;
-  --accent-foreground: #f7f6f0;
+  --background: #003c3c;
+  --foreground: #f5f0f0;
+  --card: #003030;
+  --card-foreground: #f5f0f0;
+  --popover: #003030;
+  --popover-foreground: #f5f0f0;
+  --primary: #e6fa50;
+  --primary-foreground: #003c3c;
+  --secondary: #0a5050;
+  --secondary-foreground: #f5f0f0;
+  --muted: #0a5050;
+  --muted-foreground: #b7cccc;
+  --accent: #0a5050;
+  --accent-foreground: #f5f0f0;
   --destructive: #fb923c;
-  --border: #1d6573;
-  --input: #1d6573;
-  --ring: #c8f526;
+  --border: #1a5c5c;
+  --input: #1a5c5c;
+  --ring: #e6fa50;
 }
 
 @layer base {

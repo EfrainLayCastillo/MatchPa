@@ -6,6 +6,7 @@ import Company from '#models/company'
 import MatchRequest from '#models/match_request'
 import User from '#models/user'
 import {
+  MAX_MATCHES_PER_DAY,
   findMatchByCode,
   publishMatch,
   requestToJoin,
@@ -58,7 +59,7 @@ test.group('flujo de partidos', (group) => {
         })
       )
     )
-    return { match, players }
+    return { match, players, organizer, company }
   }
 
   async function statusOf(code: string) {
@@ -97,5 +98,77 @@ test.group('flujo de partidos', (group) => {
     await requestToJoin(players[0], match.code)
 
     await assert.rejects(() => requestToJoin(players[0], match.code), BusinessRuleError)
+  })
+  test('un jugador aceptado en un partido no puede entrar a otro que se solapa', async ({
+    assert,
+  }) => {
+    const { match, players, company } = await fixtures(0)
+    const otherOrganizer = await User.create({
+      fullName: 'Otro Org',
+      email: `otro-${Date.now()}@t.test`,
+      password: 'secret123',
+      category: 4,
+      gender: 'male',
+    })
+    const overlapping = await publishMatch(otherOrganizer, {
+      companyId: company.id,
+      courtNumber: 5,
+      startsAt: match.startsAt,
+      durationMinutes: 90,
+      category: 4,
+      type: 'mixed',
+      maxPlayers: 4,
+      guests: [],
+    })
+
+    const first = await requestToJoin(players[0], match.code)
+    const second = await requestToJoin(players[0], overlapping.code)
+    await respondToRequest(first.id, 'accept')
+    await assert.rejects(() => respondToRequest(second.id, 'accept'), BusinessRuleError)
+  })
+  test('un jugador no puede sumar un partido si ya tiene el máximo del día', async ({ assert }) => {
+    const { match, players, company } = await fixtures(0)
+    const day = match.startsAt.setZone('America/Panama').startOf('day')
+    const matchStart = match.startsAt
+    const matchEnd = matchStart.plus({ minutes: match.durationMinutes })
+    const slots = Array.from({ length: 12 }, (_, i) => day.plus({ hours: i * 2 })).filter(
+      (slot) => !(slot < matchEnd && slot.plus({ minutes: 90 }) > matchStart)
+    )
+
+    for (const startsAt of slots.slice(0, MAX_MATCHES_PER_DAY)) {
+      await publishMatch(players[0], {
+        companyId: company.id,
+        courtNumber: 2,
+        startsAt,
+        durationMinutes: 90,
+        category: 4,
+        type: 'mixed',
+        maxPlayers: 4,
+        guests: [],
+      })
+    }
+
+    const error = await requestToJoin(players[0], match.code).catch((reason) => reason)
+    assert.instanceOf(error, BusinessRuleError)
+    assert.include(error.message, 'partidos ese día')
+  })
+  test('un organizador con partido abierto no puede unirse a otro que se solapa', async ({
+    assert,
+  }) => {
+    const { match, players, company } = await fixtures(0)
+    await publishMatch(players[0], {
+      companyId: company.id,
+      courtNumber: 6,
+      startsAt: match.startsAt,
+      durationMinutes: 90,
+      category: 4,
+      type: 'mixed',
+      maxPlayers: 4,
+      guests: [],
+    })
+
+    const error = await requestToJoin(players[0], match.code).catch((reason) => reason)
+    assert.instanceOf(error, BusinessRuleError)
+    assert.include(error.message, 'horario')
   })
 })

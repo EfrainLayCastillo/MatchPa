@@ -2,7 +2,8 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/matchpa/status-badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { formatDuration, formatMatchTime, shortCategory, TYPE_LABELS } from "@/lib/format";
+import { formatDuration, shortCategory, TYPE_LABELS } from "@/lib/format";
+import { formatDateTime } from "@/lib/panamaFormatDate";
 import type { Match } from "@/lib/types";
 
 interface MatchCardProps {
@@ -19,7 +20,7 @@ export function MatchCard({ match, onJoin, joining }: MatchCardProps) {
       <CardContent className="space-y-3">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <p className="font-heading text-lg font-bold leading-tight">{formatMatchTime(match.startsAt)}</p>
+            <p className="font-heading text-lg font-bold leading-tight">{formatDateTime(match.startsAt)}</p>
             <p className="text-sm text-muted-foreground">
               {match.company.name} · Cancha {match.courtNumber} · {formatDuration(match.durationMinutes)}
             </p>

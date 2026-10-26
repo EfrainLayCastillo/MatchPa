@@ -36,7 +36,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(() => accountErrorMessage(params.get("error")));
   const [busy, setBusy] = useState(false);
   const copy = COPY[mode];
   const next = safeNextPath(params.get("next"));
@@ -53,7 +53,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
       setUser(user);
       router.replace(isProfileComplete(user) ? next : "/onboarding");
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : "No se pudo entrar, intenta de nuevo");
+      setError(authErrorMessage(err));
     } finally {
       setBusy(false);
     }
@@ -112,4 +112,17 @@ export function AuthForm({ mode }: { mode: Mode }) {
       </p>
     </div>
   );
+}
+
+/** Friendly text for auth failures. Server details (SQL, stack traces) never reach the screen. */
+function authErrorMessage(err: unknown): string {
+  if (!(err instanceof ApiError)) return "No pudimos conectarnos. Revisa tu conexión e intenta de nuevo.";
+  if (err.status === 429) return "Demasiados intentos. Espera un minuto y vuelve a intentar.";
+  if (err.status >= 500) return "Algo salió mal en nuestro lado. Intenta de nuevo en un momento.";
+  return err.message;
+}
+
+function accountErrorMessage(code: string | null): string | null {
+  if (code === "email_registrado") return "Ya tienes una cuenta con ese correo. Entra con tu contraseña.";
+  return null;
 }

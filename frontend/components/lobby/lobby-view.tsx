@@ -1,18 +1,40 @@
 "use client";
 
+import { CardListSkeleton } from "@/components/matchpa/skeletons";
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { PageTitle } from "@/components/matchpa/page-title";
 import { PushPrompt } from "@/components/matchpa/push-prompt";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { api, ApiError } from "@/lib/api";
-import { byCategoryDistance, panamaDateKey } from "@/lib/format";
+import { byCategoryDistance } from "@/lib/format";
+import {
+  useAvailabilities,
+  useCompanies,
+  useInvitations,
+  useLobbyMatches,
+  useLobbyPlayers,
+  useLobbyRealtime,
+  useOwnMatch,
+  useRefreshLobby,
+} from "@/lib/lobby-queries";
+import { formatDateTime, todayKey } from "@/lib/panamaFormatDate";
 import { shouldAskForPush } from "@/lib/push";
-import { subscribe } from "@/lib/realtime";
 import { useSession } from "@/lib/session";
-import type { Availability, Company, Match, Player } from "@/lib/types";
+import type { Availability, Match } from "@/lib/types";
 import { AvailabilitySheet } from "./availability-sheet";
 import { DateStrip } from "./date-strip";
 import { MatchCard } from "./match-card";
@@ -21,47 +43,38 @@ import { PlayerCard } from "./player-card";
 const ALL_COMPANIES = "all";
 
 export function LobbyView() {
+  const router = useRouter();
   const { user } = useSession();
-  const [date, setDate] = useState(panamaDateKey);
+  const [date, setDate] = useState<string | null>(null);
+  const playerDate = date ?? todayKey();
   const [companyFilter, setCompanyFilter] = useState(ALL_COMPANIES);
-  const [companies, setCompanies] = useState<Company[]>([]);
-  const [matches, setMatches] = useState<Match[] | null>(null);
-  const [players, setPlayers] = useState<Player[] | null>(null);
-  const [availability, setAvailability] = useState<Availability | null>(null);
-  const [version, setVersion] = useState(0);
-  const [error, setError] = useState<string | null>(null);
-  const [joiningCode, setJoiningCode] = useState<string | null>(null);
-  const [availabilityOpen, setAvailabilityOpen] = useState(false);
-  const [pushOpen, setPushOpen] = useState(false);
-
-  const reload = useCallback(() => setVersion((v) => v + 1), []);
   const companyId = companyFilter === ALL_COMPANIES ? undefined : Number(companyFilter);
 
-  useEffect(() => {
-    api.companies().then(setCompanies).catch(() => {});
-  }, []);
+  const companiesQuery = useCompanies();
+  const matchesQuery = useLobbyMatches(date, companyId);
+  const playersQuery = useLobbyPlayers(playerDate, companyId);
+  const availabilitiesQuery = useAvailabilities();
+  const invitations = useInvitations().data ?? [];
+  const ownMatch = useOwnMatch().data ?? null;
 
-  useEffect(() => subscribe("lobby", reload), [reload]);
+  const companies = companiesQuery.data ?? [];
+  const matches = matchesQuery.data;
+  const players = playersQuery.data;
+  const availability: Availability | null =
+    availabilitiesQuery.data?.find((slot) => slot.date === playerDate) ?? null;
 
-  useEffect(() => {
-    let active = true;
-    Promise.all([
-      api.matches({ date, companyId }),
-      api.players({ date, companyId }),
-      api.myAvailabilities(),
-    ])
-      .then(([nextMatches, nextPlayers, mine]) => {
-        if (!active) return;
-        setMatches(nextMatches);
-        setPlayers(nextPlayers);
-        setAvailability(mine.find((slot) => slot.date === date) ?? null);
-        setError(null);
-      })
-      .catch((err) => active && setError(err instanceof Error ? err.message : "No se pudo cargar el lobby"));
-    return () => {
-      active = false;
-    };
-  }, [date, companyId, version]);
+  const refresh = useRefreshLobby();
+  useLobbyRealtime(user?.id);
+
+  const [actionError, setActionError] = useState<string | null>(null);
+  const loadError = matchesQuery.error instanceof Error ? matchesQuery.error.message : null;
+  const error = actionError ?? loadError;
+
+  const [joiningCode, setJoiningCode] = useState<string | null>(null);
+  const [cancelling, setCancelling] = useState(false);
+  const [confirmCancel, setConfirmCancel] = useState(false);
+  const [availabilityOpen, setAvailabilityOpen] = useState(false);
+  const [pushOpen, setPushOpen] = useState(false);
 
   const companyName = (id: number | null) => companies.find((c) => c.id === id)?.name ?? "Cualquiera";
   const sortedMatches = matches?.slice().sort(byCategoryDistance(user?.category ?? null));
@@ -69,14 +82,28 @@ export function LobbyView() {
 
   async function requestToJoin(match: Match) {
     setJoiningCode(match.code);
+    setActionError(null);
     try {
       await api.requestToJoin(match.code);
       if (shouldAskForPush()) setPushOpen(true);
-      reload();
+      refresh();
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : "No se pudo enviar la solicitud");
+      setActionError(err instanceof ApiError ? err.message : "No se pudo enviar la solicitud");
     } finally {
       setJoiningCode(null);
+    }
+  }
+
+  async function cancelOwnMatch(match: Match) {
+    setCancelling(true);
+    setActionError(null);
+    try {
+      await api.closeMatch(match.code);
+      refresh();
+    } catch (err) {
+      setActionError(err instanceof ApiError ? err.message : "No se pudo cancelar el partido");
+    } finally {
+      setCancelling(false);
     }
   }
 
@@ -86,10 +113,72 @@ export function LobbyView() {
         <PageTitle hint={`Hola, ${user?.fullName.split(" ")[0]}. ${availability ? `Estás disponible ${formatWindow(availability)}.` : "Aún no estás disponible."}`}>
           Lobby
         </PageTitle>
-        <Button asChild variant="outline" size="sm">
-          <Link href="/partidos/nuevo">Publicar partido</Link>
+        <Button size="sm" className="font-bold" onClick={() => router.push(`/partidos/nuevo?n=${Date.now()}`)}>
+          Publicar partido
         </Button>
       </div>
+
+      {ownMatch ? (
+        <section className="flex flex-col gap-3 rounded-xl border border-brand-teal bg-card p-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="space-y-1">
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              Tu próximo partido · {ownMatch.isOrganizer ? "Organizas" : "Juegas"}
+            </p>
+            <p className="font-heading text-lg font-bold leading-tight">{formatDateTime(ownMatch.startsAt)}</p>
+            <p className="text-sm text-muted-foreground">
+              {ownMatch.company.name} · Cancha {ownMatch.courtNumber} · Faltan {ownMatch.spotsLeft}
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <Button asChild size="sm">
+              <Link href={`/partidos/${ownMatch.code}`}>Ver partido</Link>
+            </Button>
+            {ownMatch.isOrganizer ? (
+              <Button size="sm" variant="outline" onClick={() => setConfirmCancel(true)} disabled={cancelling}>
+                Cancelar partido
+              </Button>
+            ) : null}
+          </div>
+          <AlertDialog open={confirmCancel} onOpenChange={setConfirmCancel}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>¿Cancelar este partido?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Dejará de aparecer en el lobby y no se podrán sumar más jugadores.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Volver</AlertDialogCancel>
+                <AlertDialogAction onClick={() => cancelOwnMatch(ownMatch)} disabled={cancelling}>
+                  Sí, cancelar
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </section>
+      ) : null}
+
+      {invitations.length > 0 ? (
+        <section className="space-y-2">
+          <h2 className="font-heading text-lg font-bold">Te invitaron</h2>
+          <ul className="grid gap-2 md:grid-cols-2">
+            {invitations.map((invitation) => (
+              <li key={invitation.id}>
+                <Link
+                  href={`/partidos/${invitation.match.code}`}
+                  className="flex items-center justify-between gap-3 rounded-xl border border-brand-lime bg-brand-lime/30 p-3 text-sm font-semibold"
+                >
+                  <span>
+                    {formatDateTime(invitation.match.startsAt)} · Cancha {invitation.match.courtNumber} ·{" "}
+                    {invitation.match.companyName}
+                  </span>
+                  <span className="shrink-0 text-brand-teal dark:text-brand-lime">Responder</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
 
       <DateStrip value={date} onChange={setDate} />
 
@@ -157,10 +246,10 @@ export function LobbyView() {
       <AvailabilitySheet
         open={availabilityOpen}
         onOpenChange={setAvailabilityOpen}
-        dateKey={date}
+        dateKey={playerDate}
         current={availability}
         companies={companies}
-        onSaved={reload}
+        onSaved={refresh}
       />
       <PushPrompt
         open={pushOpen}
@@ -176,7 +265,7 @@ function formatWindow(slot: Availability): string {
 }
 
 function Loading() {
-  return <p className="py-10 text-center text-sm text-muted-foreground">Cargando…</p>;
+  return <CardListSkeleton />;
 }
 
 function Empty({ children }: { children: React.ReactNode }) {

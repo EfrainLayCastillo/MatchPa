@@ -1,5 +1,6 @@
 "use client";
 
+import { DetailSkeleton } from "@/components/matchpa/skeletons";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -24,7 +25,7 @@ export function MatchEdit({ code }: { code: string }) {
   }, [code]);
 
   if (error) return <p role="alert" className="text-sm text-destructive">{error}</p>;
-  if (!match) return <p className="text-sm text-muted-foreground">Cargando partido…</p>;
+  if (!match) return <DetailSkeleton />;
 
   if (!match.isOrganizer || match.status !== "open") {
     return (

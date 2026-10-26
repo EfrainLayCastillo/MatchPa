@@ -1,5 +1,6 @@
 "use client";
 
+import { CardListSkeleton, DetailSkeleton } from "@/components/matchpa/skeletons";
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect } from "react";
 import { isProfileComplete, useSession } from "@/lib/session";
@@ -24,8 +25,8 @@ export function SessionGate({ children, requireProfile = true }: SessionGateProp
 
   if (loading || !user || profileMissing) {
     return (
-      <div className="flex flex-1 items-center justify-center p-8 text-sm text-muted-foreground">
-        Cargando…
+      <div className="flex flex-1 flex-col">
+        <DetailSkeleton />
       </div>
     );
   }

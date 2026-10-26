@@ -6,8 +6,9 @@ import BusinessRuleError from '#exceptions/business_rule_error'
 import Match, { type MatchStatus, type MatchType } from '#models/match'
 import MatchGuest from '#models/match_guest'
 import MatchRequest, { type RequestStatus } from '#models/match_request'
-import type User from '#models/user'
+import User from '#models/user'
 import { effectiveStatus, spotsLeft } from '#services/match_rules'
+import { PANAMA_ZONE, panamaDayBounds } from '#services/panama_time'
 
 export type RequestAction = 'accept' | 'reject' | 'leave' | 'remove'
 
@@ -29,6 +30,9 @@ export interface MatchInput {
 }
 
 const ACTIVE: RequestStatus[] = ['pending', 'accepted']
+
+/** Matches a player can organize or play on the same Panama day. */
+export const MAX_MATCHES_PER_DAY = 7
 
 const TRANSITIONS: Record<RequestAction, { from: RequestStatus; to: RequestStatus }> = {
   accept: { from: 'pending', to: 'accepted' },
@@ -94,6 +98,8 @@ export async function requestToJoin(user: User, code: string): Promise<MatchRequ
       throw new BusinessRuleError('No puedes unirte a tu propio partido')
     assertOpen(match)
     await assertNoActiveRequest(match.id, user.id, trx)
+    await assertNoTimeConflict(user.id, match, trx)
+    await assertDailyLimit(user.id, match, trx)
     return MatchRequest.create(
       { matchId: match.id, userId: user.id, kind: 'join_request', status: 'pending' },
       { client: trx }
@@ -106,6 +112,8 @@ export async function inviteToMatch(code: string, userId: number): Promise<Match
     const match = await lockMatchByCode(code, trx)
     assertOpen(match)
     await assertNoActiveRequest(match.id, userId, trx)
+    await assertNoTimeConflict(userId, match, trx)
+    await assertDailyLimit(userId, match, trx)
     return MatchRequest.create(
       { matchId: match.id, userId, kind: 'invitation', status: 'pending' },
       { client: trx }
@@ -131,6 +139,8 @@ export async function respondToRequest(
       if (effectiveStatus(match) !== 'open')
         throw new BusinessRuleError('Este partido ya no está abierto')
       if (spotsLeft(match) <= 0) throw new BusinessRuleError('No quedan puestos disponibles')
+      await assertNoTimeConflict(request.userId, match, trx)
+      await assertDailyLimit(request.userId, match, trx)
     }
 
     request.status = transition.to
@@ -169,6 +179,62 @@ function matchFields(input: MatchInput) {
 function assertOpen(match: Match): void {
   if (effectiveStatus(match) !== 'open')
     throw new BusinessRuleError('Este partido ya no está abierto')
+}
+
+/**
+ * A player can hold one seat at a time: any other open or full match they organize or have
+ * accepted into that overlaps in time blocks the new seat. The user row lock serializes
+ * concurrent accepts for the same player.
+ */
+async function assertNoTimeConflict(
+  userId: number,
+  match: Match,
+  trx: TransactionClientContract
+): Promise<void> {
+  await User.query({ client: trx }).where('id', userId).forUpdate().firstOrFail()
+
+  const others = await Match.query({ client: trx })
+    .whereIn('status', ['open', 'full'])
+    .whereNot('id', match.id)
+    .where((query) => {
+      query.where('organizer_id', userId).orWhereHas('requests', (requests) => {
+        requests.where('user_id', userId).where('status', 'accepted')
+      })
+    })
+
+  const start = match.startsAt
+  const end = start.plus({ minutes: match.durationMinutes })
+  const clash = others.find(
+    (other) =>
+      other.startsAt < end && other.startsAt.plus({ minutes: other.durationMinutes }) > start
+  )
+  if (clash) throw new BusinessRuleError('Ya tienes un partido en ese horario')
+}
+
+/** Counts the player's other open or full matches that day (organized or accepted) against the daily cap. */
+async function assertDailyLimit(
+  userId: number,
+  match: Match,
+  trx: TransactionClientContract
+): Promise<void> {
+  const dateKey = match.startsAt.setZone(PANAMA_ZONE).toISODate()!
+  const { start, end } = panamaDayBounds(dateKey)
+  const sameDay = await Match.query({ client: trx })
+    .whereIn('status', ['open', 'full'])
+    .whereNot('id', match.id)
+    .where('starts_at', '>=', start.toSQL()!)
+    .where('starts_at', '<', end.toSQL()!)
+    .where((query) => {
+      query.where('organizer_id', userId).orWhereHas('requests', (requests) => {
+        requests.where('user_id', userId).where('status', 'accepted')
+      })
+    })
+
+  if (sameDay.length >= MAX_MATCHES_PER_DAY) {
+    throw new BusinessRuleError(
+      `Ya tienes ${MAX_MATCHES_PER_DAY} partidos ese día, no puedes sumar otro`
+    )
+  }
 }
 
 async function assertNoActiveRequest(

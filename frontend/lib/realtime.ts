@@ -5,7 +5,7 @@ let client: Transmit | null = null;
 
 function transmit(): Transmit {
   client ??= new Transmit({
-    baseUrl: API_ORIGIN,
+    baseUrl: API_ORIGIN || window.location.origin,
     eventSourceFactory: (url) => new EventSource(url, { withCredentials: true }),
   });
   return client;

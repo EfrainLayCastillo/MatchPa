@@ -7,8 +7,8 @@ export default function manifest(): MetadataRoute.Manifest {
     description: "Encuentra jugadores y completa tu partido de pádel.",
     start_url: "/lobby",
     display: "standalone",
-    background_color: "#f7f6f0",
-    theme_color: "#0b4a55",
+    background_color: "#f5f0f0",
+    theme_color: "#003c3c",
     icons: [{ src: "/icon.svg", sizes: "any", type: "image/svg+xml" }],
   };
 }

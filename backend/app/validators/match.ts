@@ -22,7 +22,10 @@ export const inviteValidator = vine.create({
 })
 
 export const matchFiltersValidator = vine.create({
-  date: vine.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  date: vine
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .optional(),
   companyId: vine.number().positive().optional(),
   type: vine.enum(['male', 'female', 'mixed'] as const).optional(),
 })

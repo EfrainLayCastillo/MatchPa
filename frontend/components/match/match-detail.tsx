@@ -1,52 +1,45 @@
 "use client";
 
+import { DetailSkeleton } from "@/components/matchpa/skeletons";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { PushPrompt } from "@/components/matchpa/push-prompt";
 import { StatusBadge } from "@/components/matchpa/status-badge";
 import { api, ApiError } from "@/lib/api";
-import { formatDuration, formatMatchTime, GENDER_LABELS, shortCategory, TYPE_LABELS } from "@/lib/format";
+import { formatDuration, GENDER_LABELS, shortCategory, TYPE_LABELS } from "@/lib/format";
+import { formatDateTime } from "@/lib/panamaFormatDate";
 import { shouldAskForPush } from "@/lib/push";
-import { subscribe } from "@/lib/realtime";
+import { useMatch, useMatchRealtime, useRefreshMatch } from "@/lib/match-queries";
 import { useSession } from "@/lib/session";
 import type { Match, MatchRequest } from "@/lib/types";
 import { ShareMatch } from "./share-match";
 
 export function MatchDetail({ code }: { code: string }) {
   const { user } = useSession();
-  const [match, setMatch] = useState<Match | null>(null);
-  const [version, setVersion] = useState(0);
-  const [error, setError] = useState<string | null>(null);
+  const query = useMatch(code);
+  const refresh = useRefreshMatch(code);
+  useMatchRealtime(code);
+  const match = query.data ?? null;
+  const [actionError, setActionError] = useState<string | null>(null);
+  const loadError = query.error ? (query.error instanceof ApiError ? query.error.message : "No encontramos este partido") : null;
+  const error = actionError ?? loadError;
   const [busy, setBusy] = useState(false);
   const [pushOpen, setPushOpen] = useState(false);
 
-  useEffect(() => subscribe(`matches/${code}`, () => setVersion((v) => v + 1)), [code]);
-
-  useEffect(() => {
-    let active = true;
-    api
-      .match(code)
-      .then((data) => active && setMatch(data))
-      .catch((err) => active && setError(err instanceof ApiError ? err.message : "No encontramos este partido"));
-    return () => {
-      active = false;
-    };
-  }, [code, version]);
-
-  if (error) return <p role="alert" className="p-6 text-sm text-destructive">{error}</p>;
-  if (!match) return <p className="p-6 text-sm text-muted-foreground">Cargando partido…</p>;
+  if (loadError && !match) return <p role="alert" className="p-6 text-sm text-destructive">{loadError}</p>;
+  if (!match) return <DetailSkeleton />;
 
   async function run(action: () => Promise<unknown>, afterRequest = false) {
     setBusy(true);
-    setError(null);
+    setActionError(null);
     try {
       await action();
       if (afterRequest && shouldAskForPush()) setPushOpen(true);
-      setVersion((v) => v + 1);
+      refresh();
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : "Algo salió mal, intenta de nuevo");
+      setActionError(err instanceof ApiError ? err.message : "Algo salió mal, intenta de nuevo");
     } finally {
       setBusy(false);
     }
@@ -59,7 +52,7 @@ export function MatchDetail({ code }: { code: string }) {
     <div className="mx-auto w-full max-w-2xl space-y-6 px-4 pb-16 pt-6">
       <header className="space-y-3">
         <div className="flex items-start justify-between gap-3">
-          <h1 className="font-heading text-3xl font-extrabold leading-tight">{formatMatchTime(match.startsAt)}</h1>
+          <h1 className="font-heading text-3xl font-extrabold leading-tight">{formatDateTime(match.startsAt)}</h1>
           <StatusBadge status={match.status} />
         </div>
         <p className="text-muted-foreground">
@@ -119,6 +112,7 @@ export function MatchDetail({ code }: { code: string }) {
         busy={busy}
         onJoin={() => run(() => api.requestToJoin(match.code), true)}
         onLeave={(request) => run(() => api.respondToRequest(request.id, "leave"))}
+        onAnswer={(request, action) => run(() => api.respondToRequest(request.id, action))}
       />
 
       {match.isOrganizer && match.requests ? (
@@ -132,7 +126,7 @@ export function MatchDetail({ code }: { code: string }) {
 
       {match.status === "open" || match.isOrganizer ? <ShareMatch code={match.code} summary={summary} /> : null}
 
-      {whatsappHref && match.myRequest?.status === "accepted" ? (
+      {whatsappHref && match.myRequest?.status === "accepted" && (match.status === "open" || match.status === "full") ? (
         <Button asChild variant="outline" className="w-full">
           <a href={whatsappHref} target="_blank" rel="noopener noreferrer">
             Escribir al organizador por WhatsApp
@@ -157,12 +151,14 @@ function ActionPanel({
   busy,
   onJoin,
   onLeave,
+  onAnswer,
 }: {
   match: Match;
   signedIn: boolean;
   busy: boolean;
   onJoin: () => void;
   onLeave: (request: { id: number }) => void;
+  onAnswer: (request: { id: number }, action: "accept" | "reject") => void;
 }) {
   if (match.isOrganizer) return null;
   if (!signedIn) {
@@ -178,6 +174,21 @@ function ActionPanel({
       <Button size="lg" className="h-12 w-full text-base font-bold" onClick={onJoin} disabled={busy}>
         Pedir unirme
       </Button>
+    );
+  }
+  if (request?.status === "pending" && request.kind === "invitation") {
+    return (
+      <div className="space-y-3 rounded-xl border border-border p-4 text-sm">
+        <p className="font-medium">Te invitaron a este partido.</p>
+        <div className="grid grid-cols-2 gap-2">
+          <Button onClick={() => onAnswer({ id: request.id }, "accept")} disabled={busy || match.spotsLeft === 0}>
+            Aceptar
+          </Button>
+          <Button variant="outline" onClick={() => onAnswer({ id: request.id }, "reject")} disabled={busy}>
+            Rechazar
+          </Button>
+        </div>
+      </div>
     );
   }
   if (request?.status === "pending") {
@@ -212,7 +223,8 @@ function OrganizerPanel({
   onClose: () => void;
 }) {
   const requests = match.requests ?? [];
-  const pending = requests.filter((r) => r.status === "pending");
+  const pending = requests.filter((r) => r.status === "pending" && r.kind === "join_request");
+  const invited = requests.filter((r) => r.status === "pending" && r.kind === "invitation");
   const accepted = requests.filter((r) => r.status === "accepted");
 
   return (
@@ -233,6 +245,14 @@ function OrganizerPanel({
               <Button size="sm" variant="outline" onClick={() => onRespond(request, "reject")} disabled={busy}>
                 Rechazar
               </Button>
+            </RequestRow>
+          ))}
+        </RequestGroup>
+
+        <RequestGroup title="Invitados" empty="Todavía no invitaste a nadie.">
+          {invited.map((request) => (
+            <RequestRow key={request.id} request={request}>
+              <span className="text-xs text-muted-foreground">Esperando su respuesta</span>
             </RequestRow>
           ))}
         </RequestGroup>

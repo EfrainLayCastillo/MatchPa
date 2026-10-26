@@ -1,6 +1,7 @@
 import router from '@adonisjs/core/services/router'
 import transmit from '@adonisjs/transmit/services/main'
 import { middleware } from '#start/kernel'
+import { authThrottle } from '#start/limiter'
 
 const AuthController = () => import('#controllers/auth_controller')
 const MeController = () => import('#controllers/me_controller')
@@ -19,8 +20,8 @@ transmit.registerRoutes()
 router
   .group(() => {
     router.get('companies', [CompaniesController, 'index'])
-    router.post('auth/register', [AuthController, 'register'])
-    router.post('auth/login', [AuthController, 'login'])
+    router.post('auth/register', [AuthController, 'register']).use(authThrottle)
+    router.post('auth/login', [AuthController, 'login']).use(authThrottle)
     router.get('auth/google/redirect', [AuthController, 'googleRedirect'])
     router.get('auth/google/callback', [AuthController, 'googleCallback'])
     router.get('matches/:code', [MatchesController, 'show'])

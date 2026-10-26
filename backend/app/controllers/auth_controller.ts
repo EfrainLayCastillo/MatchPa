@@ -1,4 +1,5 @@
 import type { HttpContext } from '@adonisjs/core/http'
+import BusinessRuleError from '#exceptions/business_rule_error'
 import env from '#start/env'
 import User from '#models/user'
 import { loginValidator, registerValidator } from '#validators/auth'
@@ -19,7 +20,9 @@ export default class AuthController {
 
   async login({ request, auth }: HttpContext) {
     const data = await request.validateUsing(loginValidator)
-    const user = await User.verifyCredentials(data.email, data.password)
+    const user = await User.verifyCredentials(data.email, data.password).catch(() => {
+      throw new BusinessRuleError('Correo o contraseña incorrectos')
+    })
     await auth.use('web').login(user)
     return serializeUser(user)
   }
@@ -42,13 +45,20 @@ export default class AuthController {
     }
 
     const profile = await google.user()
-    const user = await findOrLinkGoogleUser(profile)
+    const user = await findOrCreateGoogleUser(profile)
+    if (!user) return response.redirect(`${env.get('FRONTEND_URL')}/login?error=email_registrado`)
+
     await auth.use('web').login(user)
     return response.redirect(`${env.get('FRONTEND_URL')}${next}`)
   }
 }
 
-async function findOrLinkGoogleUser(profile: {
+/**
+ * Only an existing Google link is reused. A password account with the same email is never
+ * linked automatically: emails are not verified at sign-up, so linking would let a squatter
+ * inherit the owner's access. Returns null in that case.
+ */
+async function findOrCreateGoogleUser(profile: {
   id: string
   email: string | null
   name: string
@@ -57,12 +67,7 @@ async function findOrLinkGoogleUser(profile: {
   const byGoogle = await User.findBy('googleId', profile.id)
   if (byGoogle) return byGoogle
 
-  const byEmail = profile.email ? await User.findBy('email', profile.email) : null
-  if (byEmail) {
-    byEmail.googleId = profile.id
-    await byEmail.save()
-    return byEmail
-  }
+  if (profile.email && (await User.findBy('email', profile.email))) return null
 
   return User.create({
     fullName: profile.name,

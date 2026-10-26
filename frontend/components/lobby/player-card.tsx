@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -14,8 +15,26 @@ interface PlayerCardProps {
 }
 
 export function PlayerCard({ player, companyName }: PlayerCardProps) {
-  const [open, setOpen] = useState(false);
+  const router = useRouter();
+  const [matches, setMatches] = useState<Match[] | null>(null);
+  const [busy, setBusy] = useState(false);
   const { availability } = player;
+
+  async function invite() {
+    setBusy(true);
+    const mine = await api
+      .myMatches()
+      .then((all) => all.filter((match) => match.isOrganizer && match.status === "open"))
+      .catch(() => []);
+    setBusy(false);
+
+    if (mine.length === 0) {
+      const params = new URLSearchParams({ invitar: String(player.id), nombre: player.fullName, n: String(Date.now()) });
+      router.push(`/partidos/nuevo?${params.toString()}`);
+      return;
+    }
+    setMatches(mine);
+  }
 
   return (
     <Card className="gap-3 py-4">
@@ -29,59 +48,62 @@ export function PlayerCard({ player, companyName }: PlayerCardProps) {
             {availability.fromTime}–{availability.toTime} · {companyName(availability.companyId)}
           </p>
         </div>
-        <Button size="sm" variant="outline" onClick={() => setOpen(true)} className="shrink-0">
+        <Button size="sm" variant="outline" onClick={invite} disabled={busy} className="shrink-0">
           Ey Pa, ¿juegas?
         </Button>
       </CardContent>
-      <InviteDialog open={open} onOpenChange={setOpen} player={player} />
+      <InviteDialog player={player} matches={matches} onClose={() => setMatches(null)} />
     </Card>
   );
 }
 
-function InviteDialog({ open, onOpenChange, player }: { open: boolean; onOpenChange: (open: boolean) => void; player: Player }) {
-  const [matches, setMatches] = useState<Match[] | null>(null);
+function InviteDialog({
+  player,
+  matches,
+  onClose,
+}: {
+  player: Player;
+  matches: Match[] | null;
+  onClose: () => void;
+}) {
   const [message, setMessage] = useState<string | null>(null);
-
-  function handleOpenChange(next: boolean) {
-    onOpenChange(next);
-    if (next) {
-      setMessage(null);
-      api.myMatches().then((all) => setMatches(all.filter((m) => m.isOrganizer && m.status === "open")));
-    }
-  }
+  const firstName = player.fullName.split(" ")[0];
 
   async function invite(match: Match) {
     try {
       await api.invite(match.code, player.id);
-      setMessage(`Listo, le enviamos la invitación a ${player.fullName.split(" ")[0]}.`);
+      setMessage(`Listo, le enviamos la invitación a ${firstName}.`);
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "No se pudo enviar la invitación");
     }
   }
 
+  function handleOpenChange(open: boolean) {
+    if (!open) {
+      setMessage(null);
+      onClose();
+    }
+  }
+
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
+    <Dialog open={matches !== null} onOpenChange={handleOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Invitar a {player.fullName.split(" ")[0]}</DialogTitle>
+          <DialogTitle>Invitar a {firstName}</DialogTitle>
           <DialogDescription>Elige el partido al que lo quieres sumar.</DialogDescription>
         </DialogHeader>
-        {matches === null ? (
-          <p className="text-sm text-muted-foreground">Cargando tus partidos…</p>
-        ) : matches.length === 0 ? (
-          <p className="text-sm text-muted-foreground">Aún no tienes partidos abiertos. Publica uno primero.</p>
-        ) : (
-          <ul className="space-y-2">
-            {matches.map((match) => (
-              <li key={match.id}>
-                <Button variant="outline" className="w-full justify-between" onClick={() => invite(match)}>
-                  <span>Cancha {match.courtNumber} · {match.company.name}</span>
-                  <span className="text-muted-foreground">Faltan {match.spotsLeft}</span>
-                </Button>
-              </li>
-            ))}
-          </ul>
-        )}
+        <ul className="space-y-2">
+          {(matches ?? []).map((match) => (
+            <li key={match.id}>
+              <Button variant="outline" className="w-full justify-between" onClick={() => invite(match)}>
+                <span>
+                  Cancha {match.courtNumber} · {match.company.name}
+                </span>
+                <span className="text-muted-foreground">Faltan {match.spotsLeft}</span>
+              </Button>
+            </li>
+          ))}
+        </ul>
         {message ? <p role="status" className="text-sm font-medium">{message}</p> : null}
       </DialogContent>
     </Dialog>

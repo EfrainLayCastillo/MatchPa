@@ -7,6 +7,7 @@ import type {
   Gender,
   Match,
   MatchRequest,
+  MyRequest,
   MatchType,
   NewMatchInput,
   Player,
@@ -58,7 +59,7 @@ export interface PlayerFilters {
 }
 
 export interface MatchFilters {
-  date: string;
+  date?: string;
   companyId?: number;
   type?: MatchType;
 }
@@ -103,6 +104,7 @@ export const api = {
   respondToRequest: (requestId: number, action: "accept" | "reject" | "leave" | "remove") =>
     request<MatchRequest>("PATCH", `/match-requests/${requestId}`, { action }),
   myMatches: () => request<Match[]>("GET", "/me/matches"),
+  myRequests: () => request<MyRequest[]>("GET", "/me/match-requests"),
 
   savePushSubscription: (subscription: PushSubscriptionJSON) =>
     request<void>("POST", "/push-subscriptions", subscription),
