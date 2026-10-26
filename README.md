@@ -381,6 +381,18 @@ Global (no se versiona): `archify` para diagramas, `npx skills add tt-a1i/archif
 
 Para actualizar una skill, vuelve a copiar su carpeta desde el repo de origen. No hay skill pública de AdonisJS; las convenciones van en `backend/CLAUDE.md` y en `new-endpoint`.
 
+### Harness
+
+Checks deterministas en `.claude/settings.json`, que no dependen de que el modelo siga instrucciones:
+
+| Pieza | Qué hace |
+|---|---|
+| `hooks/post-edit-lint.sh` | ESLint del archivo editado; los errores vuelven a Claude |
+| `hooks/stop-verify.sh` | Typecheck, lint y tests del paquete con cambios; si fallan, Claude no termina |
+| Permisos | Bloquea force push, `reset --hard`, `rm -rf` y leer/editar `.env` |
+
+Ambos hooks no hacen nada hasta que `backend/` y `frontend/` tengan `package.json` y dependencias instaladas. Con el código se suman la suite de reglas de negocio, el chequeo de la tabla de API, E2E a 375px y CI en GitHub Actions.
+
 ### Flujo por historia
 
 1. Tomar un ítem del Roadmap y partirlo con `/slice`.
