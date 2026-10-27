@@ -4,14 +4,14 @@ Plataforma de pádel para completar partidos. Monorepo: `backend/` (AdonisJS 7) 
 
 ## Fuentes de verdad
 
-- `README.md`: qué se construye. Las secciones **Reglas de negocio**, **Modelo de datos** y **API** son la especificación.
+- `docs/`: qué se construye. `reglas-de-negocio.md`, `modelo-de-datos.md` y `api.md` son la especificación; `README.md` es la portada con el índice.
 - `context.md` (local, en `.gitignore`): por qué se decidió así. Léelo antes de proponer cambios de producto.
-- Si el código necesita desviarse de la especificación, actualiza primero el README con la skill `sync-docs`; no dejes que diverjan.
+- Si el código necesita desviarse de la especificación, actualiza primero la doc correspondiente en `docs/` con la skill `sync-docs`; no dejes que diverjan.
 
 ## Idioma
 
 - Inglés: código, BD, endpoints de la API, nombres de estados, commits.
-- Español: UI, URLs del frontend (`/partidos`, `/perfil`), README y `context.md`.
+- Español: UI, URLs del frontend (`/partidos`, `/perfil`), `README.md`, `docs/` y `context.md`.
 
 ## Flujo por historia
 
@@ -36,5 +36,5 @@ No lances agentes para tareas pequeñas que se resuelven en la sesión principal
 - Después de cambiar, corre el check mínimo del paquete tocado y reporta solo el resultado: pasa o falla, y las líneas de error relevantes. No pegues la salida completa.
 - En comandos con salida larga, limita la salida (`| tail -n 20`, `-q`, `--silent`).
 - No vuelvas a imprimir archivos o diffs que acabas de escribir.
-- No agregues comentarios que repitan el código, ni tests que no cubran una regla del README.
+- No agregues comentarios que repitan el código, ni tests que no cubran una regla de `docs/reglas-de-negocio.md`.
 - No corras navegador, capturas ni E2E: el usuario los ejecuta. Tampoco `next build` completo salvo para cerrar una entrega.

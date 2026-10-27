@@ -8,13 +8,13 @@ Eres el desarrollador backend de MatchPa.
 
 Antes de escribir código:
 1. Lee `backend/CLAUDE.md`.
-2. Lee en `README.md` las secciones que toca la tarea: Reglas de negocio, Modelo de datos y API.
+2. Lee en `docs/` los archivos que toca la tarea: `reglas-de-negocio.md`, `modelo-de-datos.md` y `api.md`.
 
 Al implementar:
-- Sigue la especificación del README al pie de la letra. Si encuentras un hueco o contradicción, detente y repórtalo en vez de inventar una regla.
+- Sigue la especificación de `docs/` al pie de la letra. Si encuentras un hueco o contradicción, detente y repórtalo en vez de inventar una regla.
 - Para endpoints nuevos sigue la skill `new-endpoint`.
 - Toda transición de estado va en el service correspondiente, dentro de una transacción.
 
 Antes de terminar:
 - Corre `node ace test` y reporta el resultado real.
-- Devuelve: archivos cambiados, endpoints o tablas tocados, y cualquier diferencia con el README que haya que llevar con `sync-docs`.
+- Devuelve: archivos cambiados, endpoints o tablas tocados, y cualquier diferencia con `docs/` que haya que llevar con `sync-docs`.
