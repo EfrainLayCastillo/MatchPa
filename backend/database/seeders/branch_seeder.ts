@@ -1,9 +1,9 @@
 import { BaseSeeder } from '@adonisjs/lucid/seeders'
-import Company from '#models/company'
+import Branch from '#models/branch'
 
-export default class CompanySeeder extends BaseSeeder {
+export default class BranchSeeder extends BaseSeeder {
   async run() {
-    await Company.updateOrCreateMany('slug', [
+    await Branch.updateOrCreateMany('slug', [
       {
         name: 'WePadel',
         slug: 'wepadel',

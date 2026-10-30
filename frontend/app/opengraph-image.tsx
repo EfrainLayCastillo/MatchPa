@@ -26,7 +26,7 @@ export default function Image() {
             Encuéntrala aquí.
           </div>
         </div>
-        <div style={{ display: "flex", fontSize: 34 }}>Partidos y jugadores de pádel por categoría, empresa y horario</div>
+        <div style={{ display: "flex", fontSize: 34 }}>Partidos y jugadores de pádel por categoría, sucursal y horario</div>
       </div>
     ),
     { ...size },

@@ -32,7 +32,7 @@ export default async function Image({ params }: { params: Promise<{ code: string
               {formatDateTime(match.startsAt)}
             </div>
             <div style={{ display: "flex", fontSize: 36 }}>
-              {`${match.company.name} · Cancha ${match.courtNumber} · ${TYPE_LABELS[match.type]} · ${shortCategory(match.category)} categoría`}
+              {`${match.branch.name} · Cancha ${match.courtNumber} · ${TYPE_LABELS[match.type]} · ${shortCategory(match.category)} categoría`}
             </div>
           </div>
         ) : (

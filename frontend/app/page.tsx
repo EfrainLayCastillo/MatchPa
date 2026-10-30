@@ -5,7 +5,7 @@ import { jsonLdHtml, SITE_JSON_LD, SITE_OPEN_GRAPH } from "@/lib/seo";
 
 const TITLE = "MatchPa — ¿Te falta una pala? Encuéntrala aquí";
 const DESCRIPTION =
-  "Jugadores disponibles y partidos de pádel buscando pala en Panamá, por categoría, empresa y horario. Publica tu partido y compártelo por WhatsApp.";
+  "Jugadores disponibles y partidos de pádel buscando pala en Panamá, por categoría, sucursal y horario. Publica tu partido y compártelo por WhatsApp.";
 
 export const metadata: Metadata = {
   title: { absolute: TITLE },
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 };
 
 const STEPS = [
-  { title: "Publica tu partido", text: "Ya tienes cancha y te faltan 1 o 2? Carga la hora, la empresa y los que ya confirmaron." },
+  { title: "Publica tu partido", text: "Ya tienes cancha y te faltan 1 o 2? Carga la hora, la sucursal y los que ya confirmaron." },
   { title: "Compártelo", text: "Mándalo al grupo de WhatsApp o a tus amigos con un link." },
   { title: "¡Match!", text: "Apruebas a quien pide unirse, y listo: ya están los 4." },
 ];
@@ -34,7 +34,7 @@ export default function HomePage() {
           <span className="block text-brand-teal dark:text-brand-lime">Encuéntrala aquí.</span>
         </h1>
         <p className="max-w-xl text-lg text-muted-foreground">
-          Jugadores disponibles y partidos buscando pala, por categoría, empresa y horario. Sin scrollear el chat del grupo.
+          Jugadores disponibles y partidos buscando pala, por categoría, sucursal y horario. Sin scrollear el chat del grupo.
         </p>
         <div className="flex flex-col gap-3 sm:flex-row">
           <Button asChild size="lg" className="h-12 text-base font-bold">

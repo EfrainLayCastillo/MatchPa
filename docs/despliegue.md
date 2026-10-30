@@ -21,4 +21,4 @@ Plataformas en plan gratuito: frontend en Vercel, backend en Render y base de da
 
 ## Seed en producción
 
-Solo se corre `company_seeder`. `user_seeder` crea cuentas de prueba y no debe correrse ahí.
+Solo se corre `branch_seeder`. `user_seeder` crea cuentas de prueba y no debe correrse ahí.

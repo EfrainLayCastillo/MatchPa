@@ -15,7 +15,7 @@ import { CATEGORIES, GENDER_LABELS, shortCategory, TYPE_LABELS } from "@/lib/for
 import { dateKey, formatClock, formatClock12, todayKey } from "@/lib/panamaFormatDate";
 import { shouldAskForPush } from "@/lib/push";
 import { useSession } from "@/lib/session";
-import type { Category, Company, Gender, Match, MatchType, NewMatchInput } from "@/lib/types";
+import type { Category, Branch, Gender, Match, MatchType, NewMatchInput } from "@/lib/types";
 
 interface GuestDraft {
   name: string;
@@ -29,11 +29,11 @@ function MatchFormBody({ match }: { match?: Match }) {
   const searchParams = useSearchParams();
   const inviteeId = match ? null : Number(searchParams.get("invitar")) || null;
   const inviteeName = searchParams.get("nombre");
-  const [companies, setCompanies] = useState<Company[]>([]);
+  const [branches, setBranches] = useState<Branch[]>([]);
   const [date, setDate] = useState(() => (match ? dateKey(new Date(match.startsAt)) : todayKey()));
   const [time, setTime] = useState(() => (match ? formatClock(match.startsAt) : "18:00"));
   const [duration, setDuration] = useState<"90" | "120">(match ? (String(match.durationMinutes) as "90" | "120") : "90");
-  const [companyId, setCompanyId] = useState(match ? String(match.company.id) : "");
+  const [branchId, setBranchId] = useState(match ? String(match.branch.id) : "");
   const [courtNumber, setCourtNumber] = useState(match ? String(match.courtNumber) : "");
   const [category, setCategory] = useState<Category>(match?.category ?? user?.category ?? 4);
   const [type, setType] = useState<MatchType>(match?.type ?? "mixed");
@@ -51,7 +51,7 @@ function MatchFormBody({ match }: { match?: Match }) {
   const seatsForGuests = Number(maxPlayers) - 1;
 
   useEffect(() => {
-    api.companies().then(setCompanies).catch(() => {});
+    api.branches().then(setBranches).catch(() => {});
   }, []);
 
   function updateGuest(index: number, patch: Partial<GuestDraft>) {
@@ -60,7 +60,7 @@ function MatchFormBody({ match }: { match?: Match }) {
 
   function buildInput(): NewMatchInput {
     return {
-      companyId: Number(companyId),
+      branchId: Number(branchId),
       courtNumber: Number(courtNumber),
       startsAt: new Date(`${date}T${time}:00-05:00`).toISOString(),
       durationMinutes: Number(duration) as 90 | 120,
@@ -72,7 +72,7 @@ function MatchFormBody({ match }: { match?: Match }) {
   }
 
   function goNext() {
-    if (!companyId) return setError("Elige la empresa de la cancha");
+    if (!branchId) return setError("Elige la sucursal de la cancha");
     if (!courtNumber) return setError("Indica el número de cancha");
     setError(null);
     setStep(1);
@@ -86,7 +86,7 @@ function MatchFormBody({ match }: { match?: Match }) {
     // Only the explicit publish button may create the match.
     const submitter = (event.nativeEvent as SubmitEvent).submitter;
     if (!submitter?.hasAttribute("data-publish")) return;
-    if (!companyId) return setError("Elige la empresa de la cancha");
+    if (!branchId) return setError("Elige la sucursal de la cancha");
     if (!courtNumber) return setError("Indica el número de cancha");
     if (guests.some((guest) => guest.name.trim() === "")) return setError("Pon el nombre de cada jugador");
 
@@ -171,13 +171,13 @@ function MatchFormBody({ match }: { match?: Match }) {
             <Input id="court" type="number" inputMode="numeric" min={1} placeholder="Ej. 3" value={courtNumber} onChange={(e) => setCourtNumber(e.target.value)} required />
           </Field>
         </div>
-        <Field label="Empresa">
-          <Select value={companyId} onValueChange={setCompanyId}>
-            <SelectTrigger className="w-full"><SelectValue placeholder="Elige una empresa" /></SelectTrigger>
+        <Field label="Sucursal">
+          <Select value={branchId} onValueChange={setBranchId}>
+            <SelectTrigger className="w-full"><SelectValue placeholder="Elige una sucursal" /></SelectTrigger>
             <SelectContent>
-              {companies.map((company) => (
-                <SelectItem key={company.id} value={company.id.toString()}>
-                  {company.name} · {company.locationLabel}
+              {branches.map((branch) => (
+                <SelectItem key={branch.id} value={branch.id.toString()}>
+                  {branch.name} · {branch.locationLabel}
                 </SelectItem>
               ))}
             </SelectContent>

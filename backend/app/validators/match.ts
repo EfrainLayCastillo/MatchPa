@@ -7,7 +7,7 @@ const guest = vine.object({
 })
 
 export const matchValidator = vine.create({
-  companyId: vine.number().positive(),
+  branchId: vine.number().positive(),
   courtNumber: vine.number().min(1).max(50),
   startsAt: vine.string().trim(),
   durationMinutes: vine.number().in([90, 120]),
@@ -26,13 +26,13 @@ export const matchFiltersValidator = vine.create({
     .string()
     .regex(/^\d{4}-\d{2}-\d{2}$/)
     .optional(),
-  companyId: vine.number().positive().optional(),
+  branchId: vine.number().positive().optional(),
   type: vine.enum(['male', 'female', 'mixed'] as const).optional(),
 })
 
 export const playerFiltersValidator = vine.create({
   date: vine.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-  companyId: vine.number().positive().optional(),
+  branchId: vine.number().positive().optional(),
 })
 
 export const requestActionValidator = vine.create({

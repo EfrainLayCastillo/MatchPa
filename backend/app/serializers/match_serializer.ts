@@ -1,18 +1,18 @@
-import type Company from '#models/company'
+import type Branch from '#models/branch'
 import type Match from '#models/match'
 import type MatchRequest from '#models/match_request'
 import type User from '#models/user'
 import { effectiveStatus, spotsLeft } from '#services/match_rules'
 
-export function serializeCompany(company: Company) {
+export function serializeBranch(branch: Branch) {
   return {
-    id: company.id,
-    name: company.name,
-    slug: company.slug,
-    phone: company.phone,
-    locationLabel: company.locationLabel,
-    mapsUrl: company.mapsUrl,
-    website: company.website,
+    id: branch.id,
+    name: branch.name,
+    slug: branch.slug,
+    phone: branch.phone,
+    locationLabel: branch.locationLabel,
+    mapsUrl: branch.mapsUrl,
+    website: branch.website,
   }
 }
 
@@ -41,7 +41,7 @@ function serializeRequest(request: MatchRequest) {
   }
 }
 
-/** Expects `company`, `organizer`, `guests`, `requests` (with `user`) preloaded. */
+/** Expects `branch`, `organizer`, `guests`, `requests` (with `user`) preloaded. */
 export function serializeMatch(match: Match, viewer: User | null) {
   const isOrganizer = viewer?.id === match.organizerId
   // The organizer's WhatsApp is for the organizer and the players who joined, nobody else.
@@ -66,7 +66,7 @@ export function serializeMatch(match: Match, viewer: User | null) {
       fullName: match.organizer.fullName,
       phone: canSeeWhatsapp ? match.organizer.whatsapp : null,
     },
-    company: serializeCompany(match.company),
+    branch: serializeBranch(match.branch),
     courtNumber: match.courtNumber,
     startsAt: match.startsAt.toISO(),
     updatedAt: match.updatedAt?.toISO() ?? null,

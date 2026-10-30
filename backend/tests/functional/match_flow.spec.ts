@@ -2,7 +2,7 @@ import { test } from '@japa/runner'
 import testUtils from '@adonisjs/core/services/test_utils'
 import { DateTime } from 'luxon'
 import BusinessRuleError from '#exceptions/business_rule_error'
-import Company from '#models/company'
+import Branch from '#models/branch'
 import MatchRequest from '#models/match_request'
 import User from '#models/user'
 import {
@@ -18,7 +18,7 @@ test.group('flujo de partidos', (group) => {
 
   async function fixtures(guestCount: number) {
     const suffix = `${Date.now()}${Math.random().toString(36).slice(2, 6)}`
-    const company = await Company.create({
+    const branch = await Branch.create({
       name: 'WePadel',
       slug: `wepadel-${suffix}`,
       phone: '+507 200-0001',
@@ -39,7 +39,7 @@ test.group('flujo de partidos', (group) => {
       gender: 'male' as const,
     }))
     const match = await publishMatch(organizer, {
-      companyId: company.id,
+      branchId: branch.id,
       courtNumber: 3,
       startsAt: DateTime.now().plus({ days: 1 }),
       durationMinutes: 90,
@@ -59,7 +59,7 @@ test.group('flujo de partidos', (group) => {
         })
       )
     )
-    return { match, players, organizer, company }
+    return { match, players, organizer, branch }
   }
 
   async function statusOf(code: string) {
@@ -102,7 +102,7 @@ test.group('flujo de partidos', (group) => {
   test('un jugador aceptado en un partido no puede entrar a otro que se solapa', async ({
     assert,
   }) => {
-    const { match, players, company } = await fixtures(0)
+    const { match, players, branch } = await fixtures(0)
     const otherOrganizer = await User.create({
       fullName: 'Otro Org',
       email: `otro-${Date.now()}@t.test`,
@@ -111,7 +111,7 @@ test.group('flujo de partidos', (group) => {
       gender: 'male',
     })
     const overlapping = await publishMatch(otherOrganizer, {
-      companyId: company.id,
+      branchId: branch.id,
       courtNumber: 5,
       startsAt: match.startsAt,
       durationMinutes: 90,
@@ -127,7 +127,7 @@ test.group('flujo de partidos', (group) => {
     await assert.rejects(() => respondToRequest(second.id, 'accept'), BusinessRuleError)
   })
   test('un jugador no puede sumar un partido si ya tiene el máximo del día', async ({ assert }) => {
-    const { match, players, company } = await fixtures(0)
+    const { match, players, branch } = await fixtures(0)
     const day = match.startsAt.setZone('America/Panama').startOf('day')
     const matchStart = match.startsAt
     const matchEnd = matchStart.plus({ minutes: match.durationMinutes })
@@ -137,7 +137,7 @@ test.group('flujo de partidos', (group) => {
 
     for (const startsAt of slots.slice(0, MAX_MATCHES_PER_DAY)) {
       await publishMatch(players[0], {
-        companyId: company.id,
+        branchId: branch.id,
         courtNumber: 2,
         startsAt,
         durationMinutes: 90,
@@ -155,9 +155,9 @@ test.group('flujo de partidos', (group) => {
   test('un organizador con partido abierto no puede unirse a otro que se solapa', async ({
     assert,
   }) => {
-    const { match, players, company } = await fixtures(0)
+    const { match, players, branch } = await fixtures(0)
     await publishMatch(players[0], {
-      companyId: company.id,
+      branchId: branch.id,
       courtNumber: 6,
       startsAt: match.startsAt,
       durationMinutes: 90,

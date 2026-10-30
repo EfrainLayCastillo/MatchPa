@@ -10,7 +10,7 @@ export default class MatchRequestsController {
     const requests = await MatchRequest.query()
       .where('user_id', auth.getUserOrFail().id)
       .whereIn('status', ['pending'])
-      .preload('match', (query) => query.preload('company'))
+      .preload('match', (query) => query.preload('branch'))
       .orderBy('created_at', 'desc')
     return requests.map((request) => ({
       id: request.id,
@@ -20,7 +20,7 @@ export default class MatchRequestsController {
         code: request.match.code,
         startsAt: request.match.startsAt.toISO(),
         courtNumber: request.match.courtNumber,
-        companyName: request.match.company.name,
+        branchName: request.match.branch.name,
       },
     }))
   }

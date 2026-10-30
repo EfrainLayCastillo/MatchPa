@@ -3,7 +3,7 @@ import { mockRequest } from "./mock-api";
 import type {
   Availability,
   Category,
-  Company,
+  Branch,
   Gender,
   Match,
   MatchRequest,
@@ -59,12 +59,12 @@ function query(params: object): string {
 
 export interface PlayerFilters {
   date: string;
-  companyId?: number;
+  branchId?: number;
 }
 
 export interface MatchFilters {
   date?: string;
-  companyId?: number;
+  branchId?: number;
   type?: MatchType;
 }
 
@@ -84,7 +84,7 @@ export const api = {
     request<User>("POST", "/auth/login", input),
   logout: () => request<void>("POST", "/auth/logout"),
 
-  companies: () => request<Company[]>("GET", "/companies"),
+  branches: () => request<Branch[]>("GET", "/branches"),
 
   players: (filters: PlayerFilters) =>
     request<Player[]>("GET", `/players?${query(filters)}`),

@@ -52,13 +52,13 @@ Una sola entidad, `match_requests`, con `kind`:
 - El WhatsApp del organizador solo lo reciben el propio organizador y los jugadores aceptados, y solo mientras el partido está `open` o `full`. Si el partido expiró o se cerró, la API no lo devuelve y el botón no aparece.
 - Si el partido no está `open`, muestra su estado en vez del botón de unirse.
 - Botón Compartir con `navigator.share`; fallback a "Copiar link" y `wa.me/?text=`.
-- Vista previa Open Graph dinámica (`generateMetadata` + `opengraph-image`): empresa, fecha, hora, categoría y puestos.
+- Vista previa Open Graph dinámica (`generateMetadata` + `opengraph-image`): sucursal, fecha, hora, categoría y puestos.
 - SEO: JSON-LD `SportsEvent` en partidos `open` y `full`; `noindex` en `closed` y `expired`; código inexistente → 404.
 
 ## Disponibilidad
 
 - Una por jugador por fecha (hoy o futura), con rango de horas.
-- Empresa opcional; vacía = cualquiera.
+- Sucursal opcional; vacía = cualquiera.
 - **Horarios cada 30 minutos**, mostrados en formato de 12 horas (`8:30 a. m.`). El fin del día se guarda como `24:00` y se muestra como `12:00 a. m.`.
 - Hoy, `Desde` no puede ser antes de la próxima media hora (redondeada hacia arriba). Si ya no quedan horas hoy, no se puede guardar. La API valida lo mismo.
 - Un jugador comprometido ese día (organiza o tiene una solicitud aceptada en un partido abierto o completo) no aparece en la lista de disponibles de ese día.
@@ -70,9 +70,9 @@ Una sola entidad, `match_requests`, con `kind`:
 - La elige el jugador y la actualiza en su perfil.
 - No filtra, ordena: primero tu categoría, luego las más cercanas (`ORDER BY abs(category - :mine)`).
 
-## Empresas
+## Sucursales
 
-- Pool global; la ubicación de un partido es la empresa. Sin direcciones.
+- Pool global; la ubicación de un partido es la sucursal. Sin direcciones.
 - Catálogo fijo por seed. Inicial: WePadel y XForce.
 
 ## Estados del jugador (UI)

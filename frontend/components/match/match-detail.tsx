@@ -46,7 +46,7 @@ export function MatchDetail({ code, serverMatch }: { code: string; serverMatch?:
     }
   }
 
-  const summary = `Partido de pádel en ${match.company.name}, cancha ${match.courtNumber}. Faltan ${match.spotsLeft} puestos.`;
+  const summary = `Partido de pádel en ${match.branch.name}, cancha ${match.courtNumber}. Faltan ${match.spotsLeft} puestos.`;
   const whatsappHref = match.organizer.phone ? `https://wa.me/${match.organizer.phone.replace(/\D/g, "")}` : null;
 
   return (
@@ -57,7 +57,7 @@ export function MatchDetail({ code, serverMatch }: { code: string; serverMatch?:
           <StatusBadge status={match.status} />
         </div>
         <p className="text-muted-foreground">
-          {match.company.name} · Cancha {match.courtNumber} · {formatDuration(match.durationMinutes)}
+          {match.branch.name} · Cancha {match.courtNumber} · {formatDuration(match.durationMinutes)}
         </p>
         <div className="flex flex-wrap gap-2 text-xs font-semibold">
           <span className="rounded-md bg-brand-lime/60 px-2 py-1 text-brand-teal dark:bg-brand-lime dark:text-brand-teal">

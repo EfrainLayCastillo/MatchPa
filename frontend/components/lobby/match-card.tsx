@@ -22,7 +22,7 @@ export function MatchCard({ match, onJoin, joining }: MatchCardProps) {
           <div>
             <p className="font-heading text-lg font-bold leading-tight">{formatDateTime(match.startsAt)}</p>
             <p className="text-sm text-muted-foreground">
-              {match.company.name} · Cancha {match.courtNumber} · {formatDuration(match.durationMinutes)}
+              {match.branch.name} · Cancha {match.courtNumber} · {formatDuration(match.durationMinutes)}
             </p>
           </div>
           <StatusBadge status={match.status} />

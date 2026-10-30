@@ -5,7 +5,7 @@ export function serializeAvailability(availability: Availability) {
     date: availability.date.toISODate(),
     fromTime: availability.fromTime,
     toTime: availability.toTime,
-    companyId: availability.companyId,
+    branchId: availability.branchId,
   }
 }
 

@@ -8,7 +8,7 @@ import { panamaDayBounds } from '#services/panama_time'
 export default class PlayersController {
   async index({ auth, request }: HttpContext) {
     const me = auth.getUserOrFail()
-    const { date, companyId } = await request.validateUsing(playerFiltersValidator)
+    const { date, branchId } = await request.validateUsing(playerFiltersValidator)
     const busyIds = await busyPlayerIds(date)
 
     const slots = await Availability.query()
@@ -19,8 +19,8 @@ export default class PlayersController {
       .whereHas('user', (query) => {
         query.whereNotNull('category').whereNotNull('gender')
       })
-      .if(companyId, (query) =>
-        query.where((inner) => inner.whereNull('company_id').orWhere('company_id', companyId!))
+      .if(branchId, (query) =>
+        query.where((inner) => inner.whereNull('branch_id').orWhere('branch_id', branchId!))
       )
     return slots.map(serializePlayerAvailability)
   }

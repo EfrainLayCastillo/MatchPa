@@ -24,7 +24,7 @@ import { api, ApiError } from "@/lib/api";
 import { byCategoryDistance } from "@/lib/format";
 import {
   useAvailabilities,
-  useCompanies,
+  useBranches,
   useInvitations,
   useLobbyMatches,
   useLobbyPlayers,
@@ -41,24 +41,24 @@ import { DateStrip } from "./date-strip";
 import { MatchCard } from "./match-card";
 import { PlayerCard } from "./player-card";
 
-const ALL_COMPANIES = "all";
+const ALL_BRANCHES = "all";
 
 export function LobbyView() {
   const router = useRouter();
   const { user } = useSession();
   const [date, setDate] = useState<string | null>(null);
   const playerDate = date ?? todayKey();
-  const [companyFilter, setCompanyFilter] = useState(ALL_COMPANIES);
-  const companyId = companyFilter === ALL_COMPANIES ? undefined : Number(companyFilter);
+  const [branchFilter, setBranchFilter] = useState(ALL_BRANCHES);
+  const branchId = branchFilter === ALL_BRANCHES ? undefined : Number(branchFilter);
 
-  const companiesQuery = useCompanies();
-  const matchesQuery = useLobbyMatches(date, companyId);
-  const playersQuery = useLobbyPlayers(playerDate, companyId);
+  const branchesQuery = useBranches();
+  const matchesQuery = useLobbyMatches(date, branchId);
+  const playersQuery = useLobbyPlayers(playerDate, branchId);
   const availabilitiesQuery = useAvailabilities();
   const invitations = useInvitations().data ?? [];
   const ownMatch = useOwnMatch().data ?? null;
 
-  const companies = companiesQuery.data ?? [];
+  const branches = branchesQuery.data ?? [];
   const matches = matchesQuery.data;
   const players = playersQuery.data;
   const availability: Availability | null =
@@ -76,7 +76,7 @@ export function LobbyView() {
   const [availabilityOpen, setAvailabilityOpen] = useState(false);
   const [pushOpen, setPushOpen] = useState(false);
 
-  const companyName = (id: number | null) => companies.find((c) => c.id === id)?.name ?? "Cualquiera";
+  const branchName = (id: number | null) => branches.find((c) => c.id === id)?.name ?? "Cualquiera";
   const sortedMatches = matches?.slice().sort(byCategoryDistance(user?.category ?? null));
   const sortedPlayers = players?.slice().sort(byCategoryDistance(user?.category ?? null));
 
@@ -126,7 +126,7 @@ export function LobbyView() {
             </p>
             <p className="font-heading text-lg font-bold leading-tight">{formatDateTime(ownMatch.startsAt)}</p>
             <p className="text-sm text-muted-foreground">
-              {ownMatch.company.name} · Cancha {ownMatch.courtNumber} · Faltan {ownMatch.spotsLeft}
+              {ownMatch.branch.name} · Cancha {ownMatch.courtNumber} · Faltan {ownMatch.spotsLeft}
             </p>
           </div>
           <div className="flex gap-2">
@@ -170,7 +170,7 @@ export function LobbyView() {
                 >
                   <span>
                     {formatDateTime(invitation.match.startsAt)} · Cancha {invitation.match.courtNumber} ·{" "}
-                    {invitation.match.companyName}
+                    {invitation.match.branchName}
                   </span>
                   <span className="shrink-0 text-brand-teal dark:text-brand-lime">Responder</span>
                 </Link>
@@ -183,15 +183,15 @@ export function LobbyView() {
       <DateStrip value={date} onChange={setDate} />
 
       <div className="flex items-center gap-2">
-        <Select value={companyFilter} onValueChange={setCompanyFilter}>
-          <SelectTrigger className="w-full sm:w-64" aria-label="Empresa">
+        <Select value={branchFilter} onValueChange={setBranchFilter}>
+          <SelectTrigger className="w-full sm:w-64" aria-label="Sucursal">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value={ALL_COMPANIES}>Todas las empresas</SelectItem>
-            {companies.map((company) => (
-              <SelectItem key={company.id} value={company.id.toString()}>
-                {company.name}
+            <SelectItem value={ALL_BRANCHES}>Todas las sucursales</SelectItem>
+            {branches.map((branch) => (
+              <SelectItem key={branch.id} value={branch.id.toString()}>
+                {branch.name}
               </SelectItem>
             ))}
           </SelectContent>
@@ -223,7 +223,7 @@ export function LobbyView() {
             <ul className="grid gap-3 md:grid-cols-2">
               {sortedPlayers?.map((player) => (
                 <li key={player.id}>
-                  <PlayerCard player={player} companyName={companyName} />
+                  <PlayerCard player={player} branchName={branchName} />
                 </li>
               ))}
             </ul>
@@ -244,7 +244,7 @@ export function LobbyView() {
         onOpenChange={setAvailabilityOpen}
         dateKey={playerDate}
         current={availability}
-        companies={companies}
+        branches={branches}
         onSaved={refresh}
       />
       <PushPrompt

@@ -9,9 +9,9 @@ import type { Match } from "@/lib/types";
 /** Keys are hierarchical so one invalidation can refresh every lobby query at once. */
 export const lobbyKeys = {
   lobby: ["lobby"] as const,
-  companies: ["companies"] as const,
-  matches: (date: string | null, companyId?: number) => ["lobby", "matches", date, companyId] as const,
-  players: (date: string, companyId?: number) => ["lobby", "players", date, companyId] as const,
+  branches: ["branches"] as const,
+  matches: (date: string | null, branchId?: number) => ["lobby", "matches", date, branchId] as const,
+  players: (date: string, branchId?: number) => ["lobby", "players", date, branchId] as const,
   availabilities: ["me", "availabilities"] as const,
   requests: ["me", "match-requests"] as const,
   owned: ["me", "matches"] as const,
@@ -20,26 +20,26 @@ export const lobbyKeys = {
 /** Re-fetch on every visit: the cached data shows instantly, then updates in the background. */
 const ON_VISIT = { refetchOnMount: "always" } as const;
 
-export function useCompanies() {
+export function useBranches() {
   return useQuery({
-    queryKey: lobbyKeys.companies,
-    queryFn: () => api.companies(),
+    queryKey: lobbyKeys.branches,
+    queryFn: () => api.branches(),
     staleTime: 10 * 60_000,
   });
 }
 
-export function useLobbyMatches(date: string | null, companyId?: number) {
+export function useLobbyMatches(date: string | null, branchId?: number) {
   return useQuery({
-    queryKey: lobbyKeys.matches(date, companyId),
-    queryFn: () => api.matches({ date: date ?? undefined, companyId }),
+    queryKey: lobbyKeys.matches(date, branchId),
+    queryFn: () => api.matches({ date: date ?? undefined, branchId }),
     ...ON_VISIT,
   });
 }
 
-export function useLobbyPlayers(date: string, companyId?: number) {
+export function useLobbyPlayers(date: string, branchId?: number) {
   return useQuery({
-    queryKey: lobbyKeys.players(date, companyId),
-    queryFn: () => api.players({ date, companyId }),
+    queryKey: lobbyKeys.players(date, branchId),
+    queryFn: () => api.players({ date, branchId }),
     ...ON_VISIT,
   });
 }

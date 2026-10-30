@@ -12,7 +12,7 @@ Plataforma social de pádel para completar partidos y encontrar jugadores. Pensa
 <tr>
 <td align="center" width="33%"><img src="docs/capturas/home.png" width="220" alt="Home"/><br/><sub><b>Home</b>: página de inicio</sub></td>
 <td align="center" width="33%"><img src="docs/capturas/lobby.png" width="220" alt="Lobby"/><br/><sub><b>Lobby</b>: partidos y jugadores del día, ordenados por tu categoría</sub></td>
-<td align="center" width="33%"><img src="docs/capturas/available.png" width="220" alt="Disponibilidad"/><br/><sub><b>Disponibilidad</b>: horario por día y empresa</sub></td>
+<td align="center" width="33%"><img src="docs/capturas/available.png" width="220" alt="Disponibilidad"/><br/><sub><b>Disponibilidad</b>: horario por día y sucursal</sub></td>
 </tr>
 <tr>
 <td align="center" width="33%"><img src="docs/capturas/new.png" width="220" alt="Publicar partido"/><br/><sub><b>Publicar partido</b>: formulario en dos pasos</sub></td>
@@ -23,17 +23,17 @@ Plataforma social de pádel para completar partidos y encontrar jugadores. Pensa
 
 ## El problema
 
-Las empresas con canchas de pádel (WePadel, XForce…) tienen grupos de WhatsApp donde se repite a diario:
+Las sucursales con canchas de pádel (WePadel, XForce…) tienen grupos de WhatsApp donde se repite a diario:
 
 > "¿Quién disponible para las 6pm? Buscamos pala de 4ta categoría"
 >
 > "Partido mixto — Sacha, Efrain, Esteban. Buscamos una pala disponible"
 
-La cancha ya está reservada (empresa, # de cancha, hora), el partido es de 4 y dura 1h30 o 2h, y casi siempre falta 1. El mensaje se pierde en el chat.
+La cancha ya está reservada (sucursal, # de cancha, hora), el partido es de 4 y dura 1h30 o 2h, y casi siempre falta 1. El mensaje se pierde en el chat.
 
 ## La solución (MVP)
 
-1. **Publicar partido:** el organizador carga fecha, hora, empresa, cancha, categoría, tipo y los jugadores que ya tiene. Se muestran los puestos disponibles.
+1. **Publicar partido:** el organizador carga fecha, hora, sucursal, cancha, categoría, tipo y los jugadores que ya tiene. Se muestran los puestos disponibles.
 2. **Compartir:** el partido genera un link público para el grupo de WhatsApp o amistades.
 3. **Unirse:** un jugador pide unirse o el organizador lo invita desde el pool ("Ey Pa, ¿juegas?"). El organizador aprueba.
 4. **Disponibilidad:** un jugador se postula para un día y queda visible en el pool.
@@ -81,7 +81,7 @@ Abre [http://localhost:3000](http://localhost:3000). Variables, datos de prueba 
 
 | Documento | Contenido |
 |---|---|
-| [Reglas de negocio](docs/reglas-de-negocio.md) | Partidos, solicitudes, disponibilidad, categorías y empresas |
+| [Reglas de negocio](docs/reglas-de-negocio.md) | Partidos, solicitudes, disponibilidad, categorías y sucursales |
 | [Modelo de datos](docs/modelo-de-datos.md) | Tablas y columnas |
 | [API](docs/api.md) | Endpoints y acciones |
 | [Frontend](docs/frontend.md) | Mobile first y rutas |

@@ -7,16 +7,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { api, ApiError } from "@/lib/api";
 import { earliestSlotToday, formatClock12, formatDay, halfHourTimes, todayKey } from "@/lib/panamaFormatDate";
-import type { Availability, Company } from "@/lib/types";
+import type { Availability, Branch } from "@/lib/types";
 
-const ANY_COMPANY = "any";
+const ANY_BRANCH = "any";
 
 interface AvailabilitySheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   dateKey: string;
   current: Availability | null;
-  companies: Company[];
+  branches: Branch[];
   onSaved: () => void;
 }
 
@@ -30,7 +30,7 @@ export function AvailabilitySheet(props: AvailabilitySheetProps) {
   );
 }
 
-function AvailabilityForm({ dateKey, current, companies, onOpenChange, onSaved }: AvailabilitySheetProps) {
+function AvailabilityForm({ dateKey, current, branches, onOpenChange, onSaved }: AvailabilitySheetProps) {
   // Today, nothing before the next half hour is bookable.
   const earliest = dateKey === todayKey() ? earliestSlotToday() : "00:00";
   const noSlotsLeft = earliest === null;
@@ -43,7 +43,7 @@ function AvailabilityForm({ dateKey, current, companies, onOpenChange, onSaved }
     setFromTime(next);
     if (toTime <= next) setToTime(endAfter(next));
   }
-  const [companyId, setCompanyId] = useState(current?.companyId?.toString() ?? ANY_COMPANY);
+  const [branchId, setBranchId] = useState(current?.branchId?.toString() ?? ANY_BRANCH);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -55,7 +55,7 @@ function AvailabilityForm({ dateKey, current, companies, onOpenChange, onSaved }
       await api.setAvailability(dateKey, {
         fromTime,
         toTime,
-        companyId: companyId === ANY_COMPANY ? null : Number(companyId),
+        branchId: branchId === ANY_BRANCH ? null : Number(branchId),
       });
       onSaved();
       onOpenChange(false);
@@ -115,16 +115,16 @@ function AvailabilityForm({ dateKey, current, companies, onOpenChange, onSaved }
       </div>
 
       <div className="space-y-1.5">
-        <Label htmlFor="company">Empresa (opcional)</Label>
-        <Select value={companyId} onValueChange={setCompanyId}>
-          <SelectTrigger id="company" className="w-full">
+        <Label htmlFor="branch">Sucursal (opcional)</Label>
+        <Select value={branchId} onValueChange={setBranchId}>
+          <SelectTrigger id="branch" className="w-full">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value={ANY_COMPANY}>Cualquiera</SelectItem>
-            {companies.map((company) => (
-              <SelectItem key={company.id} value={company.id.toString()}>
-                {company.name} · {company.locationLabel}
+            <SelectItem value={ANY_BRANCH}>Cualquiera</SelectItem>
+            {branches.map((branch) => (
+              <SelectItem key={branch.id} value={branch.id.toString()}>
+                {branch.name} · {branch.locationLabel}
               </SelectItem>
             ))}
           </SelectContent>

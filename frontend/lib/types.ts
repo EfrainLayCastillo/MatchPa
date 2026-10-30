@@ -12,7 +12,7 @@ export type RequestStatus =
 
 export type Category = 1 | 2 | 3 | 4 | 5 | 6 | 7;
 
-export interface Company {
+export interface Branch {
   id: number;
   name: string;
   slug: string;
@@ -36,7 +36,7 @@ export interface Availability {
   date: string;
   fromTime: string;
   toTime: string;
-  companyId: number | null;
+  branchId: number | null;
 }
 
 export interface Player {
@@ -73,14 +73,14 @@ export interface MyRequest {
   id: number;
   kind: RequestKind;
   status: RequestStatus;
-  match: { code: string; startsAt: string; courtNumber: number; companyName: string };
+  match: { code: string; startsAt: string; courtNumber: number; branchName: string };
 }
 
 export interface Match {
   id: number;
   code: string;
   organizer: { id: number; fullName: string; phone: string | null };
-  company: Company;
+  branch: Branch;
   courtNumber: number;
   startsAt: string;
   updatedAt: string | null;
@@ -98,7 +98,7 @@ export interface Match {
 }
 
 export interface NewMatchInput {
-  companyId: number;
+  branchId: number;
   courtNumber: number;
   startsAt: string;
   durationMinutes: 90 | 120;

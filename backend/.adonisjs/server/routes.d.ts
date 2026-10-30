@@ -7,7 +7,7 @@ export type ScannedRoutes = {
     'event_stream': { paramsTuple?: []; params?: {} }
     'subscribe': { paramsTuple?: []; params?: {} }
     'unsubscribe': { paramsTuple?: []; params?: {} }
-    'companies.index': { paramsTuple?: []; params?: {} }
+    'branches.index': { paramsTuple?: []; params?: {} }
     'auth.register': { paramsTuple?: []; params?: {} }
     'auth.login': { paramsTuple?: []; params?: {} }
     'auth.google_redirect': { paramsTuple?: []; params?: {} }
@@ -34,7 +34,7 @@ export type ScannedRoutes = {
   }
   GET: {
     'event_stream': { paramsTuple?: []; params?: {} }
-    'companies.index': { paramsTuple?: []; params?: {} }
+    'branches.index': { paramsTuple?: []; params?: {} }
     'auth.google_redirect': { paramsTuple?: []; params?: {} }
     'auth.google_callback': { paramsTuple?: []; params?: {} }
     'matches.show': { paramsTuple: [ParamValue]; params: {'code': ParamValue} }
@@ -47,7 +47,7 @@ export type ScannedRoutes = {
   }
   HEAD: {
     'event_stream': { paramsTuple?: []; params?: {} }
-    'companies.index': { paramsTuple?: []; params?: {} }
+    'branches.index': { paramsTuple?: []; params?: {} }
     'auth.google_redirect': { paramsTuple?: []; params?: {} }
     'auth.google_callback': { paramsTuple?: []; params?: {} }
     'matches.show': { paramsTuple: [ParamValue]; params: {'code': ParamValue} }

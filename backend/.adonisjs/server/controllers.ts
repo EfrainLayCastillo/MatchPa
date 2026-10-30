@@ -6,7 +6,7 @@
 export const controllers = {
   Auth: () => import('#controllers/auth_controller'),
   Availabilities: () => import('#controllers/availabilities_controller'),
-  Companies: () => import('#controllers/companies_controller'),
+  Branches: () => import('#controllers/branches_controller'),
   Invitations: () => import('#controllers/invitations_controller'),
   JoinRequests: () => import('#controllers/join_requests_controller'),
   MatchRequests: () => import('#controllers/match_requests_controller'),

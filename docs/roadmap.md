@@ -2,7 +2,7 @@
 
 ## MVP
 
-- [x] Setup: monorepo, PostgreSQL en Docker, migraciones, seed de empresas
+- [x] Setup: monorepo, PostgreSQL en Docker, migraciones, seed de sucursales
 - [x] Auth con Google y registro, onboarding
 - [x] Publicar partido y listarlo en el lobby
 - [x] Pedir unirse y aprobación
@@ -15,7 +15,7 @@
 - [x] Botón `wa.me` al organizador (solo jugadores aceptados, partido abierto o completo)
 - [x] Límites: 7 partidos por día y sin solapamientos
 - [x] WhatsApp cifrado y visibilidad restringida
-- [x] Mis partidas con orden y filtro por empresa
+- [x] Mis partidas con orden y filtro por sucursal
 
 ## Beta
 

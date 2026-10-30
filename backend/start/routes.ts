@@ -5,7 +5,7 @@ import { authThrottle } from '#start/limiter'
 
 const AuthController = () => import('#controllers/auth_controller')
 const MeController = () => import('#controllers/me_controller')
-const CompaniesController = () => import('#controllers/companies_controller')
+const BranchesController = () => import('#controllers/branches_controller')
 const PlayersController = () => import('#controllers/players_controller')
 const AvailabilitiesController = () => import('#controllers/availabilities_controller')
 const MatchesController = () => import('#controllers/matches_controller')
@@ -19,7 +19,7 @@ transmit.registerRoutes()
 
 router
   .group(() => {
-    router.get('companies', [CompaniesController, 'index'])
+    router.get('branches', [BranchesController, 'index'])
     router.post('auth/register', [AuthController, 'register']).use(authThrottle)
     router.post('auth/login', [AuthController, 'login']).use(authThrottle)
     router.get('auth/google/redirect', [AuthController, 'googleRedirect'])

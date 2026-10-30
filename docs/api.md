@@ -1,6 +1,6 @@
 # API (MVP)
 
-Base `/api`. Todo requiere sesión salvo auth, `GET /companies` y `GET /matches/:code`. Los partidos se identifican por `code`.
+Base `/api`. Todo requiere sesión salvo auth, `GET /branches` y `GET /matches/:code`. Los partidos se identifican por `code`.
 
 ## Auth y perfil
 
@@ -18,8 +18,8 @@ Base `/api`. Todo requiere sesión salvo auth, `GET /companies` y `GET /matches/
 
 | Método | Endpoint | Descripción |
 |---|---|---|
-| `GET` | `/companies` | Catálogo de empresas |
-| `GET` | `/players` | Jugadores disponibles (`date`, `companyId`, horario) |
+| `GET` | `/branches` | Catálogo de sucursales |
+| `GET` | `/players` | Jugadores disponibles (`date`, `branchId`, horario) |
 | `GET` | `/me/availabilities` | Mis disponibilidades futuras |
 | `PUT` | `/me/availabilities/:date` | Crear o actualizar |
 | `DELETE` | `/me/availabilities/:date` | Quitar |
@@ -29,7 +29,7 @@ Base `/api`. Todo requiere sesión salvo auth, `GET /companies` y `GET /matches/
 | Método | Endpoint | Descripción |
 |---|---|---|
 | `POST` | `/matches` | Publicar (con invitados) |
-| `GET` | `/matches` | Partidos `open` (`date`, `companyId`, `type`) |
+| `GET` | `/matches` | Partidos `open` (`date`, `branchId`, `type`) |
 | `GET` | `/matches/:code` | Detalle público; incluye solicitudes si eres organizador |
 | `PATCH` | `/matches/:code` | Editar mientras está `open` |
 | `POST` | `/matches/:code/close` | Cerrar |

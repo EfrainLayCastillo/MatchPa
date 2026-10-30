@@ -6,7 +6,7 @@ import { dateKey } from "./panamaFormatDate";
 import type {
   Availability,
   Category,
-  Company,
+  Branch,
   Gender,
   Match,
   MatchRequest,
@@ -24,7 +24,7 @@ interface StoredMatch {
   updatedAt: string;
   code: string;
   organizerId: number;
-  companyId: number;
+  branchId: number;
   courtNumber: number;
   startsAt: string;
   durationMinutes: 90 | 120;
@@ -36,7 +36,7 @@ interface StoredMatch {
   requests: { id: number; userId: number; kind: MatchRequest["kind"]; status: RequestStatus }[];
 }
 
-const companies: Company[] = [
+const branches: Branch[] = [
   {
     id: 1,
     name: "WePadel",
@@ -77,17 +77,17 @@ const users: (User & { password: string })[] = [
 
 const availabilities = new Map<number, Availability[]>();
 const today = dateKey(new Date());
-availabilities.set(2, [{ date: today, fromTime: "17:00", toTime: "21:00", companyId: 1 }]);
-availabilities.set(3, [{ date: today, fromTime: "18:00", toTime: "22:00", companyId: null }]);
-availabilities.set(4, [{ date: today, fromTime: "16:00", toTime: "20:00", companyId: 2 }]);
-availabilities.set(6, [{ date: today, fromTime: "19:00", toTime: "23:00", companyId: null }]);
+availabilities.set(2, [{ date: today, fromTime: "17:00", toTime: "21:00", branchId: 1 }]);
+availabilities.set(3, [{ date: today, fromTime: "18:00", toTime: "22:00", branchId: null }]);
+availabilities.set(4, [{ date: today, fromTime: "16:00", toTime: "20:00", branchId: 2 }]);
+availabilities.set(6, [{ date: today, fromTime: "19:00", toTime: "23:00", branchId: null }]);
 
 const matches: StoredMatch[] = [
   {
     id: 1,
     code: "k3p9xw2m",
     organizerId: 2,
-    companyId: 1,
+    branchId: 1,
     courtNumber: 3,
     startsAt: at(dateKey(new Date(Date.now() + 86_400_000)), "18:00"),
     durationMinutes: 90,
@@ -181,7 +181,7 @@ function viewOf(match: StoredMatch): Match {
     id: match.id,
     code: match.code,
     organizer: { id: organizer.id, fullName: organizer.fullName, phone: isOrganizer || me ? organizer.phone : null },
-    company: companies.find((c) => c.id === match.companyId)!,
+    branch: branches.find((c) => c.id === match.branchId)!,
     courtNumber: match.courtNumber,
     startsAt: match.startsAt,
     updatedAt: match.updatedAt,
@@ -209,21 +209,21 @@ function requireOrganizer(match: StoredMatch) {
   if (me !== match.organizerId) fail(403, "Solo el organizador puede hacer esto");
 }
 
-function openMatchesFor(date: string, companyId?: number, type?: MatchType) {
+function openMatchesFor(date: string, branchId?: number, type?: MatchType) {
   return matches
     .filter((m) => dateKey(new Date(m.startsAt)) === date)
-    .filter((m) => companyId === undefined || m.companyId === companyId)
+    .filter((m) => branchId === undefined || m.branchId === branchId)
     .filter((m) => type === undefined || m.type === type)
     .map(viewOf)
     .filter((m) => m.status === "open");
 }
 
-function playersFor(date: string, companyId?: number): Player[] {
+function playersFor(date: string, branchId?: number): Player[] {
   return users
     .filter((u) => u.id !== me && u.category && u.gender)
     .flatMap((u) => {
       const slot = (availabilities.get(u.id) ?? []).find((a) => a.date === date);
-      if (!slot || (companyId !== undefined && slot.companyId !== null && slot.companyId !== companyId)) return [];
+      if (!slot || (branchId !== undefined && slot.branchId !== null && slot.branchId !== branchId)) return [];
       return [{ id: u.id, fullName: u.fullName, category: u.category!, gender: u.gender!, avatarUrl: null, availability: slot }];
     });
 }
@@ -262,18 +262,18 @@ export async function mockRequest<T>(method: Method, fullPath: string, body?: un
     me = null;
   });
 
-  on(/^GET \/companies$/, () => companies);
+  on(/^GET \/branches$/, () => branches);
 
   on(/^GET \/players$/, () => {
     requireMe();
-    return playersFor(params.get("date") ?? today, numberOrUndefined(params.get("companyId")));
+    return playersFor(params.get("date") ?? today, numberOrUndefined(params.get("branchId")));
   });
   on(/^GET \/me\/availabilities$/, () => availabilities.get(requireMe().id) ?? []);
   on(/^PUT \/me\/availabilities\/(.+)$/, (m) => {
     const id = requireMe().id;
     const date = m[1];
     const rest = (availabilities.get(id) ?? []).filter((a) => a.date !== date);
-    const slot: Availability = { date, fromTime: String(input.fromTime), toTime: String(input.toTime), companyId: (input.companyId as number | null) ?? null };
+    const slot: Availability = { date, fromTime: String(input.fromTime), toTime: String(input.toTime), branchId: (input.branchId as number | null) ?? null };
     availabilities.set(id, [...rest, slot]);
     return slot;
   });
@@ -283,7 +283,7 @@ export async function mockRequest<T>(method: Method, fullPath: string, body?: un
   });
 
   on(/^GET \/matches$/, () =>
-    openMatchesFor(params.get("date") ?? today, numberOrUndefined(params.get("companyId")), (params.get("type") as MatchType) || undefined),
+    openMatchesFor(params.get("date") ?? today, numberOrUndefined(params.get("branchId")), (params.get("type") as MatchType) || undefined),
   );
   on(/^POST \/matches$/, () => {
     const user = requireMe();
@@ -291,7 +291,7 @@ export async function mockRequest<T>(method: Method, fullPath: string, body?: un
       id: nextId++,
       code: Math.random().toString(36).slice(2, 10).padEnd(8, "x"),
       organizerId: user.id,
-      companyId: Number(input.companyId),
+      branchId: Number(input.branchId),
       courtNumber: Number(input.courtNumber),
       startsAt: String(input.startsAt),
       durationMinutes: input.durationMinutes as 90 | 120,
@@ -312,7 +312,7 @@ export async function mockRequest<T>(method: Method, fullPath: string, body?: un
     requireOrganizer(match);
     if (statusOf(match) !== "open") fail(422, "Solo puedes editar un partido abierto");
     Object.assign(match, {
-      companyId: Number(input.companyId),
+      branchId: Number(input.branchId),
       courtNumber: Number(input.courtNumber),
       startsAt: String(input.startsAt),
       updatedAt: new Date().toISOString(),
@@ -387,7 +387,7 @@ export async function mockRequest<T>(method: Method, fullPath: string, body?: un
             code: match.code,
             startsAt: match.startsAt,
             courtNumber: match.courtNumber,
-            companyName: companies.find((c) => c.id === match.companyId)!.name,
+            branchName: branches.find((c) => c.id === match.branchId)!.name,
           },
         })),
     );

@@ -17,7 +17,7 @@ import type { Match, MyRequest } from "@/lib/types";
 
 type SortBy = "updated" | "match";
 
-const ALL_COMPANIES = "all";
+const ALL_BRANCHES = "all";
 
 export function MyMatchesView() {
   const matchesQuery = useQuery({
@@ -32,24 +32,24 @@ export function MyMatchesView() {
   });
 
   const [sortBy, setSortBy] = useState<SortBy>("updated");
-  const [company, setCompany] = useState(ALL_COMPANIES);
+  const [branch, setBranch] = useState(ALL_BRANCHES);
 
-  const companies = useMemo(() => {
+  const branches = useMemo(() => {
     const names = new Set<string>();
-    (matchesQuery.data ?? []).forEach((match) => names.add(match.company.name));
-    (requestsQuery.data ?? []).forEach((request) => names.add(request.match.companyName));
+    (matchesQuery.data ?? []).forEach((match) => names.add(match.branch.name));
+    (requestsQuery.data ?? []).forEach((request) => names.add(request.match.branchName));
     return [...names].sort();
   }, [matchesQuery.data, requestsQuery.data]);
 
   const matches = useMemo(() => {
     const filtered = (matchesQuery.data ?? []).filter(
-      (match) => company === ALL_COMPANIES || match.company.name === company,
+      (match) => branch === ALL_BRANCHES || match.branch.name === branch,
     );
     return filtered.slice().sort(sorter(sortBy));
-  }, [matchesQuery.data, company, sortBy]);
+  }, [matchesQuery.data, branch, sortBy]);
 
   const pending = (requestsQuery.data ?? []).filter(
-    (request) => company === ALL_COMPANIES || request.match.companyName === company,
+    (request) => branch === ALL_BRANCHES || request.match.branchName === branch,
   );
 
   return (
@@ -57,13 +57,13 @@ export function MyMatchesView() {
       <PageTitle hint="Los partidos que organizas o en los que juegas.">Mis partidas</PageTitle>
 
       <div className="flex flex-col gap-2 sm:flex-row">
-        <Select value={company} onValueChange={setCompany}>
-          <SelectTrigger className="w-full sm:w-56" aria-label="Empresa">
+        <Select value={branch} onValueChange={setBranch}>
+          <SelectTrigger className="w-full sm:w-56" aria-label="Sucursal">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value={ALL_COMPANIES}>Todas las empresas</SelectItem>
-            {companies.map((name) => (
+            <SelectItem value={ALL_BRANCHES}>Todas las sucursales</SelectItem>
+            {branches.map((name) => (
               <SelectItem key={name} value={name}>
                 {name}
               </SelectItem>
@@ -100,9 +100,9 @@ export function MyMatchesView() {
           <CardListSkeleton />
         ) : matches.length === 0 ? (
           <p className="rounded-xl border border-dashed border-border py-10 text-center text-sm text-muted-foreground">
-            {company === ALL_COMPANIES
+            {branch === ALL_BRANCHES
               ? "Todavía no organizas ni juegas ningún partido."
-              : `No tienes partidos en ${company}.`}
+              : `No tienes partidos en ${branch}.`}
           </p>
         ) : (
           <ul className="space-y-3">
@@ -136,7 +136,7 @@ function MatchRow({ match }: { match: Match }) {
           <div className="space-y-1">
             <p className="font-heading text-lg font-bold leading-tight">{formatDateTime(match.startsAt)}</p>
             <p className="text-sm text-muted-foreground">
-              {match.company.name} · Cancha {match.courtNumber} · {formatDuration(match.durationMinutes)}
+              {match.branch.name} · Cancha {match.courtNumber} · {formatDuration(match.durationMinutes)}
             </p>
           </div>
           <StatusBadge status={match.status} />
@@ -177,7 +177,7 @@ function PendingRow({ request }: { request: MyRequest }) {
       className="flex items-center justify-between gap-3 rounded-xl border border-border bg-card p-3 text-sm"
     >
       <span>
-        {formatDateTime(request.match.startsAt)} · Cancha {request.match.courtNumber} · {request.match.companyName}
+        {formatDateTime(request.match.startsAt)} · Cancha {request.match.courtNumber} · {request.match.branchName}
       </span>
       <span className="shrink-0 font-semibold text-brand-teal dark:text-brand-lime">{label}</span>
     </Link>

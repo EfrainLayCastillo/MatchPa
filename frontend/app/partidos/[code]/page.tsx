@@ -18,8 +18,8 @@ export async function generateMetadata({ params }: MatchPageProps): Promise<Meta
   if (match === null) notFound();
   if (!match) return { title: "Partido" };
 
-  const title = `${match.company.name} · ${formatDateTime(match.startsAt)}`;
-  const description = `Cancha ${match.courtNumber}, ${match.company.name}. Faltan ${match.spotsLeft} puestos.`;
+  const title = `${match.branch.name} · ${formatDateTime(match.startsAt)}`;
+  const description = `Cancha ${match.courtNumber}, ${match.branch.name}. Faltan ${match.spotsLeft} puestos.`;
   return {
     title,
     description,

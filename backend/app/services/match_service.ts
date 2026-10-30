@@ -19,7 +19,7 @@ export interface GuestInput {
 }
 
 export interface MatchInput {
-  companyId: number
+  branchId: number
   courtNumber: number
   startsAt: DateTime
   durationMinutes: 90 | 120
@@ -159,14 +159,14 @@ export function loadMatch(id: number, trx: TransactionClientContract): Promise<M
     .where('id', id)
     .preload('guests')
     .preload('requests', (query) => query.preload('user'))
-    .preload('company')
+    .preload('branch')
     .preload('organizer')
     .firstOrFail()
 }
 
 function matchFields(input: MatchInput) {
   return {
-    companyId: input.companyId,
+    branchId: input.branchId,
     courtNumber: input.courtNumber,
     startsAt: input.startsAt,
     durationMinutes: input.durationMinutes,
@@ -289,7 +289,7 @@ function lockMatchById(id: number, trx: TransactionClientContract): Promise<Matc
 /** Read query with every relation the serializer needs. */
 export function matchQuery() {
   return Match.query()
-    .preload('company')
+    .preload('branch')
     .preload('organizer')
     .preload('guests')
     .preload('requests', (query) => query.preload('user'))

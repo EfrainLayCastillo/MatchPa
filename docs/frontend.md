@@ -20,6 +20,6 @@ Las URLs son visibles para el usuario, así que van en español.
 | `/partidos/nuevo` | Sí | Publicar partido |
 | `/partidos/[code]` | Para actuar | Detalle público. El organizador gestiona solicitudes, invita, saca y cierra; el jugador puede salirse |
 | `/perfil` | Sí | Editar categoría, género y WhatsApp, activar/desactivar push |
-| `/mis-partidas` | Sí | Partidos que organizas o juegas, con estado y filtros por empresa y orden (por defecto, última actualización) |
+| `/mis-partidas` | Sí | Partidos que organizas o juegas, con estado y filtros por sucursal y orden (por defecto, última actualización) |
 
-Ambas pestañas del lobby se ordenan por cercanía a tu categoría. **Partidos** filtra por empresa, tipo y hora; **Jugadores** por empresa y horario, y al tocar uno aparece "Ey Pa, ¿juegas?".
+Ambas pestañas del lobby se ordenan por cercanía a tu categoría. **Partidos** filtra por sucursal, tipo y hora; **Jugadores** por sucursal y horario, y al tocar uno aparece "Ey Pa, ¿juegas?".

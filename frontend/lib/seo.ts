@@ -30,14 +30,14 @@ export function matchJsonLd(match: Match) {
   return {
     "@context": "https://schema.org",
     "@type": "SportsEvent",
-    name: `Partido de pádel en ${match.company.name}`,
+    name: `Partido de pádel en ${match.branch.name}`,
     sport: "Padel",
     url: `${SITE_URL}/partidos/${match.code}`,
     startDate: match.startsAt,
     endDate: endsAt.toISOString(),
     eventStatus: "https://schema.org/EventScheduled",
     eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
-    location: { "@type": "Place", name: match.company.name, address: match.company.locationLabel },
+    location: { "@type": "Place", name: match.branch.name, address: match.branch.locationLabel },
     organizer: { "@id": `${SITE_URL}/#organization` },
   };
 }

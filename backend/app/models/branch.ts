@@ -1,7 +1,7 @@
 import { DateTime } from 'luxon'
 import { BaseModel, column } from '@adonisjs/lucid/orm'
 
-export default class Company extends BaseModel {
+export default class Branch extends BaseModel {
   @column({ isPrimary: true })
   declare id: number
 

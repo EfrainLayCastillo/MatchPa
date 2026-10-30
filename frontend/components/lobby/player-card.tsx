@@ -11,10 +11,10 @@ import type { Match, Player } from "@/lib/types";
 
 interface PlayerCardProps {
   player: Player;
-  companyName: (companyId: number | null) => string;
+  branchName: (branchId: number | null) => string;
 }
 
-export function PlayerCard({ player, companyName }: PlayerCardProps) {
+export function PlayerCard({ player, branchName }: PlayerCardProps) {
   const router = useRouter();
   const [matches, setMatches] = useState<Match[] | null>(null);
   const [busy, setBusy] = useState(false);
@@ -45,7 +45,7 @@ export function PlayerCard({ player, companyName }: PlayerCardProps) {
             {shortCategory(player.category)} categoría · {GENDER_LABELS[player.gender]}
           </p>
           <p className="text-xs text-muted-foreground">
-            {availability.fromTime}–{availability.toTime} · {companyName(availability.companyId)}
+            {availability.fromTime}–{availability.toTime} · {branchName(availability.branchId)}
           </p>
         </div>
         <Button size="sm" variant="outline" onClick={invite} disabled={busy} className="shrink-0">
@@ -97,7 +97,7 @@ function InviteDialog({
             <li key={match.id}>
               <Button variant="outline" className="w-full justify-between" onClick={() => invite(match)}>
                 <span>
-                  Cancha {match.courtNumber} · {match.company.name}
+                  Cancha {match.courtNumber} · {match.branch.name}
                 </span>
                 <span className="text-muted-foreground">Faltan {match.spotsLeft}</span>
               </Button>

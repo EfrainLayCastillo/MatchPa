@@ -1,7 +1,7 @@
 import { DateTime } from 'luxon'
 import { BaseModel, belongsTo, column, hasMany } from '@adonisjs/lucid/orm'
 import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations'
-import Company from '#models/company'
+import Branch from '#models/branch'
 import MatchGuest from '#models/match_guest'
 import MatchRequest from '#models/match_request'
 import User from '#models/user'
@@ -20,7 +20,7 @@ export default class Match extends BaseModel {
   declare organizerId: number
 
   @column()
-  declare companyId: number
+  declare branchId: number
 
   @column()
   declare courtNumber: number
@@ -49,8 +49,8 @@ export default class Match extends BaseModel {
   @belongsTo(() => User, { foreignKey: 'organizerId' })
   declare organizer: BelongsTo<typeof User>
 
-  @belongsTo(() => Company)
-  declare company: BelongsTo<typeof Company>
+  @belongsTo(() => Branch)
+  declare branch: BelongsTo<typeof Branch>
 
   @hasMany(() => MatchGuest)
   declare guests: HasMany<typeof MatchGuest>

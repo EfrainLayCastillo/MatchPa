@@ -18,7 +18,7 @@ import { matchFiltersValidator, matchValidator } from '#validators/match'
 export default class MatchesController {
   async index({ auth, request }: HttpContext) {
     const viewer = auth.getUserOrFail()
-    const { date, companyId, type } = await request.validateUsing(matchFiltersValidator)
+    const { date, branchId, type } = await request.validateUsing(matchFiltersValidator)
     const matches = await matchQuery()
       .where('status', 'open')
       .where('starts_at', '>', DateTime.now().toUTC().toSQL()!)
@@ -26,7 +26,7 @@ export default class MatchesController {
         const { start, end } = panamaDayBounds(date!)
         query.where('starts_at', '>=', start.toSQL()!).where('starts_at', '<', end.toSQL()!)
       })
-      .if(companyId, (query) => query.where('company_id', companyId!))
+      .if(branchId, (query) => query.where('branch_id', branchId!))
       .if(type, (query) => query.where('type', type!))
       .orderBy('starts_at')
     return matches.map((match) => serializeMatch(match, viewer))
