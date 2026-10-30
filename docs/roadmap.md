@@ -21,7 +21,7 @@
 
 - [x] SEO de la página principal: metadata, Open Graph, Twitter Card, canonical y JSON-LD `Organization`/`WebSite`
 - [x] SEO del partido: metadata dinámica, JSON-LD `SportsEvent` y `noindex` en partidos cerrados o expirados
-- [ ] `sitemap.xml` y `robots.txt` dinámicos
+- [x] `sitemap.xml` y `robots.txt` (sin partidos: el `code` no debe enumerarse)
 - [ ] Rendimiento y accesibilidad: Core Web Vitals, imágenes optimizadas, HTML semántico
 - [ ] Google Analytics 4 con eventos clave (registro, publicar partido, pedir unirse, aprobación)
 - [ ] Google Search Console y verificación del dominio
