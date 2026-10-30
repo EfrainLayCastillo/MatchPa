@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { track } from "@/lib/analytics";
 import { api, ApiError } from "@/lib/api";
 import { CATEGORIES, GENDER_LABELS, shortCategory } from "@/lib/format";
 import { useSession } from "@/lib/session";
@@ -36,7 +37,10 @@ export function ProfileForm({ mode }: ProfileFormProps) {
     setSaved(false);
     try {
       setUser(await api.updateMe({ category, gender, phone: phone.trim() }));
-      if (mode === "onboarding") router.replace("/lobby");
+      if (mode === "onboarding") {
+        track("sign_up", { category });
+        router.replace("/lobby");
+      }
       else setSaved(true);
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "No se pudo guardar tu perfil");

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { PushPrompt } from "@/components/matchpa/push-prompt";
 import { StatusBadge } from "@/components/matchpa/status-badge";
+import { track } from "@/lib/analytics";
 import { api, ApiError } from "@/lib/api";
 import { formatDuration, GENDER_LABELS, shortCategory, TYPE_LABELS } from "@/lib/format";
 import { formatDateTime } from "@/lib/panamaFormatDate";
@@ -44,6 +45,11 @@ export function MatchDetail({ code, serverMatch }: { code: string; serverMatch?:
     } finally {
       setBusy(false);
     }
+  }
+
+  async function respond(requestId: number, action: "accept" | "reject" | "remove") {
+    await api.respondToRequest(requestId, action);
+    if (action === "accept") track("join_approved", {});
   }
 
   const summary = `Partido de pádel en ${match.branch.name}, cancha ${match.courtNumber}. Faltan ${match.spotsLeft} puestos.`;
@@ -113,7 +119,7 @@ export function MatchDetail({ code, serverMatch }: { code: string; serverMatch?:
             match={match}
             signedIn={user !== null}
             busy={busy}
-            onJoin={() => run(() => api.requestToJoin(match.code), true)}
+            onJoin={() => run(() => api.requestToJoin(match.code).then(() => track("join_request", { source: "match_page" })), true)}
             onLeave={(request) => run(() => api.respondToRequest(request.id, "leave"))}
             onAnswer={(request, action) => run(() => api.respondToRequest(request.id, action))}
           />
@@ -122,7 +128,7 @@ export function MatchDetail({ code, serverMatch }: { code: string; serverMatch?:
             <OrganizerPanel
               match={match}
               busy={busy}
-              onRespond={(request, action) => run(() => api.respondToRequest(request.id, action))}
+              onRespond={(request, action) => run(() => respond(request.id, action))}
               onClose={() => run(() => api.closeMatch(match.code))}
             />
           ) : null}

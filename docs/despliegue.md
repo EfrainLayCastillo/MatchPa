@@ -11,7 +11,7 @@ Plataformas en plan gratuito: frontend en Vercel, backend en Render y base de da
 ## Variables de producción
 
 - **Render:** `NODE_ENV=production`, `NODE_VERSION=24`, `HOST=0.0.0.0`, `PORT=10000`, `SESSION_DRIVER=cookie`, `APP_KEY`, `APP_URL` (URL de Render), `FRONTEND_URL` (URL de Vercel), `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_DATABASE`.
-- **Vercel:** `BACKEND_URL` (URL de Render), `NEXT_PUBLIC_API_URL=/api`, `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_MOCK_API=false`.
+- **Vercel:** `BACKEND_URL` (URL de Render), `NEXT_PUBLIC_API_URL=/api`, `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_MOCK_API=false`, `NEXT_PUBLIC_GTM_ID=GTM-KHLG4MHS` (solo Production).
 
 ## Limitaciones del plan gratuito
 

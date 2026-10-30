@@ -87,6 +87,7 @@ Abre [http://localhost:3000](http://localhost:3000). Variables, datos de prueba 
 | [Frontend](docs/frontend.md) | Mobile first y rutas |
 | [Tiempo real](docs/tiempo-real.md) | Canales Transmit, push y modal opt-in |
 | [Seguridad](docs/seguridad.md) | Datos sensibles, sesión y límites |
+| [Analítica](docs/analitica.md) | GA4 por Tag Manager y eventos del embudo |
 | [Brandbook](docs/brandbook.md) | Colores, tipografía, logo y tono |
 | [Desarrollo local](docs/desarrollo-local.md) | Instalación, datos de prueba y variables |
 | [Despliegue](docs/despliegue.md) | Vercel, Render, Neon y sus variables |

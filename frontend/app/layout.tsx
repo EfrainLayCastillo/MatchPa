@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from "next";
 import { SITE_URL } from "@/lib/config";
 import { SITE_OPEN_GRAPH } from "@/lib/seo";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { GoogleTagManager } from "@next/third-parties/google";
+import { GTM_ID } from "@/lib/analytics";
 import { Bricolage_Grotesque, Inter, Yellowtail } from "next/font/google";
 import "./globals.css";
 import { SiteHeader } from "@/components/matchpa/site-header";
@@ -48,6 +50,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         </QueryProvider>
         <SpeedInsights />
       </body>
+      {GTM_ID ? <GoogleTagManager gtmId={GTM_ID} /> : null}
     </html>
   );
 }

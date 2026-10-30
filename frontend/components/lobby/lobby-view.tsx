@@ -20,6 +20,7 @@ import { PageTitle } from "@/components/matchpa/page-title";
 import { PushPrompt } from "@/components/matchpa/push-prompt";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { track } from "@/lib/analytics";
 import { api, ApiError } from "@/lib/api";
 import { byCategoryDistance } from "@/lib/format";
 import {
@@ -85,6 +86,7 @@ export function LobbyView() {
     setActionError(null);
     try {
       await api.requestToJoin(match.code);
+      track("join_request", { source: "lobby" });
       if (shouldAskForPush()) setPushOpen(true);
       refresh();
     } catch (err) {

@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PushPrompt } from "@/components/matchpa/push-prompt";
+import { track } from "@/lib/analytics";
 import { api, ApiError } from "@/lib/api";
 import { CATEGORIES, GENDER_LABELS, shortCategory, TYPE_LABELS } from "@/lib/format";
 import { dateKey, formatClock, formatClock12, todayKey } from "@/lib/panamaFormatDate";
@@ -99,6 +100,7 @@ function MatchFormBody({ match }: { match?: Match }) {
         return;
       }
       const published = await api.createMatch(buildInput());
+      track("publish_match", { match_type: published.type, category: published.category, max_players: published.maxPlayers });
       if (inviteeId) await api.invite(published.code, inviteeId).catch(() => null);
       if (shouldAskForPush()) {
         setCreated(published);
