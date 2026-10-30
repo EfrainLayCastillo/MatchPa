@@ -1,6 +1,6 @@
 # MatchPa
 
-Plataforma de pádel para completar partidos. Monorepo: `backend/` (AdonisJS 7) y `frontend/` (Next.js). Cada carpeta tiene su propio `CLAUDE.md`.
+Plataforma de pádel para completar partidos. Monorepo: `backend/` (AdonisJS 7), `frontend/` (Next.js) y `marketing/` (videos para Instagram con HyperFrames). Cada carpeta tiene su propio `CLAUDE.md`.
 
 ## Fuentes de verdad
 
@@ -15,16 +15,18 @@ Plataforma de pádel para completar partidos. Monorepo: `backend/` (AdonisJS 7) 
 
 ## Flujo por historia
 
-1. Partir el ítem del Roadmap con `/slice`.
-2. Planear con `/rpi`.
-3. Implementar con los agentes `backend` y/o `frontend`.
-4. Revisar con el agente `rules-reviewer` y `/code-review`.
-5. `sync-docs` y commit.
+Partir el ítem del Roadmap con `/slice`. Su `slices.md` va al scratchpad de la sesión, nunca al repo: es un artefacto temporal y se descarta al aplicarlo. Luego, según el tamaño:
 
-No lances agentes para tareas pequeñas que se resuelven en la sesión principal.
+- **Historia chica** (un solo paquete, ~5 archivos o menos, sin reglas de negocio nuevas): implementar en la sesión principal → `/code-review` → commit. Sin `/rpi` ni agentes.
+- **Historia grande** (backend y frontend, o reglas/modelo/endpoints nuevos):
+  1. Planear con `/rpi`.
+  2. Implementar con los agentes `backend` y/o `frontend`.
+  3. Revisar con el agente `rules-reviewer` y `/code-review`.
+  4. `sync-docs` y commit.
 
 ## Convenciones
 
+- Al cerrar cada implementación, propone el mensaje de commit de lo aplicado (uno por cambio lógico, con sus archivos) sin commitear, salvo que se pida.
 - Commits en inglés con Conventional Commits (`feat(matches): ...`). Las skills globales `/commit` (Jira `COL-`) y `/create-pr` (Bitbucket) no aplican: el repo está en GitHub, usa `git` y `gh`.
 - Hora: timestamps en UTC; las reglas por día se evalúan en `America/Panama`.
 - `backend/` y `frontend/` ya contienen un `CLAUDE.md`: al generar el proyecto con `create-adonisjs` o `create-next-app`, hazlo en una carpeta temporal y mueve el resultado, porque esos CLIs rechazan carpetas con archivos.

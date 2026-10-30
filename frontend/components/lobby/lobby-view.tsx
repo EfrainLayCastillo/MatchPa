@@ -1,6 +1,7 @@
 "use client";
 
 import { CardListSkeleton } from "@/components/matchpa/skeletons";
+import { LoadFailed } from "@/components/matchpa/load-failed";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -67,8 +68,7 @@ export function LobbyView() {
   useLobbyRealtime(user?.id);
 
   const [actionError, setActionError] = useState<string | null>(null);
-  const loadError = matchesQuery.error instanceof Error ? matchesQuery.error.message : null;
-  const error = actionError ?? loadError;
+  const error = actionError;
 
   const [joiningCode, setJoiningCode] = useState<string | null>(null);
   const [cancelling, setCancelling] = useState(false);
@@ -207,31 +207,27 @@ export function LobbyView() {
         </TabsList>
 
         <TabsContent value="matches" className="mt-4">
-          {sortedMatches === undefined ? <Loading /> : sortedMatches.length === 0 ? (
-            <Empty>No hay partidos buscando pala para este día.</Empty>
-          ) : (
+          <ListState query={matchesQuery} count={sortedMatches?.length} empty="No hay partidos buscando pala para este día.">
             <ul className="grid gap-3 md:grid-cols-2">
-              {sortedMatches.map((match) => (
+              {sortedMatches?.map((match) => (
                 <li key={match.id}>
                   <MatchCard match={match} onJoin={requestToJoin} joining={joiningCode === match.code} />
                 </li>
               ))}
             </ul>
-          )}
+          </ListState>
         </TabsContent>
 
         <TabsContent value="players" className="mt-4">
-          {sortedPlayers === undefined ? <Loading /> : sortedPlayers.length === 0 ? (
-            <Empty>Nadie disponible para este día todavía.</Empty>
-          ) : (
+          <ListState query={playersQuery} count={sortedPlayers?.length} empty="Nadie disponible para este día todavía.">
             <ul className="grid gap-3 md:grid-cols-2">
-              {sortedPlayers.map((player) => (
+              {sortedPlayers?.map((player) => (
                 <li key={player.id}>
                   <PlayerCard player={player} companyName={companyName} />
                 </li>
               ))}
             </ul>
-          )}
+          </ListState>
         </TabsContent>
       </Tabs>
 
@@ -264,8 +260,18 @@ function formatWindow(slot: Availability): string {
   return `de ${slot.fromTime} a ${slot.toTime}`;
 }
 
-function Loading() {
-  return <CardListSkeleton />;
+interface ListStateProps {
+  query: { isError: boolean; refetch: () => Promise<unknown> };
+  count: number | undefined;
+  empty: string;
+  children: React.ReactNode;
+}
+
+function ListState({ query, count, empty, children }: ListStateProps) {
+  if (count === undefined && query.isError) return <LoadFailed onRetry={query.refetch} />;
+  if (count === undefined) return <CardListSkeleton />;
+  if (count === 0) return <Empty>{empty}</Empty>;
+  return children;
 }
 
 function Empty({ children }: { children: React.ReactNode }) {

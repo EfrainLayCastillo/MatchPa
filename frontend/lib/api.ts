@@ -16,6 +16,7 @@ import type {
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3333/api";
 const USE_MOCKS = process.env.NEXT_PUBLIC_MOCK_API === "true";
+const REQUEST_TIMEOUT_MS = 20_000;
 
 export async function request<T>(
   method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE",
@@ -26,12 +27,15 @@ export async function request<T>(
 
   const res = await fetch(`${API_URL}${path}`, {
     method,
+    signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
     credentials: "include",
     headers: {
       Accept: "application/json",
       ...(body === undefined ? {} : { "Content-Type": "application/json" }),
     },
     body: body === undefined ? undefined : JSON.stringify(body),
+  }).catch(() => {
+    throw new ApiError(0, [{ message: "No pudimos conectar con el servidor, intenta de nuevo" }]);
   });
 
   if (res.status === 204) return undefined as T;

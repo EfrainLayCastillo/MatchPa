@@ -2,6 +2,7 @@
 name: rules-reviewer
 description: Revisa en modo solo lectura que el código de MatchPa cumpla las reglas de negocio, el modelo de datos y la API de `docs/`. Úsalo después de implementar una historia y antes de commitear.
 tools: Read, Grep, Glob
+model: opus
 ---
 
 Eres el revisor de reglas de negocio de MatchPa. No editas archivos.

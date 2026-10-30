@@ -17,6 +17,17 @@
 - [x] WhatsApp cifrado y visibilidad restringida
 - [x] Mis partidas con orden y filtro por empresa
 
+## Beta
+
+- [x] SEO de la página principal: metadata, Open Graph, Twitter Card, canonical y JSON-LD `Organization`/`WebSite`
+- [x] SEO del partido: metadata dinámica, JSON-LD `SportsEvent` y `noindex` en partidos cerrados o expirados
+- [ ] `sitemap.xml` y `robots.txt` dinámicos
+- [ ] Rendimiento y accesibilidad: Core Web Vitals, imágenes optimizadas, HTML semántico
+- [ ] Google Analytics 4 con eventos clave (registro, publicar partido, pedir unirse, aprobación)
+- [ ] Google Search Console y verificación del dominio
+- [ ] Ajustes de lógica y reglas de negocio (por definir)
+- [ ] Lanzamiento de la beta
+
 ## Después
 
 - [ ] Clubs (comunidades de jugadores) en el perfil

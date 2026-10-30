@@ -1,4 +1,6 @@
 import type { Metadata, Viewport } from "next";
+import { SITE_URL } from "@/lib/config";
+import { SITE_OPEN_GRAPH } from "@/lib/seo";
 import { Bricolage_Grotesque, Inter, Yellowtail } from "next/font/google";
 import "./globals.css";
 import { SiteHeader } from "@/components/matchpa/site-header";
@@ -17,8 +19,11 @@ const yellowtail = Yellowtail({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: { default: "MatchPa", template: "%s · MatchPa" },
   description: "Encuentra jugadores y completa tu partido de pádel.",
+  openGraph: SITE_OPEN_GRAPH,
+  twitter: { card: "summary_large_image" },
 };
 
 export const viewport: Viewport = {

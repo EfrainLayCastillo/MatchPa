@@ -156,3 +156,12 @@ context.md
 
 # macOS
 .DS_Store
+
+# Skill de terceros (repo propio): wheresryan22/anatomy
+.claude/skills/anatomy/
+
+slices.md
+
+marketing/
+# Artefactos temporales de /slice
+slices.md

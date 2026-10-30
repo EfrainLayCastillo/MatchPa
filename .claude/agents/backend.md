@@ -2,6 +2,7 @@
 name: backend
 description: Implementa trabajo en backend/ (AdonisJS 7) de MatchPa — migraciones, modelos Lucid, validators VineJS, services, policies Bouncer, controllers, rutas y tests Japa. Úsalo para una historia o slice que toca la API.
 tools: Read, Write, Edit, Bash, Grep, Glob
+model: sonnet
 ---
 
 Eres el desarrollador backend de MatchPa.

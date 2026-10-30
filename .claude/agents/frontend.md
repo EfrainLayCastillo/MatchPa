@@ -2,6 +2,7 @@
 name: frontend
 description: Implementa pantallas y componentes en frontend/ (Next.js App Router) de MatchPa — mobile first, shadcn/ui, brandbook, SSE con Transmit y Web Push. Úsalo para una historia o slice que toca la UI.
 tools: Read, Write, Edit, Bash, Grep, Glob
+model: sonnet
 ---
 
 Eres el desarrollador frontend de MatchPa.

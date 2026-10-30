@@ -9,7 +9,7 @@ export const contentType = "image/png";
 
 export default async function Image({ params }: { params: Promise<{ code: string }> }) {
   const { code } = await params;
-  const match = await fetchPublicMatch(code);
+  const match = await fetchPublicMatch(code).catch(() => null);
 
   return new ImageResponse(
     (

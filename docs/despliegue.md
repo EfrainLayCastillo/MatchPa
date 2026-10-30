@@ -4,7 +4,7 @@ Plataformas en plan gratuito: frontend en Vercel, backend en Render y base de da
 
 | Pieza | Plataforma | Configuración |
 |---|---|---|
-| Frontend (Next.js) | Vercel (Hobby) | Root directory `frontend`. Reenvía `/api` y `/__transmit` a Render con `BACKEND_URL`, así el navegador ve un solo origen y la cookie de sesión funciona sin dominio propio. |
+| Frontend (Next.js) | Vercel (Hobby) | Root directory `frontend`. Reenvía `/api` y `/__transmit` a Render con `BACKEND_URL`, así el navegador ve un solo origen y la cookie de sesión funciona sin dominio propio. El servidor de Next (metadata e imagen OG del partido) llama a `BACKEND_URL` directo, porque `/api` es relativo. |
 | Backend (AdonisJS) | Render (web service, Free) | Root directory `backend`. Build: `npm ci --include=dev && node ace build`. Start: `cd build && npm ci --omit=dev && node ace migration:run --force && node bin/server.js`. |
 | PostgreSQL | Neon (Free) | Conexión con SSL obligatorio en producción. Usar el endpoint directo, sin `-pooler`. |
 

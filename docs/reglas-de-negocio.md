@@ -53,6 +53,7 @@ Una sola entidad, `match_requests`, con `kind`:
 - Si el partido no está `open`, muestra su estado en vez del botón de unirse.
 - Botón Compartir con `navigator.share`; fallback a "Copiar link" y `wa.me/?text=`.
 - Vista previa Open Graph dinámica (`generateMetadata` + `opengraph-image`): empresa, fecha, hora, categoría y puestos.
+- SEO: JSON-LD `SportsEvent` en partidos `open` y `full`; `noindex` en `closed` y `expired`; código inexistente → 404.
 
 ## Disponibilidad
 

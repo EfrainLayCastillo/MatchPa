@@ -1,5 +1,18 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { jsonLdHtml, SITE_JSON_LD, SITE_OPEN_GRAPH } from "@/lib/seo";
+
+const TITLE = "MatchPa — ¿Te falta una pala? Encuéntrala aquí";
+const DESCRIPTION =
+  "Jugadores disponibles y partidos de pádel buscando pala en Panamá, por categoría, empresa y horario. Publica tu partido y compártelo por WhatsApp.";
+
+export const metadata: Metadata = {
+  title: { absolute: TITLE },
+  description: DESCRIPTION,
+  alternates: { canonical: "/" },
+  openGraph: { ...SITE_OPEN_GRAPH, title: TITLE, description: DESCRIPTION, url: "/" },
+};
 
 const STEPS = [
   { title: "Publica tu partido", text: "Ya tienes cancha y te faltan 1 o 2? Carga la hora, la empresa y los que ya confirmaron." },
@@ -10,6 +23,10 @@ const STEPS = [
 export default function HomePage() {
   return (
     <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-12 px-4 pb-16 pt-10 sm:pt-16">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLdHtml(SITE_JSON_LD) }}
+      />
       <section className="space-y-6">
         <p className="font-script text-3xl text-brand-teal dark:text-brand-lime">ey Pa, ¿juegas?</p>
         <h1 className="font-heading text-5xl font-extrabold leading-[0.95] sm:text-7xl">
