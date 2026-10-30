@@ -16,9 +16,10 @@ import { useSession } from "@/lib/session";
 import type { Match, MatchRequest } from "@/lib/types";
 import { ShareMatch } from "./share-match";
 
-export function MatchDetail({ code }: { code: string }) {
+export function MatchDetail({ code, serverMatch }: { code: string; serverMatch?: Match }) {
   const { user } = useSession();
-  const query = useMatch(code);
+  const query = useMatch(code, serverMatch);
+  const personalized = !query.isPlaceholderData;
   const refresh = useRefreshMatch(code);
   useMatchRealtime(code);
   const match = query.data ?? null;
@@ -106,33 +107,39 @@ export function MatchDetail({ code }: { code: string }) {
         </p>
       ) : null}
 
-      <ActionPanel
-        match={match}
-        signedIn={user !== null}
-        busy={busy}
-        onJoin={() => run(() => api.requestToJoin(match.code), true)}
-        onLeave={(request) => run(() => api.respondToRequest(request.id, "leave"))}
-        onAnswer={(request, action) => run(() => api.respondToRequest(request.id, action))}
-      />
+      {personalized ? (
+        <>
+          <ActionPanel
+            match={match}
+            signedIn={user !== null}
+            busy={busy}
+            onJoin={() => run(() => api.requestToJoin(match.code), true)}
+            onLeave={(request) => run(() => api.respondToRequest(request.id, "leave"))}
+            onAnswer={(request, action) => run(() => api.respondToRequest(request.id, action))}
+          />
 
-      {match.isOrganizer && match.requests ? (
-        <OrganizerPanel
-          match={match}
-          busy={busy}
-          onRespond={(request, action) => run(() => api.respondToRequest(request.id, action))}
-          onClose={() => run(() => api.closeMatch(match.code))}
-        />
-      ) : null}
+          {match.isOrganizer && match.requests ? (
+            <OrganizerPanel
+              match={match}
+              busy={busy}
+              onRespond={(request, action) => run(() => api.respondToRequest(request.id, action))}
+              onClose={() => run(() => api.closeMatch(match.code))}
+            />
+          ) : null}
 
-      {match.status === "open" || match.isOrganizer ? <ShareMatch code={match.code} summary={summary} /> : null}
+          {match.status === "open" || match.isOrganizer ? <ShareMatch code={match.code} summary={summary} /> : null}
 
-      {whatsappHref && match.myRequest?.status === "accepted" && (match.status === "open" || match.status === "full") ? (
-        <Button asChild variant="outline" className="w-full">
-          <a href={whatsappHref} target="_blank" rel="noopener noreferrer">
-            Escribir al organizador por WhatsApp
-          </a>
-        </Button>
-      ) : null}
+          {whatsappHref && match.myRequest?.status === "accepted" && (match.status === "open" || match.status === "full") ? (
+            <Button asChild variant="outline" className="w-full">
+              <a href={whatsappHref} target="_blank" rel="noopener noreferrer">
+                Escribir al organizador por WhatsApp
+              </a>
+            </Button>
+          ) : null}
+        </>
+      ) : (
+        <div aria-hidden className="h-12 animate-pulse rounded-lg bg-muted" />
+      )}
 
       {error ? <p role="alert" className="text-sm text-destructive">{error}</p> : null}
 

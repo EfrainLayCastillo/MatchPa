@@ -50,7 +50,7 @@ export function SiteHeader() {
             <DropdownMenu>
               <DropdownMenuTrigger
                 aria-label="Menú de usuario"
-                className="flex size-9 items-center justify-center rounded-full bg-brand-ivory text-brand-teal outline-none focus-visible:ring-2 focus-visible:ring-brand-lime"
+                className="flex size-9 pointer-coarse:size-11 items-center justify-center rounded-full bg-brand-ivory text-brand-teal outline-none focus-visible:ring-2 focus-visible:ring-brand-lime"
               >
                 <Menu className="size-5 md:hidden" aria-hidden />
                 <span className="hidden text-sm font-bold md:block">{user.fullName.charAt(0).toUpperCase()}</span>

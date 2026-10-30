@@ -45,7 +45,7 @@ async function MatchContent({ params }: MatchPageProps) {
       {match && isIndexable(match) ? (
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdHtml(matchJsonLd(match)) }} />
       ) : null}
-      <MatchDetail code={code} />
+      <MatchDetail code={code} serverMatch={match ?? undefined} />
     </>
   );
 }

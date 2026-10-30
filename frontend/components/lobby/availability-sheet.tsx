@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from "@/components/ui/sheet";
@@ -116,9 +115,9 @@ function AvailabilityForm({ dateKey, current, companies, onOpenChange, onSaved }
       </div>
 
       <div className="space-y-1.5">
-        <Label>Empresa (opcional)</Label>
+        <Label htmlFor="company">Empresa (opcional)</Label>
         <Select value={companyId} onValueChange={setCompanyId}>
-          <SelectTrigger className="w-full">
+          <SelectTrigger id="company" className="w-full">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
