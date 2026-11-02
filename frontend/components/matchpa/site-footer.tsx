@@ -1,7 +1,4 @@
-"use client";
-
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { ContactLink } from "./contact-link";
 
 const LINKS = [
@@ -10,12 +7,10 @@ const LINKS = [
   { href: "/beta", label: "Beta" },
 ];
 
-/** Hidden in the lobby: its fixed "Estoy disponible" bar would cover it. */
+/** Hidden while a fixed bottom bar is on screen; it would cover the footer. */
 export function SiteFooter() {
-  if (usePathname() === "/lobby") return null;
-
   return (
-    <footer className="border-t border-border">
+    <footer className="border-t border-border [body:has([data-fixed-bottom-bar])_&]:hidden">
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-3 px-4 py-6 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
         <nav aria-label="Pie de página" className="-ml-2 flex">
           {LINKS.map((link) => (

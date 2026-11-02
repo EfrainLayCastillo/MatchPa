@@ -240,7 +240,7 @@ export function LobbyView() {
         </TabsContent>
       </Tabs>
 
-      <div className="fixed inset-x-0 bottom-0 z-20 border-t border-border bg-background/95 p-4 backdrop-blur">
+      <div data-fixed-bottom-bar className="fixed inset-x-0 bottom-0 z-20 border-t border-border bg-background/95 p-4 backdrop-blur">
         <div className="mx-auto max-w-6xl">
           <Button
             size="lg"
