@@ -61,7 +61,7 @@ const users: (User & { password: string })[] = [
   {
     id: 1,
     fullName: "Efrain Lay",
-    email: "efrain@matchpa.net",
+    email: "efrain@matchpa.app",
     password: "demo",
     avatarUrl: null,
     phone: "+507 6000-0001",
@@ -108,7 +108,7 @@ function seedPlayer(id: number, fullName: string, category: Category, gender: Ge
   return {
     id,
     fullName,
-    email: `${fullName.split(" ")[0]?.toLowerCase()}@matchpa.net`,
+    email: `${fullName.split(" ")[0]?.toLowerCase()}@matchpa.app`,
     password: "demo",
     avatarUrl: null,
     phone: `+507 6000-000`,

@@ -4,7 +4,7 @@
 
 Plataforma social de pádel para completar partidos y encontrar jugadores. Pensada para crecer a torneos y más deportes.
 
-🌐 **[match-pa.vercel.app](https://match-pa.vercel.app/)**
+🌐 **[matchpa.app](https://matchpa.app/)**
 
 ## Capturas
 

@@ -25,6 +25,8 @@
 - [x] Rendimiento y accesibilidad: Core Web Vitals, imágenes optimizadas, HTML semántico
 - [x] Google Analytics 4 con eventos clave (registro, publicar partido, pedir unirse, aprobación)
 - [x] Google Search Console (propiedad de prefijo de URL sobre `match-pa.vercel.app`; dominio propio pendiente)
+- [ ] Dominio propio `matchpa.app`: Vercel, redirección desde `match-pa.vercel.app` y propiedad de dominio en Search Console
+- [ ] Correo de Resend en `mail.matchpa.app` (SPF/DKIM/DMARC)
 - [ ] Registro con verificación de correo: código de 6 dígitos con expiración e intentos limitados; la cuenta no publica ni se une hasta verificar
 - [ ] Recuperación de contraseña por correo
 - [ ] Google desactivado detrás de un flag (botón oculto y rutas apagadas)

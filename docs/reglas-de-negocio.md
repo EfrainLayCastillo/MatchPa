@@ -46,7 +46,7 @@ Una sola entidad, `match_requests`, con `kind`:
 
 ## Link para compartir
 
-- URL: `matchpa.net/partidos/<code>`, con `code` aleatorio de 8 caracteres (no el `id`, para evitar enumeración).
+- URL: `matchpa.app/partidos/<code>`, con `code` aleatorio de 8 caracteres (no el `id`, para evitar enumeración).
 - Se muestra al publicar y en el detalle.
 - Ver no requiere cuenta. Unirse sí: login → onboarding → vuelve al partido y envía la solicitud.
 - El WhatsApp del organizador solo lo reciben el propio organizador y los jugadores aceptados, y solo mientras el partido está `open` o `full`. Si el partido expiró o se cerró, la API no lo devuelve y el botón no aparece.

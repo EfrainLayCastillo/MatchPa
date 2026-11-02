@@ -46,7 +46,7 @@ Los seeders usan `updateOrCreate`, así que se pueden correr varias veces.
 | `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Google Cloud |
 | `GOOGLE_CALLBACK_URL` | `http://localhost:3333/api/auth/google/callback` |
 | `VAPID_PUBLIC_KEY` / `VAPID_PRIVATE_KEY` | `npx web-push generate-vapid-keys` |
-| `VAPID_SUBJECT` | `mailto:hola@matchpa.net` |
+| `VAPID_SUBJECT` | `mailto:hola@matchpa.app` |
 
 | Frontend (`.env.local`) | Ejemplo |
 |---|---|

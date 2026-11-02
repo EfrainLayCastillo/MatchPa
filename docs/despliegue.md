@@ -4,14 +4,20 @@ Plataformas en plan gratuito: frontend en Vercel, backend en Render y base de da
 
 | Pieza | Plataforma | Configuración |
 |---|---|---|
-| Frontend (Next.js) | Vercel (Hobby) | Root directory `frontend`. Reenvía `/api` y `/__transmit` a Render con `BACKEND_URL`, así el navegador ve un solo origen y la cookie de sesión funciona sin dominio propio. El servidor de Next (metadata e imagen OG del partido) llama a `BACKEND_URL` directo, porque `/api` es relativo. |
+| Frontend (Next.js) | Vercel (Hobby) | Root directory `frontend`. Reenvía `/api` y `/__transmit` a Render con `BACKEND_URL`, así el navegador ve un solo origen (`matchpa.app`) y la cookie de sesión es de primera parte. El backend no tiene subdominio público. El servidor de Next (metadata e imagen OG del partido) llama a `BACKEND_URL` directo, porque `/api` es relativo. |
 | Backend (AdonisJS) | Render (web service, Free) | Root directory `backend`. Build: `npm ci --include=dev && node ace build`. Start: `cd build && npm ci --omit=dev && node ace migration:run --force && node bin/server.js`. |
 | PostgreSQL | Neon (Free) | Conexión con SSL obligatorio en producción. Usar el endpoint directo, sin `-pooler`. |
 
 ## Variables de producción
 
-- **Render:** `NODE_ENV=production`, `NODE_VERSION=24`, `HOST=0.0.0.0`, `PORT=10000`, `SESSION_DRIVER=cookie`, `APP_KEY`, `APP_URL` (URL de Render), `FRONTEND_URL` (URL de Vercel), `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_DATABASE`.
-- **Vercel:** `BACKEND_URL` (URL de Render), `NEXT_PUBLIC_API_URL=/api`, `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_MOCK_API=false`, `NEXT_PUBLIC_GTM_ID=GTM-KHLG4MHS` (solo Production).
+- **Render:** `NODE_ENV=production`, `NODE_VERSION=24`, `HOST=0.0.0.0`, `PORT=10000`, `SESSION_DRIVER=cookie`, `APP_KEY`, `APP_URL` (URL de Render), `FRONTEND_URL=https://matchpa.app`, `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_DATABASE`.
+- **Vercel:** `BACKEND_URL` (URL de Render), `NEXT_PUBLIC_API_URL=/api`, `NEXT_PUBLIC_SITE_URL=https://matchpa.app` (se incrusta al compilar: cambiarla exige redeploy), `NEXT_PUBLIC_MOCK_API=false`, `NEXT_PUBLIC_GTM_ID=GTM-KHLG4MHS` (solo Production).
+
+## Dominio
+
+- `matchpa.app` registrado en Cloudflare. Los registros que apuntan a Vercel van en modo **DNS only** (nube gris): el proxy de Cloudflare encima de Vercel duplica el TLS y puede bufferear el SSE de Transmit.
+- `match-pa.vercel.app` redirige con 308 a `matchpa.app` (Vercel → Domains).
+- Search Console: propiedad de dominio verificada con un TXT en Cloudflare. La de prefijo de URL sobre `match-pa.vercel.app` queda solo como historial.
 
 ## Limitaciones del plan gratuito
 
