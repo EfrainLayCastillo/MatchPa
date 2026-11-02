@@ -8,7 +8,13 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { PageTitle } from "@/components/matchpa/page-title";
 import { PushPrompt } from "@/components/matchpa/push-prompt";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { track } from "@/lib/analytics";
 import { api, ApiError } from "@/lib/api";
@@ -41,7 +47,8 @@ export function LobbyView() {
   const [date, setDate] = useState<string | null>(null);
   const playerDate = date ?? todayKey();
   const [branchFilter, setBranchFilter] = useState(ALL_BRANCHES);
-  const branchId = branchFilter === ALL_BRANCHES ? undefined : Number(branchFilter);
+  const branchId =
+    branchFilter === ALL_BRANCHES ? undefined : Number(branchFilter);
 
   const branchesQuery = useBranches();
   const matchesQuery = useLobbyMatches(date, branchId);
@@ -67,9 +74,14 @@ export function LobbyView() {
   const [availabilityOpen, setAvailabilityOpen] = useState(false);
   const [pushOpen, setPushOpen] = useState(false);
 
-  const branchName = (id: number | null) => branches.find((c) => c.id === id)?.name ?? "Cualquiera";
-  const sortedMatches = matches?.slice().sort(byCategoryDistance(user?.category ?? null));
-  const sortedPlayers = players?.slice().sort(byCategoryDistance(user?.category ?? null));
+  const branchName = (id: number | null) =>
+    branches.find((c) => c.id === id)?.name ?? "Cualquiera";
+  const sortedMatches = matches
+    ?.slice()
+    .sort(byCategoryDistance(user?.category ?? null));
+  const sortedPlayers = players
+    ?.slice()
+    .sort(byCategoryDistance(user?.category ?? null));
 
   async function requestToJoin(match: Match) {
     setJoiningCode(match.code);
@@ -80,7 +92,11 @@ export function LobbyView() {
       if (shouldAskForPush()) setPushOpen(true);
       refresh();
     } catch (err) {
-      setActionError(err instanceof ApiError ? err.message : "No se pudo enviar la solicitud");
+      setActionError(
+        err instanceof ApiError
+          ? err.message
+          : "No se pudo enviar la solicitud",
+      );
     } finally {
       setJoiningCode(null);
     }
@@ -93,25 +109,39 @@ export function LobbyView() {
       await api.closeMatch(match.code);
       refresh();
     } catch (err) {
-      setActionError(err instanceof ApiError ? err.message : "No se pudo cancelar el partido");
+      setActionError(
+        err instanceof ApiError
+          ? err.message
+          : "No se pudo cancelar el partido",
+      );
     } finally {
       setCancelling(false);
     }
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-5 px-4 pb-32 pt-6">
+    <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-5 px-4 pb-32 pt-6">
       <div className="flex items-end justify-between gap-3">
-        <PageTitle hint={`Hola, ${user?.fullName.split(" ")[0]}. ${availability ? formatWindow(availability) : "Aún no estás disponible."}`}>
+        <PageTitle
+          hint={`Hola, ${user?.fullName.split(" ")[0]}. ${availability ? formatWindow(availability) : "Aún no estás disponible."}`}
+        >
           Lobby
         </PageTitle>
-        <Button size="sm" className="font-bold" onClick={() => router.push(`/partidos/nuevo?n=${Date.now()}`)}>
+        <Button
+          size="sm"
+          className="font-bold"
+          onClick={() => router.push(`/partidos/nuevo?n=${Date.now()}`)}
+        >
           Publicar partido
         </Button>
       </div>
 
       {upcomingMatches.length > 0 ? (
-        <UpcomingMatches matches={upcomingMatches} cancelling={cancelling} onCancel={cancelOwnMatch} />
+        <UpcomingMatches
+          matches={upcomingMatches}
+          cancelling={cancelling}
+          onCancel={cancelOwnMatch}
+        />
       ) : null}
 
       {invitations.length > 0 ? (
@@ -125,10 +155,13 @@ export function LobbyView() {
                   className="flex items-center justify-between gap-3 rounded-xl border border-brand-lime bg-brand-lime/30 p-3 text-sm font-semibold"
                 >
                   <span>
-                    {formatDateTime(invitation.match.startsAt)} · Cancha {invitation.match.courtNumber} ·{" "}
+                    {formatDateTime(invitation.match.startsAt)} · Cancha{" "}
+                    {invitation.match.courtNumber} ·{" "}
                     {invitation.match.branchName}
                   </span>
-                  <span className="shrink-0 text-brand-teal dark:text-brand-lime">Responder</span>
+                  <span className="shrink-0 text-brand-teal dark:text-brand-lime">
+                    Responder
+                  </span>
                 </Link>
               </li>
             ))}
@@ -154,20 +187,36 @@ export function LobbyView() {
         </Select>
       </div>
 
-      {error ? <p role="alert" className="text-sm text-destructive">{error}</p> : null}
+      {error ? (
+        <p role="alert" className="text-sm text-destructive">
+          {error}
+        </p>
+      ) : null}
 
       <Tabs defaultValue="matches">
         <TabsList className="w-full sm:w-auto">
-          <TabsTrigger value="matches">Partidos {matches ? `(${matches.length})` : ""}</TabsTrigger>
-          <TabsTrigger value="players">Jugadores {players ? `(${players.length})` : ""}</TabsTrigger>
+          <TabsTrigger value="matches">
+            Partidos {matches ? `(${matches.length})` : ""}
+          </TabsTrigger>
+          <TabsTrigger value="players">
+            Jugadores {players ? `(${players.length})` : ""}
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="matches" className="mt-4">
-          <ListState query={matchesQuery} count={sortedMatches?.length} empty="No hay partidos buscando pala para este día.">
+          <ListState
+            query={matchesQuery}
+            count={sortedMatches?.length}
+            empty="No hay partidos buscando pala para este día."
+          >
             <ul className="grid gap-3 md:grid-cols-2">
               {sortedMatches?.map((match) => (
                 <li key={match.id}>
-                  <MatchCard match={match} onJoin={requestToJoin} joining={joiningCode === match.code} />
+                  <MatchCard
+                    match={match}
+                    onJoin={requestToJoin}
+                    joining={joiningCode === match.code}
+                  />
                 </li>
               ))}
             </ul>
@@ -175,7 +224,11 @@ export function LobbyView() {
         </TabsContent>
 
         <TabsContent value="players" className="mt-4">
-          <ListState query={playersQuery} count={sortedPlayers?.length} empty="Nadie disponible para este día todavía.">
+          <ListState
+            query={playersQuery}
+            count={sortedPlayers?.length}
+            empty="Nadie disponible para este día todavía."
+          >
             <ul className="grid gap-3 md:grid-cols-2">
               {sortedPlayers?.map((player) => (
                 <li key={player.id}>
@@ -188,8 +241,12 @@ export function LobbyView() {
       </Tabs>
 
       <div className="fixed inset-x-0 bottom-0 z-20 border-t border-border bg-background/95 p-4 backdrop-blur">
-        <div className="mx-auto max-w-5xl">
-          <Button size="lg" className="h-12 w-full text-base font-bold" onClick={() => setAvailabilityOpen(true)}>
+        <div className="mx-auto max-w-6xl">
+          <Button
+            size="lg"
+            className="h-12 w-full text-base font-bold"
+            onClick={() => setAvailabilityOpen(true)}
+          >
             {availability ? "Editar mi disponibilidad" : "Estoy disponible"}
           </Button>
         </div>
@@ -214,7 +271,9 @@ export function LobbyView() {
 
 function formatWindow(slot: Availability): string {
   const label = formatAvailabilityWindow(slot);
-  return slot.fromTime === null ? `Estás disponible ${label.toLowerCase()}.` : `Estás disponible: ${label}.`;
+  return slot.fromTime === null
+    ? `Estás disponible ${label.toLowerCase()}.`
+    : `Estás disponible: ${label}.`;
 }
 
 interface ListStateProps {
@@ -225,12 +284,17 @@ interface ListStateProps {
 }
 
 function ListState({ query, count, empty, children }: ListStateProps) {
-  if (count === undefined && query.isError) return <LoadFailed onRetry={query.refetch} />;
+  if (count === undefined && query.isError)
+    return <LoadFailed onRetry={query.refetch} />;
   if (count === undefined) return <CardListSkeleton />;
   if (count === 0) return <Empty>{empty}</Empty>;
   return children;
 }
 
 function Empty({ children }: { children: React.ReactNode }) {
-  return <p className="rounded-xl border border-dashed border-border py-10 text-center text-sm text-muted-foreground">{children}</p>;
+  return (
+    <p className="rounded-xl border border-dashed border-border py-10 text-center text-sm text-muted-foreground">
+      {children}
+    </p>
+  );
 }

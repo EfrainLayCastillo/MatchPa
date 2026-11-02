@@ -13,6 +13,7 @@ Las URLs son visibles para el usuario, así que van en español.
 | Ruta | Sesión | Descripción |
 |---|---|---|
 | `/` | No | Home |
+| `/beta` | No | Qué es la beta: el problema, por qué nació, cómo se usa y lo que viene. Enlazada desde el badge "Beta" del header |
 | `/login` | No | Google o correo y contraseña |
 | `/registro` | No | Registro básico |
 | `/onboarding` | Sí | Categoría, género y teléfono. Obligatorio antes del lobby |

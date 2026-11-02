@@ -32,7 +32,12 @@
 - [ ] Clubs (comunidades de jugadores) en el perfil
 - [ ] Chat del partido con mensajes predefinidos ("Voy en camino", "Llego 10 min tarde", "No puedo ir")
 - [ ] Avisos por WhatsApp Cloud API
-- [ ] Torneos: eliminación directa, liguilla, Americano/Mexicano
+- [ ] Eventos especiales: página `/eventos` con los main events de cada sucursal y del año
+  - [ ] Vitrina tematizada: lista y detalle `/eventos/[slug]` con portada, colores y logo propios (tema como datos, no código por evento). Los carga el admin; la inscripción, por WhatsApp a la sucursal
+  - [ ] Inscripción de parejas en la app, con cupos por categoría y aprobación del admin
+  - [ ] Eliminación directa: cuadro generado desde los inscritos, resultados en vivo con Transmit
+  - [ ] Liguilla (fase de grupos + eliminación) con tabla de posiciones
+  - [ ] Americano / Mexicano: ranking individual por puntos con rotación de compañero
 - [ ] Lobby 3D con avatares estilo Mii
 - [ ] Análisis de video con IA
 - [ ] Más deportes: tenis, fútbol 5, básquet
