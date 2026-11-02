@@ -6,16 +6,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 import { PageTitle } from "@/components/matchpa/page-title";
 import { PushPrompt } from "@/components/matchpa/push-prompt";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -30,8 +20,8 @@ import {
   useLobbyMatches,
   useLobbyPlayers,
   useLobbyRealtime,
-  useOwnMatch,
   useRefreshLobby,
+  useUpcomingMatches,
 } from "@/lib/lobby-queries";
 import { formatDateTime, todayKey } from "@/lib/panamaFormatDate";
 import { shouldAskForPush } from "@/lib/push";
@@ -41,6 +31,7 @@ import { AvailabilitySheet } from "./availability-sheet";
 import { DateStrip } from "./date-strip";
 import { MatchCard } from "./match-card";
 import { PlayerCard } from "./player-card";
+import { UpcomingMatches } from "./upcoming-matches";
 
 const ALL_BRANCHES = "all";
 
@@ -57,7 +48,7 @@ export function LobbyView() {
   const playersQuery = useLobbyPlayers(playerDate, branchId);
   const availabilitiesQuery = useAvailabilities();
   const invitations = useInvitations().data ?? [];
-  const ownMatch = useOwnMatch().data ?? null;
+  const upcomingMatches = useUpcomingMatches().data ?? [];
 
   const branches = branchesQuery.data ?? [];
   const matches = matchesQuery.data;
@@ -73,7 +64,6 @@ export function LobbyView() {
 
   const [joiningCode, setJoiningCode] = useState<string | null>(null);
   const [cancelling, setCancelling] = useState(false);
-  const [confirmCancel, setConfirmCancel] = useState(false);
   const [availabilityOpen, setAvailabilityOpen] = useState(false);
   const [pushOpen, setPushOpen] = useState(false);
 
@@ -120,44 +110,8 @@ export function LobbyView() {
         </Button>
       </div>
 
-      {ownMatch ? (
-        <section className="flex flex-col gap-3 rounded-xl border border-brand-teal bg-card p-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="space-y-1">
-            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              Tu próximo partido · {ownMatch.isOrganizer ? "Organizas" : "Juegas"}
-            </p>
-            <p className="font-heading text-lg font-bold leading-tight">{formatDateTime(ownMatch.startsAt)}</p>
-            <p className="text-sm text-muted-foreground">
-              {ownMatch.branch.name} · Cancha {ownMatch.courtNumber} · Faltan {ownMatch.spotsLeft}
-            </p>
-          </div>
-          <div className="flex gap-2">
-            <Button asChild size="sm">
-              <Link href={`/partidos/${ownMatch.code}`}>Ver partido</Link>
-            </Button>
-            {ownMatch.isOrganizer ? (
-              <Button size="sm" variant="outline" onClick={() => setConfirmCancel(true)} disabled={cancelling}>
-                Cancelar partido
-              </Button>
-            ) : null}
-          </div>
-          <AlertDialog open={confirmCancel} onOpenChange={setConfirmCancel}>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>¿Cancelar este partido?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  Dejará de aparecer en el lobby y no se podrán sumar más jugadores.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Volver</AlertDialogCancel>
-                <AlertDialogAction onClick={() => cancelOwnMatch(ownMatch)} disabled={cancelling}>
-                  Sí, cancelar
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        </section>
+      {upcomingMatches.length > 0 ? (
+        <UpcomingMatches matches={upcomingMatches} cancelling={cancelling} onCancel={cancelOwnMatch} />
       ) : null}
 
       {invitations.length > 0 ? (

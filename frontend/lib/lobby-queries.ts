@@ -61,11 +61,11 @@ export function useInvitations() {
   });
 }
 
-export function useOwnMatch() {
+export function useUpcomingMatches() {
   return useQuery({
     queryKey: lobbyKeys.owned,
     queryFn: () => api.myMatches(),
-    select: nextMatch,
+    select: upcoming,
     ...ON_VISIT,
   });
 }
@@ -89,8 +89,9 @@ export function useLobbyRealtime(userId: number | undefined) {
   );
 }
 
-/** The soonest open or full match the user organizes or plays in. */
-function nextMatch(matches: Match[]): Match | null {
-  const open = matches.filter((m) => m.status === "open" || m.status === "full");
-  return open.sort((a, b) => a.startsAt.localeCompare(b.startsAt))[0] ?? null;
+/** Open or full matches the user organizes or plays in, soonest first. */
+function upcoming(matches: Match[]): Match[] {
+  return matches
+    .filter((m) => m.status === "open" || m.status === "full")
+    .sort((a, b) => a.startsAt.localeCompare(b.startsAt));
 }

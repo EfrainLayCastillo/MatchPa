@@ -16,7 +16,7 @@ Las URLs son visibles para el usuario, así que van en español.
 | `/login` | No | Google o correo y contraseña |
 | `/registro` | No | Registro básico |
 | `/onboarding` | Sí | Categoría, género y teléfono. Obligatorio antes del lobby |
-| `/lobby` | Sí | Selector de fecha y pestañas **Partidos** / **Jugadores**. Botón fijo "Estoy disponible" (bottom sheet) |
+| `/lobby` | Sí | Carrusel de tus próximos partidos (abiertos o completos, el más cercano primero). Selector de fecha y pestañas **Partidos** / **Jugadores**. Botón fijo "Estoy disponible" (bottom sheet) |
 | `/partidos/nuevo` | Sí | Publicar partido |
 | `/partidos/[code]` | Para actuar | Detalle público. El organizador gestiona solicitudes, invita, saca y cierra; el jugador puede salirse |
 | `/perfil` | Sí | Editar categoría, género y WhatsApp, activar/desactivar push |
