@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { BetaPill } from "@/components/matchpa/beta-badge";
+import { ContactLink } from "@/components/matchpa/contact-link";
 import { StepCards } from "@/components/matchpa/step-cards";
 import { UpcomingFeatures } from "@/components/matchpa/upcoming-features";
 import { Button } from "@/components/ui/button";
@@ -32,7 +33,7 @@ const HOW_TO = [
 const EXPECT = [
   "Las funciones base ya funcionan: publicar, compartir, unirse, invitar y avisos push.",
   "Vamos a ir cambiando cosas según cómo la usen ustedes. Algo puede moverse de lugar.",
-  "Si algo falla o te falta, cuéntanos: cada comentario se convierte en una mejora.",
+  "Cada comentario, error o idea que nos mandes se convierte en una mejora.",
 ];
 
 export default function BetaPage() {
@@ -90,6 +91,9 @@ export default function BetaPage() {
             </li>
           ))}
         </ul>
+        <p className="rounded-2xl border border-brand-turquoise/40 bg-brand-turquoise/10 p-4 text-sm">
+          ¿Una duda, una idea o algo que no funciona? Escríbenos a <ContactLink />.
+        </p>
       </section>
 
       <section aria-labelledby="viene" className="space-y-4">

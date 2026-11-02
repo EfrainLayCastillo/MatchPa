@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { ContactLink } from "./contact-link";
 
 const LINKS = [
   { href: "/", label: "Inicio" },
@@ -27,13 +28,18 @@ export function SiteFooter() {
             </Link>
           ))}
         </nav>
-        <p>
-          © Match
-          <span className="font-script text-base text-brand-teal dark:text-brand-lime">
-            Pa
-          </span>{" "}
-          · Hecho en Panamá para los que no se pierden un partido.
-        </p>
+        <div className="space-y-1 sm:text-right">
+          <p>
+            ¿Dudas o ideas? <ContactLink />
+          </p>
+          <p>
+            © Match
+            <span className="font-script text-base text-brand-teal dark:text-brand-lime">
+              Pa
+            </span>{" "}
+            · Hecho en Panamá para los que no se pierden un partido.
+          </p>
+        </div>
       </div>
     </footer>
   );

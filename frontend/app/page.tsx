@@ -82,10 +82,13 @@ export default function HomePage() {
               arranca.
             </span>
           </h2>
-          <p className="max-w-xl text-brand-ivory/80">
-            MatchPa está en beta: lo esencial ya funciona y vamos sumando lo que
-            nos piden en la cancha. Esto es lo próximo.
+          <p className="text-brand-ivory/80">
+            MatchPa está en beta: lo esencial ya funciona y vamos sumando lo que nos piden en la cancha.
           </p>
+        </div>
+        <div className="flex items-center gap-4" aria-hidden>
+          <span className="font-script text-3xl text-brand-lime sm:text-4xl">esto es lo próximo</span>
+          <span className="h-px flex-1 bg-gradient-to-r from-brand-lime/70 to-transparent" />
         </div>
         <UpcomingFeatures />
         <Link
