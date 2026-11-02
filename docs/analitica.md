@@ -22,7 +22,7 @@ Las visitas de página las registra la medición mejorada de GA4 ("Cambios de p�
 
 ## Configuración en GTM
 
-1. Etiqueta **Google tag** con el ID `G-…` de GA4, activador *Initialization – All Pages*.
+1. Etiqueta **Google tag** con el ID `G-P6RE7HL8BN` de GA4, activador *Initialization – All Pages*.
 2. Activador **Evento personalizado** con nombre `sign_up|publish_match|join_request|join_approved` y la opción de expresión regular.
 3. Variables de capa de datos: `category`, `match_type`, `max_players`, `source`.
 4. Etiqueta **Evento de GA4** con nombre `{{Event}}`, los parámetros anteriores y el activador del paso 2.
