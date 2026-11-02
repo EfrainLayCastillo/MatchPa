@@ -95,6 +95,10 @@ Abre [http://localhost:3000](http://localhost:3000). Variables, datos de prueba 
 | [Roadmap](docs/roadmap.md) | Lo hecho y lo que sigue |
 | [Arquitectura](docs/arquitectura.html) | Diagrama interactivo |
 
+## Herramientas por evaluar
+
+- **[fallow](https://github.com/fallow-rs/fallow):** detecta código muerto, dependencias sin uso y duplicados en TS/JS. Se corre a mano en cada paquete con `npx fallow dead-code` o `npx fallow dupes`, sin instalarlo ni ponerlo en CI. Ignora sus avisos sobre `components/ui/**` (shadcn) y `public/sw.js`, y en el backend sobre `pg`, `hot-hook`, los specs de Japa y los ciclos entre modelos de Lucid: son falsos positivos.
+
 ## Estado
 
 - **Desarrollo:** MVP en curso. Lo hecho y lo pendiente está en el [roadmap](docs/roadmap.md).

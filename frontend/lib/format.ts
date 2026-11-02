@@ -30,10 +30,6 @@ export const GENDER_LABELS: Record<Gender, string> = {
 
 export const CATEGORIES = [1, 2, 3, 4, 5, 6, 7] as const satisfies Category[];
 
-export function categoryLabel(category: Category): string {
-  return `${CATEGORY_LABELS[category]} categoría`;
-}
-
 export function shortCategory(category: Category): string {
   return CATEGORY_LABELS[category];
 }

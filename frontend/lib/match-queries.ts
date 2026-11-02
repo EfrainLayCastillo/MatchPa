@@ -7,7 +7,7 @@ import { lobbyKeys } from "@/lib/lobby-queries";
 import { subscribe } from "@/lib/realtime";
 import type { Match } from "@/lib/types";
 
-export const matchKeys = {
+const matchKeys = {
   detail: (code: string) => ["match", code] as const,
 };
 

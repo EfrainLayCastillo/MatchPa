@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { api } from "@/lib/api";
-import { GENDER_LABELS, shortCategory } from "@/lib/format";
+import { GENDER_LABELS, firstName, shortCategory } from "@/lib/format";
 import type { Match, Player } from "@/lib/types";
 
 interface PlayerCardProps {
@@ -67,12 +67,12 @@ function InviteDialog({
   onClose: () => void;
 }) {
   const [message, setMessage] = useState<string | null>(null);
-  const firstName = player.fullName.split(" ")[0];
+  const playerName = firstName(player.fullName);
 
   async function invite(match: Match) {
     try {
       await api.invite(match.code, player.id);
-      setMessage(`Listo, le enviamos la invitación a ${firstName}.`);
+      setMessage(`Listo, le enviamos la invitación a ${playerName}.`);
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "No se pudo enviar la invitación");
     }
@@ -89,7 +89,7 @@ function InviteDialog({
     <Dialog open={matches !== null} onOpenChange={handleOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Invitar a {firstName}</DialogTitle>
+          <DialogTitle>Invitar a {playerName}</DialogTitle>
           <DialogDescription>Elige el partido al que lo quieres sumar.</DialogDescription>
         </DialogHeader>
         <ul className="space-y-2">

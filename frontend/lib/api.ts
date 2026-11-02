@@ -18,7 +18,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3333/api";
 const USE_MOCKS = process.env.NEXT_PUBLIC_MOCK_API === "true";
 const REQUEST_TIMEOUT_MS = 20_000;
 
-export async function request<T>(
+async function request<T>(
   method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE",
   path: string,
   body?: unknown,
@@ -57,18 +57,18 @@ function query(params: object): string {
   return new URLSearchParams(entries.map(([k, v]) => [k, String(v)])).toString();
 }
 
-export interface PlayerFilters {
+interface PlayerFilters {
   date: string;
   branchId?: number;
 }
 
-export interface MatchFilters {
+interface MatchFilters {
   date?: string;
   branchId?: number;
   type?: MatchType;
 }
 
-export interface ProfileInput {
+interface ProfileInput {
   fullName?: string;
   category?: Category;
   gender?: Gender;

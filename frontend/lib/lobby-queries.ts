@@ -90,7 +90,7 @@ export function useLobbyRealtime(userId: number | undefined) {
 }
 
 /** The soonest open or full match the user organizes or plays in. */
-export function nextMatch(matches: Match[]): Match | null {
+function nextMatch(matches: Match[]): Match | null {
   const open = matches.filter((m) => m.status === "open" || m.status === "full");
   return open.sort((a, b) => a.startsAt.localeCompare(b.startsAt))[0] ?? null;
 }
