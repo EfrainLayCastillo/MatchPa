@@ -34,8 +34,8 @@ export interface User {
 
 export interface Availability {
   date: string;
-  fromTime: string;
-  toTime: string;
+  fromTime: string | null;
+  toTime: string | null;
   branchId: number | null;
 }
 

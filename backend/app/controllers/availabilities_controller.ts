@@ -4,7 +4,8 @@ import BusinessRuleError from '#exceptions/business_rule_error'
 import Availability from '#models/availability'
 import { availabilityValidator } from '#validators/profile'
 import { serializeAvailability } from '#serializers/availability_serializer'
-import { PANAMA_ZONE, earliestSlotToday, todayInPanama } from '#services/panama_time'
+import { assertAvailabilityWindow } from '#services/availability_rules'
+import { PANAMA_ZONE, todayInPanama } from '#services/panama_time'
 import { lobbyChanged } from '#services/realtime'
 
 export default class AvailabilitiesController {
@@ -20,10 +21,7 @@ export default class AvailabilitiesController {
     const userId = auth.getUserOrFail().id
     const date = assertFutureDate(params.date)
     const data = await request.validateUsing(availabilityValidator)
-    if (data.toTime <= data.fromTime)
-      throw new BusinessRuleError('La hora de fin debe ser después de la de inicio')
-
-    assertNotPast(date, data.fromTime)
+    assertAvailabilityWindow(date, data.fromTime, data.toTime)
 
     const existing = await Availability.query().where('user_id', userId).where('date', date).first()
     const slot = existing ?? new Availability()
@@ -48,13 +46,4 @@ function assertFutureDate(date: string): string {
     throw new BusinessRuleError('La fecha debe ser hoy o una fecha futura')
   }
   return date
-}
-
-/** Same-day slots can't start before the next half hour. */
-function assertNotPast(date: string, fromTime: string): void {
-  if (date !== todayInPanama()) return
-  const earliest = earliestSlotToday()
-  if (earliest === null || fromTime < earliest) {
-    throw new BusinessRuleError('Esa hora ya pasó, elige una hora posterior')
-  }
 }

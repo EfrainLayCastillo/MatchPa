@@ -21,7 +21,7 @@ Base `/api`. Todo requiere sesión salvo auth, `GET /branches` y `GET /matches/:
 | `GET` | `/branches` | Catálogo de sucursales |
 | `GET` | `/players` | Jugadores disponibles (`date`, `branchId`, horario) |
 | `GET` | `/me/availabilities` | Mis disponibilidades futuras |
-| `PUT` | `/me/availabilities/:date` | Crear o actualizar |
+| `PUT` | `/me/availabilities/:date` | Crear o actualizar (`fromTime`, `toTime`, `branchId`; horario `null` = todo el día) |
 | `DELETE` | `/me/availabilities/:date` | Quitar |
 
 ## Partidos

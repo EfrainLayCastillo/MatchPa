@@ -15,10 +15,10 @@ export default class Availability extends BaseModel {
   declare date: DateTime
 
   @column()
-  declare fromTime: string
+  declare fromTime: string | null
 
   @column()
-  declare toTime: string
+  declare toTime: string | null
 
   @column()
   declare branchId: number | null

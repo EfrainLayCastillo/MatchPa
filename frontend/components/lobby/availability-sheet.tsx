@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from "@/components/ui/sheet";
@@ -34,10 +35,16 @@ function AvailabilityForm({ dateKey, current, branches, onOpenChange, onSaved }:
   // Today, nothing before the next half hour is bookable.
   const earliest = dateKey === todayKey() ? earliestSlotToday() : "00:00";
   const noSlotsLeft = earliest === null;
-  const initialFrom = laterOf(current?.fromTime.slice(0, 5) ?? "18:00", earliest ?? "23:30");
+  const initialFrom = laterOf(current?.fromTime?.slice(0, 5) ?? "18:00", earliest ?? "23:30");
   const [fromTime, setFromTime] = useState(initialFrom);
-  const [toTime, setToTime] = useState(laterOf(current?.toTime.slice(0, 5) ?? "21:00", endAfter(initialFrom)));
+  const [toTime, setToTime] = useState(laterOf(current?.toTime?.slice(0, 5) ?? "21:00", endAfter(initialFrom)));
+  const [hasWindow, setHasWindow] = useState(current?.fromTime != null && !noSlotsLeft);
   const fromOptions = earliest ? halfHourTimes(fromTime).filter((t) => t >= earliest) : [];
+
+  function toggleWindow(on: boolean) {
+    setHasWindow(on);
+    if (on && earliest && fromTime < earliest) changeFrom(earliest);
+  }
 
   function changeFrom(next: string) {
     setFromTime(next);
@@ -48,13 +55,13 @@ function AvailabilityForm({ dateKey, current, branches, onOpenChange, onSaved }:
   const [busy, setBusy] = useState(false);
 
   async function save() {
-    if (toTime <= fromTime) return setError("La hora de fin debe ser después de la de inicio");
+    if (hasWindow && toTime <= fromTime) return setError("La hora de fin debe ser después de la de inicio");
     setBusy(true);
     setError(null);
     try {
       await api.setAvailability(dateKey, {
-        fromTime,
-        toTime,
+        fromTime: hasWindow ? fromTime : null,
+        toTime: hasWindow ? toTime : null,
         branchId: branchId === ANY_BRANCH ? null : Number(branchId),
       });
       onSaved();
@@ -81,6 +88,20 @@ function AvailabilityForm({ dateKey, current, branches, onOpenChange, onSaved }:
         <SheetDescription>Aparecerás en el pool de jugadores para ese día.</SheetDescription>
       </SheetHeader>
 
+      <div className="flex min-h-11 items-center gap-3">
+        <Checkbox
+          id="has-window"
+          checked={hasWindow}
+          onCheckedChange={(checked) => toggleWindow(checked === true)}
+          disabled={noSlotsLeft}
+          className="size-5"
+        />
+        <Label htmlFor="has-window" className="min-h-11 flex-1 items-center">
+          Tengo horario
+        </Label>
+      </div>
+
+      {hasWindow ? (
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-1.5">
           <Label htmlFor="from">Desde</Label>
@@ -113,6 +134,7 @@ function AvailabilityForm({ dateKey, current, branches, onOpenChange, onSaved }:
           </Select>
         </div>
       </div>
+      ) : null}
 
       <div className="space-y-1.5">
         <Label htmlFor="branch">Sucursal (opcional)</Label>

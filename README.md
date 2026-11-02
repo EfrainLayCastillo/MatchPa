@@ -12,7 +12,7 @@ Plataforma social de pádel para completar partidos y encontrar jugadores. Pensa
 <tr>
 <td align="center" width="33%"><img src="docs/capturas/home.png" width="220" alt="Home"/><br/><sub><b>Home</b>: página de inicio</sub></td>
 <td align="center" width="33%"><img src="docs/capturas/lobby.png" width="220" alt="Lobby"/><br/><sub><b>Lobby</b>: partidos y jugadores del día, ordenados por tu categoría</sub></td>
-<td align="center" width="33%"><img src="docs/capturas/available.png" width="220" alt="Disponibilidad"/><br/><sub><b>Disponibilidad</b>: horario por día y sucursal</sub></td>
+<td align="center" width="33%"><img src="docs/capturas/available.png" width="220" alt="Disponibilidad"/><br/><sub><b>Disponibilidad</b>: por día, con horario y sucursal opcionales</sub></td>
 </tr>
 <tr>
 <td align="center" width="33%"><img src="docs/capturas/new.png" width="220" alt="Publicar partido"/><br/><sub><b>Publicar partido</b>: formulario en dos pasos</sub></td>

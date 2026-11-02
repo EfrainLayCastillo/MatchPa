@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { api } from "@/lib/api";
-import { GENDER_LABELS, firstName, shortCategory } from "@/lib/format";
+import { GENDER_LABELS, firstName, formatAvailabilityWindow, shortCategory } from "@/lib/format";
 import type { Match, Player } from "@/lib/types";
 
 interface PlayerCardProps {
@@ -45,7 +45,7 @@ export function PlayerCard({ player, branchName }: PlayerCardProps) {
             {shortCategory(player.category)} categoría · {GENDER_LABELS[player.gender]}
           </p>
           <p className="text-xs text-muted-foreground">
-            {availability.fromTime}–{availability.toTime} · {branchName(availability.branchId)}
+            {formatAvailabilityWindow(availability)} · {branchName(availability.branchId)}
           </p>
         </div>
         <Button size="sm" variant="outline" onClick={invite} disabled={busy} className="shrink-0">

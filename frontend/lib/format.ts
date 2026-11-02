@@ -1,4 +1,5 @@
-import type { Category, Gender, MatchStatus, MatchType } from "./types";
+import { formatClock12, todayKey } from "./panamaFormatDate";
+import type { Availability, Category, Gender, MatchStatus, MatchType } from "./types";
 
 const CATEGORY_LABELS: Record<Category, string> = {
   1: "1ra",
@@ -50,4 +51,11 @@ export function formatDuration(minutes: 90 | 120): string {
 
 export function firstName(fullName: string): string {
   return fullName.split(" ")[0] ?? fullName;
+}
+
+export function formatAvailabilityWindow(slot: Pick<Availability, "date" | "fromTime" | "toTime">): string {
+  if (slot.fromTime === null || slot.toTime === null) {
+    return slot.date === todayKey() ? "Resto del día" : "Todo el día";
+  }
+  return `${formatClock12(slot.fromTime.slice(0, 5))} – ${formatClock12(slot.toTime.slice(0, 5))}`;
 }

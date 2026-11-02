@@ -25,7 +25,6 @@
 - [x] Rendimiento y accesibilidad: Core Web Vitals, imágenes optimizadas, HTML semántico
 - [x] Google Analytics 4 con eventos clave (registro, publicar partido, pedir unirse, aprobación)
 - [x] Google Search Console (propiedad de prefijo de URL sobre `match-pa.vercel.app`; dominio propio pendiente)
-- [ ] Ajustes de lógica y reglas de negocio (por definir)
 - [ ] Lanzamiento de la beta
 
 ## Después

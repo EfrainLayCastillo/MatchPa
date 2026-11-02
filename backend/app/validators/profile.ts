@@ -13,7 +13,13 @@ export const updateProfileValidator = vine.create({
 })
 
 export const availabilityValidator = vine.create({
-  fromTime: vine.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/),
-  toTime: vine.string().regex(/^(([01]\d|2[0-3]):[0-5]\d|24:00)$/),
+  fromTime: vine
+    .string()
+    .regex(/^([01]\d|2[0-3]):(00|30)$/)
+    .nullable(),
+  toTime: vine
+    .string()
+    .regex(/^(([01]\d|2[0-3]):(00|30)|24:00)$/)
+    .nullable(),
   branchId: vine.number().positive().nullable(),
 })

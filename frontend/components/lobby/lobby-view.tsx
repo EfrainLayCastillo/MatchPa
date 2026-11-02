@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { track } from "@/lib/analytics";
 import { api, ApiError } from "@/lib/api";
-import { byCategoryDistance } from "@/lib/format";
+import { byCategoryDistance, formatAvailabilityWindow } from "@/lib/format";
 import {
   useAvailabilities,
   useBranches,
@@ -102,7 +102,7 @@ export function LobbyView() {
   return (
     <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-5 px-4 pb-32 pt-6">
       <div className="flex items-end justify-between gap-3">
-        <PageTitle hint={`Hola, ${user?.fullName.split(" ")[0]}. ${availability ? `Estás disponible ${formatWindow(availability)}.` : "Aún no estás disponible."}`}>
+        <PageTitle hint={`Hola, ${user?.fullName.split(" ")[0]}. ${availability ? formatWindow(availability) : "Aún no estás disponible."}`}>
           Lobby
         </PageTitle>
         <Button size="sm" className="font-bold" onClick={() => router.push(`/partidos/nuevo?n=${Date.now()}`)}>
@@ -213,7 +213,8 @@ export function LobbyView() {
 }
 
 function formatWindow(slot: Availability): string {
-  return `de ${slot.fromTime} a ${slot.toTime}`;
+  const label = formatAvailabilityWindow(slot);
+  return slot.fromTime === null ? `Estás disponible ${label.toLowerCase()}.` : `Estás disponible: ${label}.`;
 }
 
 interface ListStateProps {

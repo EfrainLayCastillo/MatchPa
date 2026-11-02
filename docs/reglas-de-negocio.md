@@ -57,10 +57,11 @@ Una sola entidad, `match_requests`, con `kind`:
 
 ## Disponibilidad
 
-- Una por jugador por fecha (hoy o futura), con rango de horas.
+- Una por jugador por fecha (hoy o futura).
+- **Horario opcional.** Sin horario = disponible todo el día; si es hoy, el resto del día. Si se indica, `Desde` y `Hasta` van juntos.
 - Sucursal opcional; vacía = cualquiera.
-- **Horarios cada 30 minutos**, mostrados en formato de 12 horas (`8:30 a. m.`). El fin del día se guarda como `24:00` y se muestra como `12:00 a. m.`.
-- Hoy, `Desde` no puede ser antes de la próxima media hora (redondeada hacia arriba). Si ya no quedan horas hoy, no se puede guardar. La API valida lo mismo.
+- **Horarios cada 30 minutos** (`:00` o `:30`, la API también lo valida), mostrados en formato de 12 horas (`8:30 a. m.`). El fin del día se guarda como `24:00` y se muestra como `12:00 a. m.`.
+- Hoy, `Desde` no puede ser antes de la próxima media hora (redondeada hacia arriba). Si ya no quedan medias horas hoy, no se puede guardar, con o sin horario. La API valida lo mismo.
 - Un jugador comprometido ese día (organiza o tiene una solicitud aceptada en un partido abierto o completo) no aparece en la lista de disponibles de ese día.
 - El jugador la quita o expira al terminar el día (`date < hoy` en hora de Panamá).
 
