@@ -39,6 +39,12 @@
 
 ## Después
 
+- [ ] Panel administrativo `/admin` para catálogos y datos estáticos
+  - [ ] Rol `admin` de plataforma (el dueño): CRUD de sucursales, aprobar "Sugerir sucursal" y cargar eventos especiales
+  - [ ] Rol de admin de sucursal: cuenta ligada a una o más sucursales asociadas; edita solo sus datos (teléfono, website, `maps_url`) y sus eventos
+  - [ ] Invitación del admin de plataforma para asociar una sucursal, sin autoregistro
+  - [ ] Auditoría: quién cambió qué y cuándo
+
 - [ ] Clubs (comunidades de jugadores) en el perfil
 - [ ] Chat del partido con mensajes predefinidos ("Voy en camino", "Llego 10 min tarde", "No puedo ir")
 - [ ] Avisos por WhatsApp Cloud API
