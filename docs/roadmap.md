@@ -25,7 +25,17 @@
 - [x] Rendimiento y accesibilidad: Core Web Vitals, imágenes optimizadas, HTML semántico
 - [x] Google Analytics 4 con eventos clave (registro, publicar partido, pedir unirse, aprobación)
 - [x] Google Search Console (propiedad de prefijo de URL sobre `match-pa.vercel.app`; dominio propio pendiente)
+- [ ] Registro con verificación de correo: código de 6 dígitos con expiración e intentos limitados; la cuenta no publica ni se une hasta verificar
+- [ ] Recuperación de contraseña por correo
+- [ ] Google desactivado detrás de un flag (botón oculto y rutas apagadas)
+- [ ] Endurecer seguridad del backend: CSP y headers con Shield, rate limit en endpoints de escritura, sesión regenerada al login, `npm audit` en CI
+- [ ] Endurecer seguridad de la BD: rol de app sin permisos de DDL (las migraciones con otro rol), backups/PITR de Neon verificados
+- [ ] Catálogo completo de sucursales de Panamá con coordenadas, y "Sugerir sucursal" con aprobación del admin
 - [ ] Lanzamiento de la beta
+
+## Beta: segunda etapa
+
+- [ ] Reactivar Google y vincularlo a la cuenta con el mismo correo solo si ese correo está verificado
 
 ## Después
 
