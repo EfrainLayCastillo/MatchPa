@@ -6,6 +6,7 @@ import { GoogleTagManager } from "@next/third-parties/google";
 import { GTM_ID } from "@/lib/analytics";
 import { Bricolage_Grotesque, Inter, Yellowtail } from "next/font/google";
 import "./globals.css";
+import { SiteFooter } from "@/components/matchpa/site-footer";
 import { SiteHeader } from "@/components/matchpa/site-header";
 import { SessionProvider } from "@/lib/session";
 import { QueryProvider } from "@/components/matchpa/query-provider";
@@ -47,6 +48,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <SessionProvider>
             <SiteHeader />
             <main className="flex flex-1 flex-col">{children}</main>
+            <SiteFooter />
           </SessionProvider>
         </QueryProvider>
         <SpeedInsights />
