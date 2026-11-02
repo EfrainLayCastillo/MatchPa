@@ -27,6 +27,7 @@ export const metadata: Metadata = {
   description: "Encuentra jugadores y completa tu partido de pádel.",
   openGraph: SITE_OPEN_GRAPH,
   twitter: { card: "summary_large_image" },
+  verification: { google: "v0eJGIWsNCVgZ4Hg8guEabY7jI_hAPGd5S3Kt-peaNY" },
 };
 
 export const viewport: Viewport = {

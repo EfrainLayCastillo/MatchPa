@@ -24,7 +24,7 @@
 - [x] `sitemap.xml` y `robots.txt` (sin partidos: el `code` no debe enumerarse)
 - [x] Rendimiento y accesibilidad: Core Web Vitals, imágenes optimizadas, HTML semántico
 - [x] Google Analytics 4 con eventos clave (registro, publicar partido, pedir unirse, aprobación)
-- [ ] Google Search Console y verificación del dominio
+- [x] Google Search Console (propiedad de prefijo de URL sobre `match-pa.vercel.app`; dominio propio pendiente)
 - [ ] Ajustes de lógica y reglas de negocio (por definir)
 - [ ] Lanzamiento de la beta
 
