@@ -10,7 +10,9 @@ Especificación de qué debe cumplir el backend y el frontend. Si el código se 
 - Las cuentas creadas con Google nacen verificadas si Google reporta el correo como verificado.
 - Reenvío: espera de 60 s entre códigos y máximo 5 por hora, por usuario.
 - Mientras no esté verificado, el perfil muestra un aviso con el botón "Verificar correo", que envía un código al tocarlo.
-- Verificar es opcional por ahora: el usuario puede seguir con "Hacerlo después".
+- Publicar, pedir unirse y aceptar una invitación exigen correo verificado. Lobby, perfil y disponibilidad no: "Hacerlo después" deja explorar.
+- Las acciones del organizador sobre sus partidos (aprobar, rechazar, sacar, editar, cerrar) e invitar no lo exigen: publicar ya lo exigió, y así los partidos de cuentas anteriores a la verificación no quedan congelados.
+- El organizador no puede aprobar una solicitud de un jugador sin verificar (solicitudes creadas antes de la verificación): responde "Este jugador aún no verifica su correo".
 
 ## Partidos
 

@@ -44,6 +44,7 @@ async function request<T>(
     throw new ApiError(
       res.status,
       data.errors ?? [{ message: data.message ?? "Algo salió mal, intenta de nuevo" }],
+      data.code,
     );
   }
   return data as T;

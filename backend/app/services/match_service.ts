@@ -7,6 +7,7 @@ import Match, { type MatchStatus, type MatchType } from '#models/match'
 import MatchGuest from '#models/match_guest'
 import MatchRequest, { type RequestStatus } from '#models/match_request'
 import User from '#models/user'
+import { assertEmailVerified } from '#services/email_verification'
 import { effectiveStatus, spotsLeft } from '#services/match_rules'
 import { PANAMA_ZONE, panamaDayBounds } from '#services/panama_time'
 
@@ -42,6 +43,7 @@ const TRANSITIONS: Record<RequestAction, { from: RequestStatus; to: RequestStatu
 }
 
 export async function publishMatch(organizer: User, input: MatchInput): Promise<Match> {
+  assertEmailVerified(organizer)
   return db.transaction(async (trx) => {
     const match = await Match.create(
       { ...matchFields(input), code: generateCode(), organizerId: organizer.id, status: 'open' },
@@ -92,6 +94,7 @@ export async function closeMatch(code: string): Promise<Match> {
 }
 
 export async function requestToJoin(user: User, code: string): Promise<MatchRequest> {
+  assertEmailVerified(user)
   return db.transaction(async (trx) => {
     const match = await lockMatchByCode(code, trx)
     if (match.organizerId === user.id)
@@ -135,6 +138,8 @@ export async function respondToRequest(
     if (request.status !== transition.from)
       throw new BusinessRuleError('Esta solicitud ya no se puede cambiar')
 
+    if (action === 'accept') await assertPlayerVerified(request, trx)
+
     if (action === 'accept') {
       if (effectiveStatus(match) !== 'open')
         throw new BusinessRuleError('Este partido ya no está abierto')
@@ -148,6 +153,13 @@ export async function respondToRequest(
     await syncStatus(match.id, trx)
     return request
   })
+}
+
+/** The invitee sees the verify prompt; an organizer approving an old unverified join request gets a rule error. */
+async function assertPlayerVerified(request: MatchRequest, trx: TransactionClientContract) {
+  const player = await User.findOrFail(request.userId, { client: trx })
+  if (request.kind === 'invitation') return assertEmailVerified(player)
+  if (!player.emailVerifiedAt) throw new BusinessRuleError('Este jugador aún no verifica su correo')
 }
 
 export function generateCode(): string {

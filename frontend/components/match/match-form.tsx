@@ -11,6 +11,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PushPrompt } from "@/components/matchpa/push-prompt";
 import { track } from "@/lib/analytics";
+import { useVerifiedAction } from "@/components/auth/verify-email-dialog";
 import { api, ApiError } from "@/lib/api";
 import { CATEGORIES, GENDER_LABELS, shortCategory, TYPE_LABELS } from "@/lib/format";
 import { dateKey, formatClock, formatClock12, todayKey } from "@/lib/panamaFormatDate";
@@ -26,6 +27,7 @@ interface GuestDraft {
 
 function MatchFormBody({ match }: { match?: Match }) {
   const { user } = useSession();
+  const { handleError } = useVerifiedAction();
   const router = useRouter();
   const searchParams = useSearchParams();
   const inviteeId = match ? null : Number(searchParams.get("invitar")) || null;
@@ -108,6 +110,7 @@ function MatchFormBody({ match }: { match?: Match }) {
       }
       router.push(`/partidos/${published.code}`);
     } catch (err) {
+      if (handleError(err)) return;
       setError(err instanceof ApiError ? err.message : "No se pudo publicar el partido");
     } finally {
       setBusy(false);

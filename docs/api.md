@@ -30,14 +30,14 @@ Base `/api`. Todo requiere sesión salvo auth, `GET /branches` y `GET /matches/:
 
 | Método | Endpoint | Descripción |
 |---|---|---|
-| `POST` | `/matches` | Publicar (con invitados) |
+| `POST` | `/matches` | Publicar (con invitados). 403 `EMAIL_NOT_VERIFIED` si el correo no está verificado |
 | `GET` | `/matches` | Partidos `open` (`date`, `branchId`, `type`) |
 | `GET` | `/matches/:code` | Detalle público; incluye solicitudes si eres organizador |
 | `PATCH` | `/matches/:code` | Editar mientras está `open` |
 | `POST` | `/matches/:code/close` | Cerrar |
-| `POST` | `/matches/:code/join-requests` | Pedir unirse |
+| `POST` | `/matches/:code/join-requests` | Pedir unirse. 403 `EMAIL_NOT_VERIFIED` si el correo no está verificado |
 | `POST` | `/matches/:code/invitations` | Invitar (`userId`) |
-| `PATCH` | `/match-requests/:id` | Ejecutar `action` |
+| `PATCH` | `/match-requests/:id` | Ejecutar `action`. 403 `EMAIL_NOT_VERIFIED` si el invitado acepta sin correo verificado |
 | `GET` | `/me/matches` | Partidos que organizo o juego |
 | `GET` | `/me/match-requests` | Mis solicitudes e invitaciones pendientes |
 

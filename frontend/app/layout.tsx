@@ -8,6 +8,7 @@ import { Bricolage_Grotesque, Inter, Yellowtail } from "next/font/google";
 import "./globals.css";
 import { SiteFooter } from "@/components/matchpa/site-footer";
 import { SiteHeader } from "@/components/matchpa/site-header";
+import { VerifiedActionProvider } from "@/components/auth/verify-email-dialog";
 import { SessionProvider } from "@/lib/session";
 import { QueryProvider } from "@/components/matchpa/query-provider";
 
@@ -46,9 +47,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="flex min-h-full flex-col">
         <QueryProvider>
           <SessionProvider>
-            <SiteHeader />
-            <main className="flex flex-1 flex-col">{children}</main>
-            <SiteFooter />
+            <VerifiedActionProvider>
+              <SiteHeader />
+              <main className="flex flex-1 flex-col">{children}</main>
+              <SiteFooter />
+            </VerifiedActionProvider>
           </SessionProvider>
         </QueryProvider>
         <SpeedInsights />

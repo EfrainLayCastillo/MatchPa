@@ -8,6 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { PushPrompt } from "@/components/matchpa/push-prompt";
 import { StatusBadge } from "@/components/matchpa/status-badge";
 import { track } from "@/lib/analytics";
+import { useVerifiedAction } from "@/components/auth/verify-email-dialog";
 import { api, ApiError } from "@/lib/api";
 import { formatDuration, GENDER_LABELS, shortCategory, TYPE_LABELS } from "@/lib/format";
 import { formatDateTime } from "@/lib/panamaFormatDate";
@@ -19,6 +20,7 @@ import { ShareMatch } from "./share-match";
 
 export function MatchDetail({ code, serverMatch }: { code: string; serverMatch?: Match }) {
   const { user } = useSession();
+  const { guard, handleError } = useVerifiedAction();
   const query = useMatch(code, serverMatch);
   const personalized = !query.isPlaceholderData;
   const refresh = useRefreshMatch(code);
@@ -41,6 +43,7 @@ export function MatchDetail({ code, serverMatch }: { code: string; serverMatch?:
       if (afterRequest && shouldAskForPush()) setPushOpen(true);
       refresh();
     } catch (err) {
+      if (handleError(err)) return;
       setActionError(err instanceof ApiError ? err.message : "Algo salió mal, intenta de nuevo");
     } finally {
       setBusy(false);
@@ -119,9 +122,12 @@ export function MatchDetail({ code, serverMatch }: { code: string; serverMatch?:
             match={match}
             signedIn={user !== null}
             busy={busy}
-            onJoin={() => run(() => api.requestToJoin(match.code).then(() => track("join_request", { source: "match_page" })), true)}
+            onJoin={() => guard(() => run(() => api.requestToJoin(match.code).then(() => track("join_request", { source: "match_page" })), true))}
             onLeave={(request) => run(() => api.respondToRequest(request.id, "leave"))}
-            onAnswer={(request, action) => run(() => api.respondToRequest(request.id, action))}
+            onAnswer={(request, action) => {
+              const answer = () => run(() => api.respondToRequest(request.id, action));
+              return action === "accept" ? guard(answer) : answer();
+            }}
           />
 
           {match.isOrganizer && match.requests ? (

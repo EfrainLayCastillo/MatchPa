@@ -127,6 +127,11 @@ function fail(status: number, message: string): never {
   throw new ApiError(status, [{ message }]);
 }
 
+function failIfUnverified(user: User): void {
+  if (user.emailVerified) return;
+  throw new ApiError(403, [{ message: "Verifica tu correo para continuar" }], "EMAIL_NOT_VERIFIED");
+}
+
 function requireMe(): User {
   const user = users.find((u) => u.id === me);
   if (!user) fail(401, "Inicia sesión para continuar");
@@ -300,6 +305,7 @@ export async function mockRequest<T>(method: Method, fullPath: string, body?: un
   );
   on(/^POST \/matches$/, () => {
     const user = requireMe();
+    failIfUnverified(user);
     const match: StoredMatch = {
       id: nextId++,
       code: Math.random().toString(36).slice(2, 10).padEnd(8, "x"),
@@ -348,6 +354,7 @@ export async function mockRequest<T>(method: Method, fullPath: string, body?: un
   on(/^POST \/matches\/([^/]+)\/join-requests$/, (m) => {
     const match = findMatch(m[1]);
     const user = requireMe();
+    failIfUnverified(user);
     if (match.organizerId === user.id) fail(422, "No puedes unirte a tu propio partido");
     if (match.requests.some((r) => r.userId === user.id && ["pending", "accepted"].includes(r.status))) {
       fail(422, "Ya tienes una solicitud activa en este partido");
@@ -379,6 +386,7 @@ export async function mockRequest<T>(method: Method, fullPath: string, body?: un
     const rule = rules[action];
     if (!rule) fail(422, "Acción no válida");
     if (!rule.allowed) fail(403, "No tienes permiso para esta acción");
+    if (action === "accept" && r.kind === "invitation") failIfUnverified(requireMe());
     if (r.status !== rule.from) fail(422, "La solicitud ya no se puede cambiar");
     r.status = rule.to;
     if (action === "accept" && spotsLeft(match) < 0) {

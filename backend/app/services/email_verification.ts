@@ -5,12 +5,17 @@ import type { TransactionClientContract } from '@adonisjs/lucid/types/database'
 import mail from '@adonisjs/mail/services/main'
 import env from '#start/env'
 import BusinessRuleError from '#exceptions/business_rule_error'
+import EmailNotVerifiedError from '#exceptions/email_not_verified_error'
 import EmailVerification from '#models/email_verification'
 import type User from '#models/user'
 import VerifyEmailNotification from '#mails/verify_email_notification'
 
 export const CODE_TTL_MINUTES = 15
 export const MAX_ATTEMPTS = 5
+
+export function assertEmailVerified(user: User): void {
+  if (!user.emailVerifiedAt) throw new EmailNotVerifiedError()
+}
 
 function hashCode(code: string) {
   return createHmac('sha256', env.get('APP_KEY').release()).update(code).digest('hex')

@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useVerifiedAction } from "@/components/auth/verify-email-dialog";
 import { api } from "@/lib/api";
 import { GENDER_LABELS, firstName, formatAvailabilityWindow, shortCategory } from "@/lib/format";
 import type { Match, Player } from "@/lib/types";
@@ -16,6 +17,7 @@ interface PlayerCardProps {
 
 export function PlayerCard({ player, branchName }: PlayerCardProps) {
   const router = useRouter();
+  const { guard } = useVerifiedAction();
   const [matches, setMatches] = useState<Match[] | null>(null);
   const [busy, setBusy] = useState(false);
   const { availability } = player;
@@ -29,11 +31,15 @@ export function PlayerCard({ player, branchName }: PlayerCardProps) {
     setBusy(false);
 
     if (mine.length === 0) {
-      const params = new URLSearchParams({ invitar: String(player.id), nombre: player.fullName, n: String(Date.now()) });
-      router.push(`/partidos/nuevo?${params.toString()}`);
+      void guard(() => publishWithInvite());
       return;
     }
     setMatches(mine);
+  }
+
+  function publishWithInvite() {
+    const params = new URLSearchParams({ invitar: String(player.id), nombre: player.fullName, n: String(Date.now()) });
+    router.push(`/partidos/nuevo?${params.toString()}`);
   }
 
   return (

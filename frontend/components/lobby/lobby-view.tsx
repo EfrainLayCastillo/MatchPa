@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { track } from "@/lib/analytics";
+import { useVerifiedAction } from "@/components/auth/verify-email-dialog";
 import { api, ApiError } from "@/lib/api";
 import { byCategoryDistance, formatAvailabilityWindow } from "@/lib/format";
 import {
@@ -43,6 +44,7 @@ const ALL_BRANCHES = "all";
 
 export function LobbyView() {
   const router = useRouter();
+  const { guard, handleError } = useVerifiedAction();
   const { user } = useSession();
   const [date, setDate] = useState<string | null>(null);
   const playerDate = date ?? todayKey();
@@ -92,6 +94,7 @@ export function LobbyView() {
       if (shouldAskForPush()) setPushOpen(true);
       refresh();
     } catch (err) {
+      if (handleError(err)) return;
       setActionError(
         err instanceof ApiError
           ? err.message
@@ -130,7 +133,7 @@ export function LobbyView() {
         <Button
           size="sm"
           className="font-bold"
-          onClick={() => router.push(`/partidos/nuevo?n=${Date.now()}`)}
+          onClick={() => guard(() => router.push(`/partidos/nuevo?n=${Date.now()}`))}
         >
           Publicar partido
         </Button>
@@ -214,7 +217,7 @@ export function LobbyView() {
                 <li key={match.id}>
                   <MatchCard
                     match={match}
-                    onJoin={requestToJoin}
+                    onJoin={(match) => guard(() => requestToJoin(match))}
                     joining={joiningCode === match.code}
                   />
                 </li>

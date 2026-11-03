@@ -2,12 +2,14 @@ import { test } from '@japa/runner'
 import testUtils from '@adonisjs/core/services/test_utils'
 import { DateTime } from 'luxon'
 import BusinessRuleError from '#exceptions/business_rule_error'
+import EmailNotVerifiedError from '#exceptions/email_not_verified_error'
 import Branch from '#models/branch'
 import MatchRequest from '#models/match_request'
 import User from '#models/user'
 import {
   MAX_MATCHES_PER_DAY,
   findMatchByCode,
+  inviteToMatch,
   publishMatch,
   requestToJoin,
   respondToRequest,
@@ -32,6 +34,7 @@ test.group('flujo de partidos', (group) => {
       password: 'secret123',
       category: 4,
       gender: 'male',
+      emailVerifiedAt: DateTime.now(),
     })
     const guests = Array.from({ length: guestCount }, (_, i) => ({
       name: `Invitado ${i + 1}`,
@@ -56,6 +59,7 @@ test.group('flujo de partidos', (group) => {
           password: 'secret123',
           category: 4,
           gender: 'male',
+          emailVerifiedAt: DateTime.now(),
         })
       )
     )
@@ -109,6 +113,7 @@ test.group('flujo de partidos', (group) => {
       password: 'secret123',
       category: 4,
       gender: 'male',
+      emailVerifiedAt: DateTime.now(),
     })
     const overlapping = await publishMatch(otherOrganizer, {
       branchId: branch.id,
@@ -170,5 +175,55 @@ test.group('flujo de partidos', (group) => {
     const error = await requestToJoin(players[0], match.code).catch((reason) => reason)
     assert.instanceOf(error, BusinessRuleError)
     assert.include(error.message, 'horario')
+  })
+
+  test('un usuario sin verificar no puede publicar ni pedir unirse', async ({ assert }) => {
+    const { match, branch } = await fixtures(0)
+    const unverified = await User.create({
+      fullName: 'Sin Verificar',
+      email: `nv-${Date.now()}@t.test`,
+      password: 'secret123',
+      category: 4,
+      gender: 'male',
+    })
+
+    await assert.rejects(() => requestToJoin(unverified, match.code), EmailNotVerifiedError)
+    await assert.rejects(
+      () =>
+        publishMatch(unverified, {
+          branchId: branch.id,
+          courtNumber: 7,
+          startsAt: DateTime.now().plus({ days: 2 }),
+          durationMinutes: 90,
+          category: 4,
+          type: 'mixed',
+          maxPlayers: 4,
+          guests: [],
+        }),
+      EmailNotVerifiedError
+    )
+  })
+
+  test('un invitado sin verificar no puede aceptar la invitación', async ({ assert }) => {
+    const { match, players } = await fixtures(0)
+    const invitation = await inviteToMatch(match.code, players[0].id)
+    players[0].emailVerifiedAt = null
+    await players[0].save()
+
+    await assert.rejects(() => respondToRequest(invitation.id, 'accept'), EmailNotVerifiedError)
+  })
+
+  test('el organizador no puede aprobar una solicitud previa de un jugador sin verificar', async ({
+    assert,
+  }) => {
+    const { match, players } = await fixtures(0)
+    const request = await requestToJoin(players[0], match.code)
+    players[0].emailVerifiedAt = null
+    await players[0].save()
+
+    await assert.rejects(
+      () => respondToRequest(request.id, 'accept'),
+      'Este jugador aún no verifica su correo'
+    )
   })
 })
