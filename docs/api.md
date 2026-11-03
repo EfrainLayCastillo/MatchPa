@@ -1,6 +1,6 @@
 # API (MVP)
 
-Base `/api`. Todo requiere sesión salvo auth, `GET /branches` y `GET /matches/:code`. Los partidos se identifican por `code`.
+Base `/api`. Las escrituras con sesión tienen límite por cuenta y responden 429 al superarlo (ver `seguridad.md`). Todo requiere sesión salvo auth, `GET /branches` y `GET /matches/:code`. Los partidos se identifican por `code`.
 
 ## Auth y perfil
 

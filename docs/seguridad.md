@@ -14,3 +14,12 @@
 - **Llave `APP_KEY`:** no cambiarla nunca en producción; si cambia, los WhatsApp cifrados dejan de descifrarse.
 - **Headers del sitio (Next, `next.config.ts`):** `X-Frame-Options: DENY`, `nosniff`, `Referrer-Policy: strict-origin-when-cross-origin` y `Permissions-Policy` sin cámara, micrófono, ubicación ni pagos. HSTS lo pone Vercel.
 - **CSP:** va en Next y no en Shield, porque el navegador la aplica a documentos HTML y la API solo responde JSON. Está en `Content-Security-Policy-Report-Only`: las violaciones salen en la consola del navegador. Lista blanca: GTM y GA4. Sin nonces porque con `cacheComponents` harían dinámicas todas las páginas, así que los scripts inline usan `'unsafe-inline'`. Cuando no haya violaciones, se cambia el header a `Content-Security-Policy`.
+- **Límites por cuenta** (`start/limiter.ts`, store `database`, clave por usuario):
+
+  | Límite | Rutas | Máximo |
+  |---|---|---|
+  | `publish` | `POST /matches`, `POST /matches/:code/close` | 10 por hora |
+  | `social` | `POST /matches/:code/join-requests`, `POST /matches/:code/invitations` | 30 por hora |
+  | `write` | `PATCH/DELETE /me`, `PATCH /matches/:code`, `PATCH /match-requests/:id`, `PUT/DELETE /me/availabilities/:date`, `POST/DELETE /push-subscriptions` | 120 por hora |
+
+  Son holgados: frenan scripts y ráfagas, no el uso normal. El frontend muestra "Vas muy rápido. Espera un momento y vuelve a intentar." en cualquier 429 sin mensaje propio.

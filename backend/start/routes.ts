@@ -2,7 +2,14 @@ import router from '@adonisjs/core/services/router'
 import transmit from '@adonisjs/transmit/services/main'
 import env from '#start/env'
 import { middleware } from '#start/kernel'
-import { authThrottle, resendCooldown, resendHourly } from '#start/limiter'
+import {
+  authThrottle,
+  publishThrottle,
+  resendCooldown,
+  resendHourly,
+  socialThrottle,
+  writeThrottle,
+} from '#start/limiter'
 
 const AuthController = () => import('#controllers/auth_controller')
 const MeController = () => import('#controllers/me_controller')
@@ -39,26 +46,36 @@ router
           .post('auth/email/resend', [AuthController, 'resendEmailCode'])
           .use([resendCooldown, resendHourly])
         router.get('me', [MeController, 'show'])
-        router.patch('me', [MeController, 'update'])
-        router.delete('me', [MeController, 'destroy'])
+        router.patch('me', [MeController, 'update']).use(writeThrottle)
+        router.delete('me', [MeController, 'destroy']).use(writeThrottle)
         router.get('me/availabilities', [AvailabilitiesController, 'index'])
-        router.put('me/availabilities/:date', [AvailabilitiesController, 'upsert'])
-        router.delete('me/availabilities/:date', [AvailabilitiesController, 'destroy'])
+        router
+          .put('me/availabilities/:date', [AvailabilitiesController, 'upsert'])
+          .use(writeThrottle)
+        router
+          .delete('me/availabilities/:date', [AvailabilitiesController, 'destroy'])
+          .use(writeThrottle)
         router.get('me/matches', [MyMatchesController, 'index'])
         router.get('me/match-requests', [MatchRequestsController, 'index'])
 
         router.get('players', [PlayersController, 'index'])
 
         router.get('matches', [MatchesController, 'index'])
-        router.post('matches', [MatchesController, 'store'])
-        router.patch('matches/:code', [MatchesController, 'update'])
-        router.post('matches/:code/close', [MatchesController, 'close'])
-        router.post('matches/:code/join-requests', [JoinRequestsController, 'store'])
-        router.post('matches/:code/invitations', [InvitationsController, 'store'])
-        router.patch('match-requests/:id', [MatchRequestsController, 'update'])
+        router.post('matches', [MatchesController, 'store']).use(publishThrottle)
+        router.patch('matches/:code', [MatchesController, 'update']).use(writeThrottle)
+        router.post('matches/:code/close', [MatchesController, 'close']).use(publishThrottle)
+        router
+          .post('matches/:code/join-requests', [JoinRequestsController, 'store'])
+          .use(socialThrottle)
+        router
+          .post('matches/:code/invitations', [InvitationsController, 'store'])
+          .use(socialThrottle)
+        router.patch('match-requests/:id', [MatchRequestsController, 'update']).use(writeThrottle)
 
-        router.post('push-subscriptions', [PushSubscriptionsController, 'store'])
-        router.delete('push-subscriptions', [PushSubscriptionsController, 'destroy'])
+        router.post('push-subscriptions', [PushSubscriptionsController, 'store']).use(writeThrottle)
+        router
+          .delete('push-subscriptions', [PushSubscriptionsController, 'destroy'])
+          .use(writeThrottle)
       })
       .use(middleware.auth())
   })

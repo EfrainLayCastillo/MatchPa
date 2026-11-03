@@ -40,6 +40,9 @@ async function request<T>(
 
   if (res.status === 204) return undefined as T;
   const data = await res.json().catch(() => ({}));
+  if (res.status === 429) {
+    throw new ApiError(429, [{ message: "Vas muy rápido. Espera un momento y vuelve a intentar." }]);
+  }
   if (!res.ok) {
     throw new ApiError(
       res.status,
