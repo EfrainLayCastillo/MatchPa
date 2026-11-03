@@ -11,6 +11,8 @@ Base `/api`. Todo requiere sesión salvo auth, `GET /branches` y `GET /matches/:
 | `POST` | `/auth/register` | Registro |
 | `POST` | `/auth/login` | Login con correo |
 | `POST` | `/auth/email/verify` | Verifica el correo con `{ code }` (6 dígitos). Requiere sesión. 422: `Código incorrecto` o `El código venció o se agotaron los intentos. Pide uno nuevo` |
+| `POST` | `/auth/password/forgot` | `{ email }`. Siempre 204, exista o no la cuenta y aunque se pase el límite de 5 códigos por hora por cuenta (simplemente no envía). 429 solo por el límite por IP |
+| `POST` | `/auth/password/reset` | `{ email, code, password }`. Cambia la contraseña, verifica el correo, cierra las demás sesiones e inicia sesión. Devuelve el usuario. 422 con un solo mensaje para cualquier fallo: `El código no es válido o venció. Pide uno nuevo` |
 | `POST` | `/auth/email/resend` | Envía un código nuevo e invalida el anterior. 204 (también si ya está verificado, sin enviar). 429 si pidió otro hace menos de 60 s o más de 5 en una hora |
 | `POST` | `/auth/logout` | Logout |
 | `GET` | `/me` | Usuario actual, con `emailVerified` |

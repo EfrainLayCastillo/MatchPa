@@ -16,6 +16,8 @@ Las URLs son visibles para el usuario, así que van en español.
 | `/beta` | No | Qué es la beta: el problema, por qué nació, cómo se usa y lo que viene. Enlazada desde el badge "Beta" del header |
 | `/login` | No | Google o correo y contraseña |
 | `/registro` | No | Registro básico |
+| `/verificar` | Sí | Código de 6 dígitos para verificar el correo, con reenvío |
+| `/recuperar` | No | Recuperar contraseña: correo, luego código y contraseña nueva |
 | `/onboarding` | Sí | Categoría, género y teléfono. Obligatorio antes del lobby |
 | `/lobby` | Sí | Carrusel de tus próximos partidos (abiertos o completos, el más cercano primero). Selector de fecha y pestañas **Partidos** / **Jugadores**. Botón fijo "Estoy disponible" (bottom sheet) |
 | `/partidos/nuevo` | Sí | Publicar partido |

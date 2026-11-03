@@ -22,6 +22,8 @@ router
     router.get('branches', [BranchesController, 'index'])
     router.post('auth/register', [AuthController, 'register']).use(authThrottle)
     router.post('auth/login', [AuthController, 'login']).use(authThrottle)
+    router.post('auth/password/forgot', [AuthController, 'forgotPassword']).use(authThrottle)
+    router.post('auth/password/reset', [AuthController, 'resetPassword']).use(authThrottle)
     router.get('auth/google/redirect', [AuthController, 'googleRedirect'])
     router.get('auth/google/callback', [AuthController, 'googleCallback'])
     router.get('matches/:code', [MatchesController, 'show'])

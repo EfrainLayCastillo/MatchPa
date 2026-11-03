@@ -3,13 +3,22 @@ import { DateTime } from 'luxon'
 import BusinessRuleError from '#exceptions/business_rule_error'
 import env from '#start/env'
 import User from '#models/user'
-import { loginValidator, registerValidator, verifyEmailValidator } from '#validators/auth'
+import {
+  forgotPasswordValidator,
+  loginValidator,
+  registerValidator,
+  resetPasswordValidator,
+  verifyEmailValidator,
+} from '#validators/auth'
 import { serializeUser } from '#serializers/match_serializer'
 import { safeNextPath } from '#services/next_path'
 import { issueCode, verifyCode } from '#services/email_verification'
+import { requestReset, resetPassword } from '#services/password_reset'
+import { startSession } from '#services/session'
 
 export default class AuthController {
-  async register({ request, auth }: HttpContext) {
+  async register(ctx: HttpContext) {
+    const { request } = ctx
     const data = await request.validateUsing(registerValidator)
     const user = await User.create({
       fullName: data.fullName,
@@ -17,7 +26,7 @@ export default class AuthController {
       password: data.password,
     })
     await issueCode(user)
-    await auth.use('web').login(user)
+    await startSession(ctx, user)
     return serializeUser(user)
   }
 
@@ -34,12 +43,27 @@ export default class AuthController {
     return response.noContent()
   }
 
-  async login({ request, auth }: HttpContext) {
+  async login(ctx: HttpContext) {
+    const { request } = ctx
     const data = await request.validateUsing(loginValidator)
     const user = await User.verifyCredentials(data.email, data.password).catch(() => {
       throw new BusinessRuleError('Correo o contraseña incorrectos')
     })
-    await auth.use('web').login(user)
+    await startSession(ctx, user)
+    return serializeUser(user)
+  }
+
+  async forgotPassword({ request, response }: HttpContext) {
+    const { email } = await request.validateUsing(forgotPasswordValidator)
+    await requestReset(emailCandidates(email, request.input('email')))
+    return response.noContent()
+  }
+
+  async resetPassword(ctx: HttpContext) {
+    const data = await ctx.request.validateUsing(resetPasswordValidator)
+    const emails = emailCandidates(data.email, ctx.request.input('email'))
+    const user = await resetPassword(emails, data.code, data.password)
+    await startSession(ctx, user)
     return serializeUser(user)
   }
 
@@ -53,7 +77,8 @@ export default class AuthController {
     return ally.use('google').redirect()
   }
 
-  async googleCallback({ session, auth, response, ally }: HttpContext) {
+  async googleCallback(ctx: HttpContext) {
+    const { session, response, ally } = ctx
     const next = session.pull('login_next', '/lobby')
     const google = ally.use('google')
     if (google.accessDenied() || google.stateMisMatch() || google.hasError()) {
@@ -64,7 +89,7 @@ export default class AuthController {
     const user = await findOrCreateGoogleUser(profile)
     if (!user) return response.redirect(`${env.get('FRONTEND_URL')}/login?error=email_registrado`)
 
-    await auth.use('web').login(user)
+    await startSession(ctx, user)
     return response.redirect(`${env.get('FRONTEND_URL')}${next}`)
   }
 }
@@ -93,4 +118,16 @@ async function findOrCreateGoogleUser(profile: {
     avatarUrl: profile.avatarUrl,
     emailVerifiedAt: profile.emailVerificationState === 'verified' ? DateTime.now() : null,
   })
+}
+
+/** Password sign-ups store the normalized email; Google accounts store it as Google sends it. */
+function emailCandidates(normalized: string, raw: unknown) {
+  return [
+    ...new Set([
+      normalized,
+      String(raw ?? '')
+        .trim()
+        .toLowerCase(),
+    ]),
+  ]
 }

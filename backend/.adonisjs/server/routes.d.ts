@@ -10,6 +10,8 @@ export type ScannedRoutes = {
     'branches.index': { paramsTuple?: []; params?: {} }
     'auth.register': { paramsTuple?: []; params?: {} }
     'auth.login': { paramsTuple?: []; params?: {} }
+    'auth.forgot_password': { paramsTuple?: []; params?: {} }
+    'auth.reset_password': { paramsTuple?: []; params?: {} }
     'auth.google_redirect': { paramsTuple?: []; params?: {} }
     'auth.google_callback': { paramsTuple?: []; params?: {} }
     'matches.show': { paramsTuple: [ParamValue]; params: {'code': ParamValue} }
@@ -65,6 +67,8 @@ export type ScannedRoutes = {
     'unsubscribe': { paramsTuple?: []; params?: {} }
     'auth.register': { paramsTuple?: []; params?: {} }
     'auth.login': { paramsTuple?: []; params?: {} }
+    'auth.forgot_password': { paramsTuple?: []; params?: {} }
+    'auth.reset_password': { paramsTuple?: []; params?: {} }
     'auth.logout': { paramsTuple?: []; params?: {} }
     'auth.verify_email': { paramsTuple?: []; params?: {} }
     'auth.resend_email_code': { paramsTuple?: []; params?: {} }

@@ -14,6 +14,10 @@ Especificación de qué debe cumplir el backend y el frontend. Si el código se 
 - Las acciones del organizador sobre sus partidos (aprobar, rechazar, sacar, editar, cerrar) e invitar no lo exigen: publicar ya lo exigió, y así los partidos de cuentas anteriores a la verificación no quedan congelados.
 - El organizador no puede aprobar una solicitud de un jugador sin verificar (solicitudes creadas antes de la verificación): responde "Este jugador aún no verifica su correo".
 
+- Recuperar contraseña: se pide con el correo y llega un código con las mismas reglas (15 min, 5 intentos). La respuesta es la misma exista o no la cuenta.
+- Cambiar la contraseña con el código verifica el correo, cierra las sesiones de los demás dispositivos e inicia sesión. Sirve también para que una cuenta de Google cree contraseña.
+- Los códigos de verificación y de recuperación son independientes: uno no sirve para el otro.
+
 ## Partidos
 
 - Fecha de hoy o futura.

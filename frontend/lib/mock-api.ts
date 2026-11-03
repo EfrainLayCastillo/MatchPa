@@ -276,6 +276,15 @@ export async function mockRequest<T>(method: Method, fullPath: string, body?: un
   on(/^POST \/auth\/email\/resend$/, () => {
     requireMe();
   });
+  on(/^POST \/auth\/password\/forgot$/, () => undefined);
+  on(/^POST \/auth\/password\/reset$/, () => {
+    const user = users.find((u) => u.email === input.email);
+    if (!user || input.code !== "123456") fail(422, "El código no es válido o venció. Pide uno nuevo");
+    user.password = String(input.password);
+    user.emailVerified = true;
+    me = user.id;
+    return publicUser(user);
+  });
   on(/^POST \/auth\/logout$/, () => {
     me = null;
   });

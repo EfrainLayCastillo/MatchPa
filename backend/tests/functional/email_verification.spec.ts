@@ -6,7 +6,7 @@ import { DateTime } from 'luxon'
 import type BusinessRuleError from '#exceptions/business_rule_error'
 import EmailVerification from '#models/email_verification'
 import User from '#models/user'
-import VerifyEmailNotification from '#mails/verify_email_notification'
+import CodeNotification from '#mails/code_notification'
 import AuthController from '#controllers/auth_controller'
 import { MAX_ATTEMPTS, issueCode, verifyCode } from '#services/email_verification'
 
@@ -22,7 +22,7 @@ test.group('verificación de correo', (group) => {
       password: 'secret123',
     })
     await issueCode(user)
-    const sent = mails.queued((m) => m instanceof VerifyEmailNotification)
+    const sent = mails.queued((m) => m instanceof CodeNotification)
     const code = /\d{6}/.exec(sent[0].message.nodeMailerMessage.subject ?? '')![0]
     return { user, code, sent, restore: () => mail.restore() }
   }
@@ -96,7 +96,7 @@ test.group('verificación de correo', (group) => {
     mail.restore()
     const { mails } = mail.fake()
     await issueCode(user)
-    const sent = mails.queued((m) => m instanceof VerifyEmailNotification)
+    const sent = mails.queued((m) => m instanceof CodeNotification)
     const newCode = /\d{6}/.exec(sent[0].message.nodeMailerMessage.subject ?? '')![0]
     if (newCode !== oldCode) {
       const error = await rejection(verifyCode(user, oldCode))
@@ -119,7 +119,7 @@ test.group('verificación de correo', (group) => {
       response: { noContent: () => null },
     } as unknown as HttpContext)
     assert.lengthOf(
-      mails.queued((m) => m instanceof VerifyEmailNotification),
+      mails.queued((m) => m instanceof CodeNotification),
       0
     )
     restore()

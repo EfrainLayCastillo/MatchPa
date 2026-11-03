@@ -27,7 +27,7 @@
 - [x] Google Search Console (propiedad de dominio `matchpa.app`; la de prefijo sobre `match-pa.vercel.app` queda como historial)
 - [x] Dominio propio `matchpa.app`: Vercel, redirección desde `match-pa.vercel.app` y propiedad de dominio en Search Console
 - [x] Registro con verificación de correo: código de 6 dígitos con expiración e intentos limitados; la cuenta no publica ni se une hasta verificar. Incluye el envío con Resend en `matchpa.app` (SPF/DKIM/DMARC)
-- [ ] Recuperación de contraseña por correo
+- [x] Recuperación de contraseña por correo
 - [ ] Google desactivado detrás de un flag (botón oculto y rutas apagadas)
 - [ ] Endurecer seguridad del backend: CSP y headers con Shield, rate limit en endpoints de escritura, sesión regenerada al login, `npm audit` en CI
 - [ ] Endurecer seguridad de la BD: rol de app sin permisos de DDL (las migraciones con otro rol), backups/PITR de Neon verificados

@@ -6,13 +6,11 @@ import { useEffect, useState } from "react";
 import { PageTitle } from "@/components/matchpa/page-title";
 import { SessionGate } from "@/components/matchpa/session-gate";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { api, ApiError } from "@/lib/api";
+import { CODE_LENGTH, CodeField, apiErrorMessage, useCountdown } from "@/components/auth/code-input";
+import { api } from "@/lib/api";
 import { safeNextPath } from "@/lib/next-path";
 import { useSession } from "@/lib/session";
 
-const CODE_LENGTH = 6;
 const RESEND_COOLDOWN_SECONDS = 60;
 
 export function VerifyEmail() {
@@ -32,18 +30,12 @@ function VerifyEmailForm() {
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
   const [resending, setResending] = useState(false);
-  const [secondsLeft, setSecondsLeft] = useState(RESEND_COOLDOWN_SECONDS);
+  const { secondsLeft, restart } = useCountdown(RESEND_COOLDOWN_SECONDS);
   const alreadyVerified = user?.emailVerified === true && !busy;
 
   useEffect(() => {
     if (alreadyVerified) router.replace(next);
   }, [alreadyVerified, next, router]);
-
-  useEffect(() => {
-    if (secondsLeft <= 0) return;
-    const timer = setTimeout(() => setSecondsLeft((s) => s - 1), 1000);
-    return () => clearTimeout(timer);
-  }, [secondsLeft]);
 
   async function resend() {
     if (resending || secondsLeft > 0) return;
@@ -54,7 +46,7 @@ function VerifyEmailForm() {
       await api.resendEmailCode();
       setCode("");
       setNotice("Te enviamos un código nuevo");
-      setSecondsLeft(RESEND_COOLDOWN_SECONDS);
+      restart();
     } catch (err) {
       setError(resendErrorMessage(err));
     }
@@ -75,8 +67,7 @@ function VerifyEmailForm() {
     }
   }
 
-  function change(raw: string) {
-    const digits = raw.replace(/\D/g, "").slice(0, CODE_LENGTH);
+  function change(digits: string) {
     setCode(digits);
     if (digits.length === CODE_LENGTH) void verify(digits);
   }
@@ -96,24 +87,7 @@ function VerifyEmailForm() {
         }}
         className="space-y-4"
       >
-        <div className="space-y-1.5">
-          <Label htmlFor="code">Código</Label>
-          <Input
-            id="code"
-            value={code}
-            onChange={(e) => change(e.target.value)}
-            inputMode="numeric"
-            autoComplete="one-time-code"
-            maxLength={CODE_LENGTH}
-            pattern="\d{6}"
-            placeholder="123456"
-            className="h-14 text-center font-heading text-2xl tracking-[0.4em]"
-            aria-invalid={error ? true : undefined}
-            aria-describedby={error ? "code-error" : undefined}
-            autoFocus
-            required
-          />
-        </div>
+        <CodeField value={code} onChange={change} error={error} />
 
         {error ? <p id="code-error" role="alert" className="text-sm text-destructive">{error}</p> : null}
 
@@ -151,11 +125,4 @@ function verifyErrorMessage(err: unknown): string {
 
 function resendErrorMessage(err: unknown): string {
   return apiErrorMessage(err, "Ya pediste varios códigos. Intenta más tarde.");
-}
-
-function apiErrorMessage(err: unknown, rateLimited: string): string {
-  if (!(err instanceof ApiError)) return "No pudimos conectarnos. Revisa tu conexión e intenta de nuevo.";
-  if (err.status === 429) return rateLimited;
-  if (err.status >= 500) return "Algo salió mal en nuestro lado. Intenta de nuevo en un momento.";
-  return err.message;
 }

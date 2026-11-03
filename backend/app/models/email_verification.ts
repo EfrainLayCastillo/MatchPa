@@ -11,6 +11,9 @@ export default class EmailVerification extends BaseModel {
   declare userId: number
 
   @column()
+  declare purpose: 'verify_email' | 'reset_password'
+
+  @column()
   declare codeHash: string
 
   @column.dateTime()

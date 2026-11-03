@@ -96,6 +96,14 @@ export function AuthForm({ mode }: { mode: Mode }) {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
+          {mode === "login" ? (
+            <Link
+              href={`/recuperar${email ? `?email=${encodeURIComponent(email)}` : ""}`}
+              className="inline-block py-2 text-sm font-semibold text-brand-teal underline-offset-4 hover:underline dark:text-brand-lime"
+            >
+              ¿Olvidaste tu contraseña?
+            </Link>
+          ) : null}
         </div>
 
         {error ? <p role="alert" className="text-sm text-destructive">{error}</p> : null}

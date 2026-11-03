@@ -1,30 +1,17 @@
-import { createHmac, randomInt, timingSafeEqual } from 'node:crypto'
-import { DateTime } from 'luxon'
 import db from '@adonisjs/lucid/services/db'
 import type { TransactionClientContract } from '@adonisjs/lucid/types/database'
 import mail from '@adonisjs/mail/services/main'
-import env from '#start/env'
+import { DateTime } from 'luxon'
 import BusinessRuleError from '#exceptions/business_rule_error'
 import EmailNotVerifiedError from '#exceptions/email_not_verified_error'
-import EmailVerification from '#models/email_verification'
 import type User from '#models/user'
-import VerifyEmailNotification from '#mails/verify_email_notification'
+import CodeNotification from '#mails/code_notification'
+import { CODE_TTL_MINUTES, MAX_ATTEMPTS, consumeCode, createCode } from '#services/one_time_codes'
 
-export const CODE_TTL_MINUTES = 15
-export const MAX_ATTEMPTS = 5
+export { CODE_TTL_MINUTES, MAX_ATTEMPTS }
 
 export function assertEmailVerified(user: User): void {
   if (!user.emailVerifiedAt) throw new EmailNotVerifiedError()
-}
-
-function hashCode(code: string) {
-  return createHmac('sha256', env.get('APP_KEY').release()).update(code).digest('hex')
-}
-
-function matches(code: string, codeHash: string) {
-  const expected = Buffer.from(codeHash, 'hex')
-  const actual = Buffer.from(hashCode(code), 'hex')
-  return expected.length === actual.length && timingSafeEqual(expected, actual)
 }
 
 async function isVerified(userId: number, trx: TransactionClientContract) {
@@ -33,44 +20,30 @@ async function isVerified(userId: number, trx: TransactionClientContract) {
 }
 
 export async function issueCode(user: User): Promise<void> {
-  const code = randomInt(0, 1_000_000).toString().padStart(6, '0')
-  await EmailVerification.updateOrCreate(
-    { userId: user.id },
-    {
-      codeHash: hashCode(code),
-      expiresAt: DateTime.now().plus({ minutes: CODE_TTL_MINUTES }),
-      attempts: 0,
-    }
-  )
-  await mail.sendLater(new VerifyEmailNotification(user, code, CODE_TTL_MINUTES))
+  const code = await createCode(user.id, 'verify_email')
+  await mail.sendLater(new CodeNotification(user, code, CODE_TTL_MINUTES, 'verify_email'))
+}
+
+async function consumeOrAlreadyVerified(user: User, code: string, trx: TransactionClientContract) {
+  try {
+    return await consumeCode(user.id, 'verify_email', code, trx)
+  } catch (error) {
+    if (await isVerified(user.id, trx)) return null
+    throw error
+  }
 }
 
 export async function verifyCode(user: User, code: string): Promise<void> {
   if (user.emailVerifiedAt) return
 
-  const expired = new BusinessRuleError(
-    'El código venció o se agotaron los intentos. Pide uno nuevo'
-  )
-  const wrong = await db.transaction(async (trx) => {
-    const row = await EmailVerification.query({ client: trx })
-      .where('userId', user.id)
-      .forUpdate()
-      .first()
-    if (!row && (await isVerified(user.id, trx))) return false
-    if (!row || row.expiresAt <= DateTime.now() || row.attempts >= MAX_ATTEMPTS) throw expired
-
-    if (!matches(code, row.codeHash)) {
-      row.useTransaction(trx)
-      row.attempts += 1
-      await row.save()
-      return true
+  const accepted = await db.transaction(async (trx) => {
+    const result = await consumeOrAlreadyVerified(user, code, trx)
+    if (result) {
+      user.useTransaction(trx)
+      user.emailVerifiedAt = DateTime.now()
+      await user.save()
     }
-
-    user.useTransaction(trx)
-    user.emailVerifiedAt = DateTime.now()
-    await user.save()
-    await row.delete()
-    return false
+    return result
   })
-  if (wrong) throw new BusinessRuleError('Código incorrecto')
+  if (accepted === false) throw new BusinessRuleError('Código incorrecto')
 }
