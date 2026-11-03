@@ -1,5 +1,6 @@
 "use client";
 
+import { VerifyEmailBanner } from "@/components/auth/verify-email-banner";
 import { LoadFailed } from "@/components/matchpa/load-failed";
 import { DetailSkeleton } from "@/components/matchpa/skeletons";
 import { useRouter, usePathname } from "next/navigation";
@@ -10,9 +11,10 @@ interface SessionGateProps {
   children: React.ReactNode;
   /** Pages that need a complete profile (category, gender, phone) redirect to onboarding. */
   requireProfile?: boolean;
+  verifyBanner?: boolean;
 }
 
-export function SessionGate({ children, requireProfile = true }: SessionGateProps) {
+export function SessionGate({ children, requireProfile = true, verifyBanner = true }: SessionGateProps) {
   const { user, loading, failed, refresh } = useSession();
   const router = useRouter();
   const pathname = usePathname();
@@ -38,5 +40,10 @@ export function SessionGate({ children, requireProfile = true }: SessionGateProp
       </div>
     );
   }
-  return children;
+  return (
+    <>
+      {verifyBanner ? <VerifyEmailBanner /> : null}
+      {children}
+    </>
+  );
 }

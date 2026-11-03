@@ -17,6 +17,7 @@ import { useSession } from "@/lib/session";
 interface VerifiedActionValue {
   guard: (fn: () => unknown) => Promise<void>;
   handleError: (err: unknown) => boolean;
+  prompt: () => void;
 }
 
 const VerifiedActionContext = createContext<VerifiedActionValue | null>(null);
@@ -43,7 +44,8 @@ export function VerifiedActionProvider({ children }: { children: React.ReactNode
     [user?.emailVerified],
   );
 
-  const value = useMemo(() => ({ guard, handleError }), [guard, handleError]);
+  const prompt = useCallback(() => setOpen(true), []);
+  const value = useMemo(() => ({ guard, handleError, prompt }), [guard, handleError, prompt]);
   return (
     <VerifiedActionContext.Provider value={value}>
       {children}

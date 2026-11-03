@@ -17,7 +17,7 @@ const RESEND_COOLDOWN_SECONDS = 60;
 
 export function VerifyEmail() {
   return (
-    <SessionGate requireProfile={false}>
+    <SessionGate requireProfile={false} verifyBanner={false}>
       <VerifyEmailForm />
     </SessionGate>
   );

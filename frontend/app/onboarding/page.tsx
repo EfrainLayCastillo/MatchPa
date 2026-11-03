@@ -4,7 +4,7 @@ import { ProfileForm } from "@/components/profile/profile-form";
 
 export default function OnboardingPage() {
   return (
-    <SessionGate requireProfile={false}>
+    <SessionGate requireProfile={false} verifyBanner={false}>
       <div className="mx-auto w-full max-w-md space-y-8 px-4 py-10">
         <PageTitle hint="Solo te lo pedimos una vez. Así los organizadores saben con quién juegan.">
           Cuéntanos de ti
