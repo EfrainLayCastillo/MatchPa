@@ -1,10 +1,13 @@
 import { DateTime } from 'luxon'
 import db from '@adonisjs/lucid/services/db'
+import logger from '@adonisjs/core/services/logger'
 import type { TransactionClientContract } from '@adonisjs/lucid/types/database'
 import Match from '#models/match'
 import MatchRequest from '#models/match_request'
 import User from '#models/user'
 import { bumpSessionVersion } from '#services/session'
+import { notifyOrganizerDeleted, notifyPlayerDeleted } from '#services/notifications'
+import { matchChanged, requestChanged } from '#services/realtime'
 import { effectiveStatus } from '#services/match_rules'
 import { closeLocked, lockMatchById, releaseSeat } from '#services/match_service'
 
@@ -95,7 +98,6 @@ async function leaveMatches(
   return result
 }
 
-/** Read before closing: closeLocked cancels the pending requests. */
 function closedMatchAudience(match: Match): ClosedMatch {
   const idsWith = (status: string) =>
     match.requests.filter((request) => request.status === status).map((request) => request.userId)
@@ -134,4 +136,26 @@ async function anonymize(user: User, trx: TransactionClientContract): Promise<vo
   })
   bumpSessionVersion(user)
   await user.save()
+}
+
+/** Realtime first and push in the background: the account is already gone, so a push failure must not fail the request. */
+export function announceAccountDeletion({
+  closed,
+  freed,
+  cancelledMatchCodes,
+}: AccountDeletionResult) {
+  const codes = [
+    ...closed.map(({ match }) => match.code),
+    ...freed.map((m) => m.code),
+    ...cancelledMatchCodes,
+  ]
+  new Set(codes).forEach((code) => matchChanged(code))
+  new Set(closed.flatMap(({ playerIds, requesterIds }) => [...playerIds, ...requesterIds])).forEach(
+    (userId) => requestChanged(userId)
+  )
+
+  Promise.all([
+    ...closed.map(({ match, playerIds }) => notifyOrganizerDeleted(match, playerIds)),
+    ...freed.map((match) => notifyPlayerDeleted(match)),
+  ]).catch((error) => logger.error({ err: error }, 'account deletion push failed'))
 }

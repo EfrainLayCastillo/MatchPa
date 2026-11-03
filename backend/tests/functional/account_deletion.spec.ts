@@ -96,6 +96,8 @@ test.group('eliminar cuenta', (group) => {
     )
     assert.equal(await statusOf(match.code), 'closed')
     assert.equal(await requestStatus(request.id), 'cancelled')
+    assert.deepEqual(result.closed[0].playerIds, [])
+    assert.deepEqual(result.closed[0].requesterIds, [player.id])
   })
 
   test('libera su puesto en un partido futuro ajeno y lo reabre', async ({ assert }) => {

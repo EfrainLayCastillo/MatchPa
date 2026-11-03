@@ -16,6 +16,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Check, Copy } from "lucide-react";
 import { api, ApiError } from "@/lib/api";
 import { useSession } from "@/lib/session";
 
@@ -84,7 +85,10 @@ export function DeleteAccount() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <div className="space-y-2">
-            <Label htmlFor="delete-confirm">Escribe {CONFIRM_WORD} para confirmar</Label>
+            <div className="flex flex-wrap items-center gap-2">
+              <Label htmlFor="delete-confirm">Escribe para confirmar</Label>
+              <CopyableWord word={CONFIRM_WORD} />
+            </div>
             <Input
               id="delete-confirm"
               className="h-11"
@@ -123,4 +127,23 @@ function deleteErrorMessage(err: unknown): string {
   if (err instanceof ApiError && err.status === 401) return "Tu sesión expiró. Vuelve a entrar e inténtalo de nuevo.";
   if (err instanceof ApiError && err.status < 500) return err.message;
   return "No pudimos eliminar tu cuenta. Intenta de nuevo.";
+}
+
+function CopyableWord({ word }: { word: string }) {
+  const [copied, setCopied] = useState(false);
+
+  async function copy() {
+    await navigator.clipboard.writeText(word).catch(() => {});
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  }
+
+  return (
+    <span className="inline-flex items-center rounded-md border bg-muted pl-3 font-mono text-sm font-bold tracking-wide">
+      {word}
+      <Button type="button" variant="ghost" size="icon" className="size-11" onClick={copy} aria-label={`Copiar ${word}`}>
+        {copied ? <Check aria-hidden /> : <Copy aria-hidden />}
+      </Button>
+    </span>
+  );
 }
