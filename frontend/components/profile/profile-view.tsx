@@ -8,6 +8,7 @@ import { PageTitle } from "@/components/matchpa/page-title";
 import { api, ApiError } from "@/lib/api";
 import { disablePush, enablePush, isPushEnabled, pushSupported } from "@/lib/push";
 import { useSession } from "@/lib/session";
+import { DeleteAccount } from "./delete-account";
 import { ProfileForm } from "./profile-form";
 
 type PushState = "loading" | "unsupported" | "on" | "off" | "denied";
@@ -41,6 +42,8 @@ export function ProfileView() {
       <Button variant="outline" className="w-full" onClick={logout}>
         Cerrar sesión
       </Button>
+
+      <DeleteAccount />
     </div>
   );
 }

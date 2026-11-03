@@ -20,6 +20,7 @@ export type ScannedRoutes = {
     'auth.resend_email_code': { paramsTuple?: []; params?: {} }
     'me.show': { paramsTuple?: []; params?: {} }
     'me.update': { paramsTuple?: []; params?: {} }
+    'me.destroy': { paramsTuple?: []; params?: {} }
     'availabilities.index': { paramsTuple?: []; params?: {} }
     'availabilities.upsert': { paramsTuple: [ParamValue]; params: {'date': ParamValue} }
     'availabilities.destroy': { paramsTuple: [ParamValue]; params: {'date': ParamValue} }
@@ -83,12 +84,13 @@ export type ScannedRoutes = {
     'matches.update': { paramsTuple: [ParamValue]; params: {'code': ParamValue} }
     'match_requests.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
-  PUT: {
-    'availabilities.upsert': { paramsTuple: [ParamValue]; params: {'date': ParamValue} }
-  }
   DELETE: {
+    'me.destroy': { paramsTuple?: []; params?: {} }
     'availabilities.destroy': { paramsTuple: [ParamValue]; params: {'date': ParamValue} }
     'push_subscriptions.destroy': { paramsTuple?: []; params?: {} }
+  }
+  PUT: {
+    'availabilities.upsert': { paramsTuple: [ParamValue]; params: {'date': ParamValue} }
   }
 }
 declare module '@adonisjs/core/types/http' {

@@ -89,6 +89,7 @@ export const api = {
   resetPassword: (input: { email: string; code: string; password: string }) =>
     request<User>("POST", "/auth/password/reset", input),
   logout: () => request<void>("POST", "/auth/logout"),
+  deleteAccount: (confirm: string) => request<void>("DELETE", "/me", { confirm }),
 
   branches: () => request<Branch[]>("GET", "/branches"),
 

@@ -288,6 +288,12 @@ export async function mockRequest<T>(method: Method, fullPath: string, body?: un
   on(/^POST \/auth\/logout$/, () => {
     me = null;
   });
+  on(/^DELETE \/me$/, () => {
+    const id = requireMe().id;
+    if (input.confirm !== "ELIMINAR") fail(422, "Escribe ELIMINAR para confirmar");
+    users.splice(users.findIndex((u) => u.id === id), 1);
+    me = null;
+  });
 
   on(/^GET \/branches$/, () => branches);
 

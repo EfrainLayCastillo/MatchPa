@@ -17,6 +17,7 @@ Base `/api`. Todo requiere sesión salvo auth, `GET /branches` y `GET /matches/:
 | `POST` | `/auth/logout` | Logout |
 | `GET` | `/me` | Usuario actual, con `emailVerified` |
 | `PATCH` | `/me` | Actualizar perfil |
+| `DELETE` | `/me` | Eliminar la cuenta con `{ confirm: "ELIMINAR" }`. Anonimiza, cierra o libera sus partidos futuros y cierra la sesión. 204 |
 
 ## Jugadores y disponibilidad
 

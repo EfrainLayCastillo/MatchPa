@@ -85,12 +85,27 @@ export async function closeMatch(code: string): Promise<Match> {
     if (status !== 'open' && status !== 'full')
       throw new BusinessRuleError('Este partido ya no está disponible')
 
-    match.status = 'closed'
-    match.closedAt = DateTime.now()
-    await match.useTransaction(trx).save()
-    await cancelPending(match.id, trx)
+    await closeLocked(match, trx)
     return loadMatch(match.id, trx)
   })
+}
+
+/** Closes a match already locked by the caller and cancels its pending requests. */
+export async function closeLocked(match: Match, trx: TransactionClientContract): Promise<void> {
+  match.status = 'closed'
+  match.closedAt = DateTime.now()
+  await match.useTransaction(trx).save()
+  await cancelPending(match.id, trx)
+}
+
+/** Frees an accepted seat on a match already locked by the caller and reopens it if there is room. */
+export async function releaseSeat(
+  request: MatchRequest,
+  trx: TransactionClientContract
+): Promise<void> {
+  request.status = 'left'
+  await request.useTransaction(trx).save()
+  await syncStatus(request.matchId, trx)
 }
 
 export async function requestToJoin(user: User, code: string): Promise<MatchRequest> {
@@ -114,6 +129,8 @@ export async function inviteToMatch(code: string, userId: number): Promise<Match
   return db.transaction(async (trx) => {
     const match = await lockMatchByCode(code, trx)
     assertOpen(match)
+    const invitee = await User.findOrFail(userId, { client: trx })
+    if (invitee.deletedAt) throw new BusinessRuleError('Este jugador ya no existe')
     await assertNoActiveRequest(match.id, userId, trx)
     await assertNoTimeConflict(userId, match, trx)
     await assertDailyLimit(userId, match, trx)
@@ -148,6 +165,11 @@ export async function respondToRequest(
       await assertDailyLimit(request.userId, match, trx)
     }
 
+    if (action === 'leave') {
+      await releaseSeat(request, trx)
+      return request
+    }
+
     request.status = transition.to
     await request.useTransaction(trx).save()
     await syncStatus(match.id, trx)
@@ -157,7 +179,10 @@ export async function respondToRequest(
 
 /** The invitee sees the verify prompt; an organizer approving an old unverified join request gets a rule error. */
 async function assertPlayerVerified(request: MatchRequest, trx: TransactionClientContract) {
-  const player = await User.findOrFail(request.userId, { client: trx })
+  const player = await User.query({ client: trx })
+    .where('id', request.userId)
+    .forUpdate()
+    .firstOrFail()
   if (request.kind === 'invitation') return assertEmailVerified(player)
   if (!player.emailVerifiedAt) throw new BusinessRuleError('Este jugador aún no verifica su correo')
 }
@@ -290,7 +315,7 @@ function lockMatchByCode(code: string, trx: TransactionClientContract): Promise<
     .then((match) => loadMatch(match.id, trx))
 }
 
-function lockMatchById(id: number, trx: TransactionClientContract): Promise<Match> {
+export function lockMatchById(id: number, trx: TransactionClientContract): Promise<Match> {
   return Match.query({ client: trx })
     .where('id', id)
     .forUpdate()

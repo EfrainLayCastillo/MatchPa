@@ -8,6 +8,7 @@ import EmailVerification from '#models/email_verification'
 import User from '#models/user'
 import CodeNotification from '#mails/code_notification'
 import { CODE_TTL_MINUTES, consumeCode, createCode } from '#services/one_time_codes'
+import { bumpSessionVersion } from '#services/session'
 
 /** Same message for unknown email, wrong, expired or exhausted code: otherwise it reveals which emails exist. */
 const INVALID_CODE = 'El código no es válido o venció. Pide uno nuevo'
@@ -41,7 +42,7 @@ async function applyNewPassword(user: User, password: string, trx: TransactionCl
   user.useTransaction(trx)
   user.password = password
   user.emailVerifiedAt ??= DateTime.now()
-  user.sessionVersion += 1
+  bumpSessionVersion(user)
   await user.save()
   await EmailVerification.query({ client: trx })
     .where('userId', user.id)

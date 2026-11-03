@@ -37,6 +37,7 @@ router
           .use([resendCooldown, resendHourly])
         router.get('me', [MeController, 'show'])
         router.patch('me', [MeController, 'update'])
+        router.delete('me', [MeController, 'destroy'])
         router.get('me/availabilities', [AvailabilitiesController, 'index'])
         router.put('me/availabilities/:date', [AvailabilitiesController, 'upsert'])
         router.delete('me/availabilities/:date', [AvailabilitiesController, 'destroy'])
