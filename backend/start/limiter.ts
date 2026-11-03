@@ -13,7 +13,6 @@ export const resendHourly = limiter.define('emailResendHourly', ({ auth }) => {
   return limiter.allowRequests(5).every('1 hour').usingKey(`user_${auth.user!.id}`)
 })
 
-/** Generous caps per account: normal use never hits them, scripts and bursts do. */
 const perUser = (name: string, requests: number, duration: string) =>
   limiter.define(name, ({ auth }) =>
     limiter.allowRequests(requests).every(duration).usingKey(`${name}_${auth.user!.id}`)

@@ -33,7 +33,7 @@
   - [x] Headers de seguridad y CSP en Next (Report-Only)
   - [ ] Aplicar la CSP (`Content-Security-Policy`) tras una semana sin violaciones
   - [x] Rate limit por cuenta en endpoints de escritura
-  - [ ] Dependencias sin vulnerabilidades altas (`npm audit`)
+  - [x] Dependencias sin vulnerabilidades altas (`npm audit`)
 - [ ] Endurecer seguridad de la BD: rol de app sin permisos de DDL (las migraciones con otro rol), backups/PITR de Neon verificados
 - [ ] Catálogo completo de sucursales de Panamá con coordenadas, y "Sugerir sucursal" con aprobación del admin
 - [ ] Lanzamiento de la beta

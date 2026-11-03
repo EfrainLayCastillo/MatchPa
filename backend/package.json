@@ -15,7 +15,8 @@
     "test": "node ace test",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "audit": "npm audit --omit=dev --audit-level=high"
   },
   "imports": {
     "#controllers/*": "./app/controllers/*.js",
@@ -88,5 +89,8 @@
     "esbuild": true,
     "fsevents": true
   },
-  "prettier": "@adonisjs/prettier-config"
+  "prettier": "@adonisjs/prettier-config",
+  "overrides": {
+    "nodemailer": "^10.3.1"
+  }
 }

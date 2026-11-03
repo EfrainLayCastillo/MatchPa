@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "audit": "npm audit --omit=dev --audit-level=high"
   },
   "dependencies": {
     "@adonisjs/transmit-client": "^1.1.0",
