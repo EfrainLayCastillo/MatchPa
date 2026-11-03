@@ -102,7 +102,7 @@ Abre [http://localhost:3000](http://localhost:3000). Variables, datos de prueba 
 ## Estado
 
 - **Desarrollo:** MVP en curso. Lo hecho y lo pendiente está en el [roadmap](docs/roadmap.md).
-- **Despliegue:** en configuración con planes gratuitos (Vercel, Render y Neon). Ver [despliegue](docs/despliegue.md).
+- **Despliegue:** en producción en [matchpa.app](https://matchpa.app/), con planes gratuitos (Vercel, Render y Neon) y dominio, DNS y correo entrante en Cloudflare. Ver [despliegue](docs/despliegue.md).
 
 ## Contribuir y licencia
 

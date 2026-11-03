@@ -1,6 +1,6 @@
 # Despliegue
 
-Plataformas en plan gratuito: frontend en Vercel, backend en Render y base de datos en Neon.
+Plataformas en plan gratuito: frontend en Vercel, backend en Render y base de datos en Neon. El dominio `matchpa.app` está registrado en Cloudflare, que también aloja su DNS y el reenvío de correo.
 
 | Pieza | Plataforma | Configuración |
 |---|---|---|
@@ -15,9 +15,15 @@ Plataformas en plan gratuito: frontend en Vercel, backend en Render y base de da
 
 ## Dominio
 
-- `matchpa.app` registrado en Cloudflare. Los registros que apuntan a Vercel van en modo **DNS only** (nube gris): el proxy de Cloudflare encima de Vercel duplica el TLS y puede bufferear el SSE de Transmit.
+- `matchpa.app` registrado en Cloudflare Registrar, con DNS en Cloudflare (nameservers `*.ns.cloudflare.com`). Los registros que apuntan a Vercel van en modo **DNS only** (nube gris): el proxy de Cloudflare encima de Vercel duplica el TLS y puede bufferear el SSE de Transmit.
 - `match-pa.vercel.app` redirige con 308 a `matchpa.app` (Vercel → Domains).
 - Search Console: propiedad de dominio verificada con un TXT en Cloudflare. La de prefijo de URL sobre `match-pa.vercel.app` queda solo como historial.
+
+## Correo
+
+- **Entrante:** Cloudflare Email Routing reenvía `hola@matchpa.app` a un Gmail personal (MX y SPF `include:_spf.mx.cloudflare.net` en la raíz). Es el `CONTACT_EMAIL` del frontend y el `VAPID_SUBJECT` del backend. Solo recibe: para responder desde `hola@` hay que usar otro servicio.
+- **Saliente (pendiente):** Resend en el subdominio `mail.matchpa.app`, para que sus SPF/DKIM no choquen con los MX de Email Routing en la raíz.
+- La regla de `hola@` debe tener la acción **Send to an email** y el Gmail de destino verificado. El Catch-all viene en **Drop**: un correo que no coincide con ninguna regla rebota con "dirección no encontrada".
 
 ## Limitaciones del plan gratuito
 
