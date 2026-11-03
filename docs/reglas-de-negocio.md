@@ -27,6 +27,7 @@ Especificación de qué debe cumplir el backend y el frontend. Si el código se 
 - Los partidos pasados no cambian y lo muestran como "Jugador eliminado".
 - Se cierran todas sus sesiones. El mismo correo puede volver a registrarse como cuenta nueva.
 - No se puede invitar a una cuenta eliminada.
+- Avisos por push: los jugadores aceptados de sus partidos cerrados reciben "Partido cancelado", y el organizador de un partido donde tenía puesto recibe "Se liberó un puesto". Las pantallas afectadas se actualizan en tiempo real.
 
 ## Partidos
 

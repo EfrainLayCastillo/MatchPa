@@ -3,8 +3,9 @@ import { deleteAccountValidator } from '#validators/account'
 import { updateProfileValidator } from '#validators/profile'
 import BusinessRuleError from '#exceptions/business_rule_error'
 import { serializeUser } from '#serializers/match_serializer'
-import { deleteAccount } from '#services/account_deletion'
-import { matchChanged } from '#services/realtime'
+import { type AccountDeletionResult, deleteAccount } from '#services/account_deletion'
+import { notifyOrganizerDeleted, notifyPlayerDeleted } from '#services/notifications'
+import { matchChanged, requestChanged } from '#services/realtime'
 import { normalizeWhatsapp } from '#services/whatsapp'
 
 export default class MeController {
@@ -29,11 +30,23 @@ export default class MeController {
     await request.validateUsing(deleteAccountValidator)
     const result = await deleteAccount(auth.getUserOrFail())
     await auth.use('web').logout()
-    new Set([
-      ...result.closedMatchCodes,
-      ...result.freedMatchCodes,
-      ...result.cancelledMatchCodes,
-    ]).forEach((code) => matchChanged(code))
+    await announceDeletion(result)
     return response.noContent()
   }
+}
+
+async function announceDeletion({ closed, freed, cancelledMatchCodes }: AccountDeletionResult) {
+  await Promise.all([
+    ...closed.map(({ match, playerIds }) => notifyOrganizerDeleted(match, playerIds)),
+    ...freed.map((match) => notifyPlayerDeleted(match)),
+  ])
+  const codes = [
+    ...closed.map(({ match }) => match.code),
+    ...freed.map((m) => m.code),
+    ...cancelledMatchCodes,
+  ]
+  new Set(codes).forEach((code) => matchChanged(code))
+  new Set(closed.flatMap(({ playerIds, requesterIds }) => [...playerIds, ...requesterIds])).forEach(
+    (userId) => requestChanged(userId)
+  )
 }

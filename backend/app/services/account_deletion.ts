@@ -8,9 +8,15 @@ import { bumpSessionVersion } from '#services/session'
 import { effectiveStatus } from '#services/match_rules'
 import { closeLocked, lockMatchById, releaseSeat } from '#services/match_service'
 
+export interface ClosedMatch {
+  match: Match
+  playerIds: number[]
+  requesterIds: number[]
+}
+
 export interface AccountDeletionResult {
-  closedMatchCodes: string[]
-  freedMatchCodes: string[]
+  closed: ClosedMatch[]
+  freed: Match[]
   cancelledMatchCodes: string[]
 }
 
@@ -43,11 +49,7 @@ async function leaveMatches(
   user: User,
   trx: TransactionClientContract
 ): Promise<AccountDeletionResult> {
-  const result: AccountDeletionResult = {
-    closedMatchCodes: [],
-    freedMatchCodes: [],
-    cancelledMatchCodes: [],
-  }
+  const result: AccountDeletionResult = { closed: [], freed: [], cancelledMatchCodes: [] }
   const now = DateTime.now().toSQL()!
 
   const organized = await Match.query({ client: trx })
@@ -77,20 +79,27 @@ async function leaveMatches(
     if (status !== 'open' && status !== 'full') continue
 
     if (organizedIds.has(id)) {
+      result.closed.push(closedMatchAudience(match))
       await closeLocked(match, trx)
-      result.closedMatchCodes.push(match.code)
     } else {
       const request = match.requests.find(
         (item) => item.userId === user.id && item.status === 'accepted'
       )
       if (!request) continue
       await releaseSeat(request, trx)
-      result.freedMatchCodes.push(match.code)
+      result.freed.push(match)
     }
   }
 
   result.cancelledMatchCodes = await cancelFuturePending(user.id, now, trx)
   return result
+}
+
+/** Read before closing: closeLocked cancels the pending requests. */
+function closedMatchAudience(match: Match): ClosedMatch {
+  const idsWith = (status: string) =>
+    match.requests.filter((request) => request.status === status).map((request) => request.userId)
+  return { match, playerIds: idsWith('accepted'), requesterIds: idsWith('pending') }
 }
 
 async function cancelFuturePending(userId: number, now: string, trx: TransactionClientContract) {

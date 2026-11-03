@@ -56,3 +56,19 @@ export function notifyMatchClosed(match: Match, playerIds: number[]): Promise<vo
     url: linkTo(match),
   })
 }
+
+export function notifyOrganizerDeleted(match: Match, playerIds: number[]): Promise<void> {
+  return notifyUsers(playerIds, {
+    title: 'Partido cancelado',
+    body: 'El organizador eliminó su cuenta',
+    url: linkTo(match),
+  })
+}
+
+export function notifyPlayerDeleted(match: Match): Promise<void> {
+  return notifyUsers([match.organizerId], {
+    title: 'Se liberó un puesto',
+    body: 'Un jugador eliminó su cuenta',
+    url: linkTo(match),
+  })
+}

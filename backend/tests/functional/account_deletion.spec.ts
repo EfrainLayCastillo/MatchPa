@@ -90,7 +90,10 @@ test.group('eliminar cuenta', (group) => {
 
     const result = await deleteAccount(organizer)
 
-    assert.deepEqual(result.closedMatchCodes, [match.code])
+    assert.deepEqual(
+      result.closed.map(({ match: closed }) => closed.code),
+      [match.code]
+    )
     assert.equal(await statusOf(match.code), 'closed')
     assert.equal(await requestStatus(request.id), 'cancelled')
   })
@@ -106,7 +109,10 @@ test.group('eliminar cuenta', (group) => {
 
     const result = await deleteAccount(player)
 
-    assert.deepEqual(result.freedMatchCodes, [match.code])
+    assert.deepEqual(
+      result.freed.map((freed) => freed.code),
+      [match.code]
+    )
     assert.equal(await requestStatus(request.id), 'left')
     assert.equal(await statusOf(match.code), 'open')
   })
@@ -134,7 +140,7 @@ test.group('eliminar cuenta', (group) => {
 
     const result = await deleteAccount(organizer)
 
-    assert.deepEqual(result.closedMatchCodes, [])
+    assert.lengthOf(result.closed, 0)
     const stored = await Match.findOrFail(match.id)
     assert.equal(stored.status, 'open')
     assert.isNull(stored.closedAt)
