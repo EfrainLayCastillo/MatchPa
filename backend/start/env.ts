@@ -16,6 +16,7 @@ export default await Env.create(new URL('../', import.meta.url), {
   DB_PASSWORD: Env.schema.string(),
   DB_DATABASE: Env.schema.string(),
 
+  GOOGLE_AUTH_ENABLED: Env.schema.boolean.optional(),
   GOOGLE_CLIENT_ID: Env.schema.string.optional(),
   GOOGLE_CLIENT_SECRET: Env.schema.string.optional(),
   GOOGLE_CALLBACK_URL: Env.schema.string.optional(),

@@ -6,8 +6,8 @@ Base `/api`. Todo requiere sesión salvo auth, `GET /branches` y `GET /matches/:
 
 | Método | Endpoint | Descripción |
 |---|---|---|
-| `GET` | `/auth/google/redirect` | Login con Google |
-| `GET` | `/auth/google/callback` | Callback de Google |
+| `GET` | `/auth/google/redirect` | Login con Google. Solo existe con `GOOGLE_AUTH_ENABLED=true` |
+| `GET` | `/auth/google/callback` | Callback de Google. Solo existe con `GOOGLE_AUTH_ENABLED=true` |
 | `POST` | `/auth/register` | Registro |
 | `POST` | `/auth/login` | Login con correo |
 | `POST` | `/auth/email/verify` | Verifica el correo con `{ code }` (6 dígitos). Requiere sesión. 422: `Código incorrecto` o `El código venció o se agotaron los intentos. Pide uno nuevo` |

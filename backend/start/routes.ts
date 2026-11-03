@@ -1,5 +1,6 @@
 import router from '@adonisjs/core/services/router'
 import transmit from '@adonisjs/transmit/services/main'
+import env from '#start/env'
 import { middleware } from '#start/kernel'
 import { authThrottle, resendCooldown, resendHourly } from '#start/limiter'
 
@@ -24,8 +25,10 @@ router
     router.post('auth/login', [AuthController, 'login']).use(authThrottle)
     router.post('auth/password/forgot', [AuthController, 'forgotPassword']).use(authThrottle)
     router.post('auth/password/reset', [AuthController, 'resetPassword']).use(authThrottle)
-    router.get('auth/google/redirect', [AuthController, 'googleRedirect'])
-    router.get('auth/google/callback', [AuthController, 'googleCallback'])
+    if (env.get('GOOGLE_AUTH_ENABLED', false)) {
+      router.get('auth/google/redirect', [AuthController, 'googleRedirect'])
+      router.get('auth/google/callback', [AuthController, 'googleCallback'])
+    }
     router.get('matches/:code', [MatchesController, 'show'])
 
     router

@@ -43,7 +43,8 @@ Los seeders usan `updateOrCreate`, así que se pueden correr varias veces.
 | `FRONTEND_URL` | `http://localhost:3000` |
 | `DB_HOST` / `DB_PORT` / `DB_USER` / `DB_PASSWORD` / `DB_DATABASE` | `localhost` / `5432` / `matchpa` / `matchpa` / `matchpa` |
 | `SESSION_DRIVER` | `cookie` |
-| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Google Cloud |
+| `GOOGLE_AUTH_ENABLED` | `false` (con `false` las rutas de Google no existen) |
+| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Google Cloud, solo si está activado |
 | `GOOGLE_CALLBACK_URL` | `http://localhost:3333/api/auth/google/callback` |
 | `VAPID_PUBLIC_KEY` / `VAPID_PRIVATE_KEY` | `npx web-push generate-vapid-keys` |
 | `VAPID_SUBJECT` | `mailto:hola@matchpa.app` |
@@ -55,3 +56,4 @@ Los seeders usan `updateOrCreate`, así que se pueden correr varias veces.
 |---|---|
 | `NEXT_PUBLIC_API_URL` | `http://localhost:3333/api` |
 | `NEXT_PUBLIC_VAPID_PUBLIC_KEY` | Llave pública del backend |
+| `NEXT_PUBLIC_GOOGLE_AUTH_ENABLED` | `false`; debe coincidir con `GOOGLE_AUTH_ENABLED` |
