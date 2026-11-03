@@ -26,6 +26,7 @@ export interface User {
   id: number;
   fullName: string;
   email: string;
+  emailVerified: boolean;
   avatarUrl: string | null;
   phone: string | null;
   category: Category | null;

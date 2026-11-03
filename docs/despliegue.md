@@ -10,7 +10,7 @@ Plataformas en plan gratuito: frontend en Vercel, backend en Render y base de da
 
 ## Variables de producción
 
-- **Render:** `NODE_ENV=production`, `NODE_VERSION=24`, `HOST=0.0.0.0`, `PORT=10000`, `SESSION_DRIVER=cookie`, `APP_KEY`, `APP_URL` (URL de Render), `FRONTEND_URL=https://matchpa.app`, `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_DATABASE`, `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT=mailto:hola@matchpa.app`. Sin las tres VAPID, Web Push se desactiva sin error.
+- **Render:** `NODE_ENV=production`, `NODE_VERSION=24`, `HOST=0.0.0.0`, `PORT=10000`, `SESSION_DRIVER=cookie`, `APP_KEY`, `APP_URL` (URL de Render), `FRONTEND_URL=https://matchpa.app`, `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_DATABASE`, `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT=mailto:hola@matchpa.app`. Sin las tres VAPID, Web Push se desactiva sin error. Correo: `MAIL_MAILER=resend`, `RESEND_API_KEY` (permiso de solo envío, limitada a `matchpa.app`), `MAIL_FROM=MatchPa <no-reply@matchpa.app>`.
 - **Vercel:** `BACKEND_URL` (URL de Render), `NEXT_PUBLIC_API_URL=/api`, `NEXT_PUBLIC_SITE_URL=https://matchpa.app` (se incrusta al compilar: cambiarla exige redeploy), `NEXT_PUBLIC_MOCK_API=false`, `NEXT_PUBLIC_GTM_ID=GTM-KHLG4MHS` (solo Production), `NEXT_PUBLIC_VAPID_PUBLIC_KEY` (la misma llave pública de Render).
 
 ## Dominio
@@ -22,7 +22,7 @@ Plataformas en plan gratuito: frontend en Vercel, backend en Render y base de da
 ## Correo
 
 - **Entrante:** Cloudflare Email Routing reenvía `hola@matchpa.app` a un Gmail personal (MX y SPF `include:_spf.mx.cloudflare.net` en la raíz). Es el `CONTACT_EMAIL` del frontend y el `VAPID_SUBJECT` del backend. Solo recibe: para responder desde `hola@` hay que usar otro servicio.
-- **Saliente (pendiente):** Resend en el subdominio `mail.matchpa.app`, para que sus SPF/DKIM no choquen con los MX de Email Routing en la raíz.
+- **Saliente:** Resend con el dominio `matchpa.app`. Sus registros no chocan con Email Routing: el DKIM va en `resend._domainkey` y el MX y SPF de rebotes en `send.`, no en la raíz. Registros en Cloudflare (DNS only): los que da Resend, y `TXT _dmarc.matchpa.app` = `v=DMARC1; p=none; rua=mailto:hola@matchpa.app`. El backend usa el transporte de Resend de `@adonisjs/mail`; en local, Mailpit.
 - La regla de `hola@` debe tener la acción **Send to an email** y el Gmail de destino verificado. El Catch-all viene en **Drop**: un correo que no coincide con ninguna regla rebota con "dirección no encontrada".
 
 ## Limitaciones del plan gratuito

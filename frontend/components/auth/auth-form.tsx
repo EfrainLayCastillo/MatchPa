@@ -51,7 +51,8 @@ export function AuthForm({ mode }: { mode: Mode }) {
           ? await api.login({ email, password })
           : await api.register({ fullName, email, password });
       setUser(user);
-      router.replace(isProfileComplete(user) ? next : "/onboarding");
+      const destination = isProfileComplete(user) ? next : "/onboarding";
+      router.replace(mode === "register" ? `/verificar?next=${encodeURIComponent(destination)}` : destination);
     } catch (err) {
       setError(authErrorMessage(err));
     } finally {

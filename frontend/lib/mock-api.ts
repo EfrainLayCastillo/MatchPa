@@ -63,6 +63,7 @@ const users: (User & { password: string })[] = [
     fullName: "Efrain Lay",
     email: "efrain@matchpa.app",
     password: "demo",
+    emailVerified: true,
     avatarUrl: null,
     phone: "+507 6000-0001",
     category: 4,
@@ -110,6 +111,7 @@ function seedPlayer(id: number, fullName: string, category: Category, gender: Ge
     fullName,
     email: `${fullName.split(" ")[0]?.toLowerCase()}@matchpa.app`,
     password: "demo",
+    emailVerified: true,
     avatarUrl: null,
     phone: `+507 6000-000`,
     category,
@@ -136,6 +138,7 @@ function publicUser(user: User & { password?: string }): User {
     id: user.id,
     fullName: user.fullName,
     email: user.email,
+    emailVerified: user.emailVerified,
     avatarUrl: user.avatarUrl,
     phone: user.phone,
     category: user.category,
@@ -253,9 +256,16 @@ export async function mockRequest<T>(method: Method, fullPath: string, body?: un
   });
   on(/^POST \/auth\/register$/, () => {
     const user = seedPlayer(nextId++, String(input.fullName), 4, "male");
-    Object.assign(user, { email: String(input.email), password: String(input.password), category: null, gender: null });
+    Object.assign(user, { email: String(input.email), password: String(input.password), category: null, gender: null, emailVerified: false });
     users.push(user);
     me = user.id;
+    return publicUser(user);
+  });
+  on(/^POST \/auth\/email\/verify$/, () => {
+    const user = users.find((u) => u.id === me);
+    if (!user) fail(401, "Inicia sesión para continuar");
+    if (input.code !== "123456") fail(422, "Código incorrecto");
+    user.emailVerified = true;
     return publicUser(user);
   });
   on(/^POST \/auth\/logout$/, () => {

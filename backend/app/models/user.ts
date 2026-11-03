@@ -43,6 +43,9 @@ export default class User extends compose(BaseModel, withAuthFinder(hash)) {
   @column()
   declare gender: 'male' | 'female' | null
 
+  @column.dateTime()
+  declare emailVerifiedAt: DateTime | null
+
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 

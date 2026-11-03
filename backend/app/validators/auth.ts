@@ -6,6 +6,13 @@ export const registerValidator = vine.create({
   password: vine.string().minLength(8).maxLength(72),
 })
 
+export const verifyEmailValidator = vine.create({
+  code: vine
+    .string()
+    .fixedLength(6)
+    .regex(/^\d{6}$/),
+})
+
 export const loginValidator = vine.create({
   email: vine.string().trim().email().normalizeEmail(),
   password: vine.string(),

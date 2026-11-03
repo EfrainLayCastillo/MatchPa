@@ -10,8 +10,9 @@ Base `/api`. Todo requiere sesión salvo auth, `GET /branches` y `GET /matches/:
 | `GET` | `/auth/google/callback` | Callback de Google |
 | `POST` | `/auth/register` | Registro |
 | `POST` | `/auth/login` | Login con correo |
+| `POST` | `/auth/email/verify` | Verifica el correo con `{ code }` (6 dígitos). Requiere sesión. 422: `Código incorrecto` o `El código venció o se agotaron los intentos. Pide uno nuevo` |
 | `POST` | `/auth/logout` | Logout |
-| `GET` | `/me` | Usuario actual |
+| `GET` | `/me` | Usuario actual, con `emailVerified` |
 | `PATCH` | `/me` | Actualizar perfil |
 
 ## Jugadores y disponibilidad

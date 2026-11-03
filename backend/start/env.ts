@@ -23,4 +23,10 @@ export default await Env.create(new URL('../', import.meta.url), {
   VAPID_PUBLIC_KEY: Env.schema.string.optional(),
   VAPID_PRIVATE_KEY: Env.schema.secret.optional(),
   VAPID_SUBJECT: Env.schema.string.optional(),
+
+  MAIL_MAILER: Env.schema.enum(['smtp', 'resend'] as const),
+  MAIL_FROM: Env.schema.string(),
+  SMTP_HOST: Env.schema.string.optional(),
+  SMTP_PORT: Env.schema.number.optional(),
+  RESEND_API_KEY: Env.schema.secret.optional(),
 })

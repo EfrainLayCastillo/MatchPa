@@ -29,6 +29,7 @@ router
     router
       .group(() => {
         router.post('auth/logout', [AuthController, 'logout'])
+        router.post('auth/email/verify', [AuthController, 'verifyEmail']).use(authThrottle)
         router.get('me', [MeController, 'show'])
         router.patch('me', [MeController, 'update'])
         router.get('me/availabilities', [AvailabilitiesController, 'index'])

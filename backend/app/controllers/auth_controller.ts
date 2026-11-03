@@ -1,10 +1,12 @@
 import type { HttpContext } from '@adonisjs/core/http'
+import { DateTime } from 'luxon'
 import BusinessRuleError from '#exceptions/business_rule_error'
 import env from '#start/env'
 import User from '#models/user'
-import { loginValidator, registerValidator } from '#validators/auth'
+import { loginValidator, registerValidator, verifyEmailValidator } from '#validators/auth'
 import { serializeUser } from '#serializers/match_serializer'
 import { safeNextPath } from '#services/next_path'
+import { issueCode, verifyCode } from '#services/email_verification'
 
 export default class AuthController {
   async register({ request, auth }: HttpContext) {
@@ -14,7 +16,15 @@ export default class AuthController {
       email: data.email,
       password: data.password,
     })
+    await issueCode(user)
     await auth.use('web').login(user)
+    return serializeUser(user)
+  }
+
+  async verifyEmail({ request, auth }: HttpContext) {
+    const { code } = await request.validateUsing(verifyEmailValidator)
+    const user = auth.getUserOrFail()
+    await verifyCode(user, code)
     return serializeUser(user)
   }
 
@@ -55,14 +65,15 @@ export default class AuthController {
 
 /**
  * Only an existing Google link is reused. A password account with the same email is never
- * linked automatically: emails are not verified at sign-up, so linking would let a squatter
- * inherit the owner's access. Returns null in that case.
+ * linked automatically: the password account may not have verified its email, so linking would
+ * let a squatter inherit the owner's access. Returns null in that case.
  */
 async function findOrCreateGoogleUser(profile: {
   id: string
   email: string | null
   name: string
   avatarUrl: string | null
+  emailVerificationState: string
 }) {
   const byGoogle = await User.findBy('googleId', profile.id)
   if (byGoogle) return byGoogle
@@ -74,5 +85,6 @@ async function findOrCreateGoogleUser(profile: {
     email: profile.email ?? `${profile.id}@google.matchpa`,
     googleId: profile.id,
     avatarUrl: profile.avatarUrl,
+    emailVerifiedAt: profile.emailVerificationState === 'verified' ? DateTime.now() : null,
   })
 }

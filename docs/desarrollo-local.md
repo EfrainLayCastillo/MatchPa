@@ -3,7 +3,7 @@
 Requisitos: Node.js 24 LTS y Docker.
 
 ```bash
-docker compose up -d
+docker compose up -d   # Postgres y Mailpit (correos en http://localhost:8025)
 
 cd backend
 cp .env.example .env
@@ -47,6 +47,9 @@ Los seeders usan `updateOrCreate`, así que se pueden correr varias veces.
 | `GOOGLE_CALLBACK_URL` | `http://localhost:3333/api/auth/google/callback` |
 | `VAPID_PUBLIC_KEY` / `VAPID_PRIVATE_KEY` | `npx web-push generate-vapid-keys` |
 | `VAPID_SUBJECT` | `mailto:hola@matchpa.app` |
+| `MAIL_MAILER` | `smtp` (Mailpit) |
+| `SMTP_HOST` / `SMTP_PORT` | `localhost` / `1025` |
+| `MAIL_FROM` | `MatchPa <no-reply@matchpa.app>` |
 
 | Frontend (`.env.local`) | Ejemplo |
 |---|---|
