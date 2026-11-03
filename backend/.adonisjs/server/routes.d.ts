@@ -15,6 +15,7 @@ export type ScannedRoutes = {
     'matches.show': { paramsTuple: [ParamValue]; params: {'code': ParamValue} }
     'auth.logout': { paramsTuple?: []; params?: {} }
     'auth.verify_email': { paramsTuple?: []; params?: {} }
+    'auth.resend_email_code': { paramsTuple?: []; params?: {} }
     'me.show': { paramsTuple?: []; params?: {} }
     'me.update': { paramsTuple?: []; params?: {} }
     'availabilities.index': { paramsTuple?: []; params?: {} }
@@ -66,6 +67,7 @@ export type ScannedRoutes = {
     'auth.login': { paramsTuple?: []; params?: {} }
     'auth.logout': { paramsTuple?: []; params?: {} }
     'auth.verify_email': { paramsTuple?: []; params?: {} }
+    'auth.resend_email_code': { paramsTuple?: []; params?: {} }
     'matches.store': { paramsTuple?: []; params?: {} }
     'matches.close': { paramsTuple: [ParamValue]; params: {'code': ParamValue} }
     'join_requests.store': { paramsTuple: [ParamValue]; params: {'code': ParamValue} }

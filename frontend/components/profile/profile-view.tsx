@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { PageTitle } from "@/components/matchpa/page-title";
-import { api } from "@/lib/api";
+import { api, ApiError } from "@/lib/api";
 import { disablePush, enablePush, isPushEnabled, pushSupported } from "@/lib/push";
 import { useSession } from "@/lib/session";
 import { ProfileForm } from "./profile-form";
@@ -26,6 +26,8 @@ export function ProfileView() {
     <div className="mx-auto w-full max-w-md space-y-8 px-4 pb-16 pt-6">
       <PageTitle hint={user?.email}>{user?.fullName}</PageTitle>
 
+      {user?.emailVerified === false ? <VerifyEmailNotice /> : null}
+
       <section className="space-y-4">
         <h2 className="font-heading text-lg font-bold">Mis datos</h2>
         <ProfileForm mode="profile" />
@@ -40,6 +42,39 @@ export function ProfileView() {
         Cerrar sesión
       </Button>
     </div>
+  );
+}
+
+function VerifyEmailNotice() {
+  const router = useRouter();
+  const [busy, setBusy] = useState(false);
+  const [failed, setFailed] = useState(false);
+
+  async function startVerification() {
+    setBusy(true);
+    setFailed(false);
+    try {
+      await api.resendEmailCode();
+    } catch (err) {
+      if (!(err instanceof ApiError && err.status === 429)) {
+        setBusy(false);
+        setFailed(true);
+        return;
+      }
+    }
+    router.push("/verificar?next=/perfil");
+  }
+
+  return (
+    <Card role="status" className="gap-3 border-brand-lime/60 bg-brand-lime/10 py-4">
+      <CardContent className="space-y-3">
+        <p className="text-sm">Tu correo no está verificado. Por favor, verifícalo para proteger tu cuenta.</p>
+        {failed ? <p role="alert" className="text-sm text-destructive">No pudimos enviar el código. Intenta de nuevo.</p> : null}
+        <Button className="h-11 w-full" onClick={startVerification} disabled={busy}>
+          {busy ? "Enviando…" : "Verificar correo"}
+        </Button>
+      </CardContent>
+    </Card>
   );
 }
 

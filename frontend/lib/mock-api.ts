@@ -268,6 +268,9 @@ export async function mockRequest<T>(method: Method, fullPath: string, body?: un
     user.emailVerified = true;
     return publicUser(user);
   });
+  on(/^POST \/auth\/email\/resend$/, () => {
+    requireMe();
+  });
   on(/^POST \/auth\/logout$/, () => {
     me = null;
   });

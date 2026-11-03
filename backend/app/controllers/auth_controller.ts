@@ -28,6 +28,12 @@ export default class AuthController {
     return serializeUser(user)
   }
 
+  async resendEmailCode({ auth, response }: HttpContext) {
+    const user = auth.getUserOrFail()
+    if (!user.emailVerifiedAt) await issueCode(user)
+    return response.noContent()
+  }
+
   async login({ request, auth }: HttpContext) {
     const data = await request.validateUsing(loginValidator)
     const user = await User.verifyCredentials(data.email, data.password).catch(() => {

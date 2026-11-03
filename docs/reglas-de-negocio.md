@@ -8,7 +8,9 @@ Especificación de qué debe cumplir el backend y el frontend. Si el código se 
 - El código vence a los 15 minutos y acepta 5 intentos; después hay que pedir otro. Pedir uno nuevo invalida el anterior.
 - El código se guarda como hash, nunca en claro.
 - Las cuentas creadas con Google nacen verificadas si Google reporta el correo como verificado.
-- Verificar es opcional en V1: el usuario puede seguir con "Hacerlo después".
+- Reenvío: espera de 60 s entre códigos y máximo 5 por hora, por usuario.
+- Mientras no esté verificado, el perfil muestra un aviso con el botón "Verificar correo", que envía un código al tocarlo.
+- Verificar es opcional por ahora: el usuario puede seguir con "Hacerlo después".
 
 ## Partidos
 

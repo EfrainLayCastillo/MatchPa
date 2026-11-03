@@ -4,3 +4,11 @@ import limiter from '@adonisjs/limiter/services/main'
 export const authThrottle = limiter.define('auth', () => {
   return limiter.allowRequests(10).every('1 minute')
 })
+
+export const resendCooldown = limiter.define('emailResendCooldown', ({ auth }) => {
+  return limiter.allowRequests(1).every('1 minute').usingKey(`user_${auth.user!.id}`)
+})
+
+export const resendHourly = limiter.define('emailResendHourly', ({ auth }) => {
+  return limiter.allowRequests(5).every('1 hour').usingKey(`user_${auth.user!.id}`)
+})

@@ -1,7 +1,7 @@
 import router from '@adonisjs/core/services/router'
 import transmit from '@adonisjs/transmit/services/main'
 import { middleware } from '#start/kernel'
-import { authThrottle } from '#start/limiter'
+import { authThrottle, resendCooldown, resendHourly } from '#start/limiter'
 
 const AuthController = () => import('#controllers/auth_controller')
 const MeController = () => import('#controllers/me_controller')
@@ -30,6 +30,9 @@ router
       .group(() => {
         router.post('auth/logout', [AuthController, 'logout'])
         router.post('auth/email/verify', [AuthController, 'verifyEmail']).use(authThrottle)
+        router
+          .post('auth/email/resend', [AuthController, 'resendEmailCode'])
+          .use([resendCooldown, resendHourly])
         router.get('me', [MeController, 'show'])
         router.patch('me', [MeController, 'update'])
         router.get('me/availabilities', [AvailabilitiesController, 'index'])

@@ -1,5 +1,6 @@
 import { BaseMail } from '@adonisjs/mail'
 import type User from '#models/user'
+import { codeEmailHtml, codeEmailText, type CodeEmail } from '#mails/templates/code_email'
 
 export default class VerifyEmailNotification extends BaseMail {
   constructor(
@@ -11,22 +12,17 @@ export default class VerifyEmailNotification extends BaseMail {
   }
 
   prepare() {
+    const content: CodeEmail = {
+      name: this.user.fullName,
+      intro: 'Usa este código para verificar tu correo en MatchPa.',
+      code: this.code,
+      ttlMinutes: this.ttlMinutes,
+    }
     this.message
       .to(this.user.email)
       .subject(`Tu código de MatchPa: ${this.code}`)
       .replyTo('hola@matchpa.app')
-      .text(
-        `Hola ${this.user.fullName}, tu código de verificación es ${this.code}. Vence en ${this.ttlMinutes} minutos.`
-      )
-      .html(
-        `<p>Hola ${escapeHtml(this.user.fullName)},</p>` +
-          `<p>Tu código de verificación es:</p>` +
-          `<p style="font-size:28px;font-weight:bold;letter-spacing:6px">${this.code}</p>` +
-          `<p>Vence en ${this.ttlMinutes} minutos.</p>`
-      )
+      .text(codeEmailText(content))
+      .html(codeEmailHtml(content))
   }
-}
-
-function escapeHtml(value: string) {
-  return value.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`)
 }

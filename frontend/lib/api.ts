@@ -83,6 +83,7 @@ export const api = {
   login: (input: { email: string; password: string }) =>
     request<User>("POST", "/auth/login", input),
   verifyEmail: (code: string) => request<User>("POST", "/auth/email/verify", { code }),
+  resendEmailCode: () => request<void>("POST", "/auth/email/resend"),
   logout: () => request<void>("POST", "/auth/logout"),
 
   branches: () => request<Branch[]>("GET", "/branches"),

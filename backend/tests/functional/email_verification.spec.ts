@@ -1,4 +1,5 @@
 import { test } from '@japa/runner'
+import type { HttpContext } from '@adonisjs/core/http'
 import testUtils from '@adonisjs/core/services/test_utils'
 import mail from '@adonisjs/mail/services/main'
 import { DateTime } from 'luxon'
@@ -6,6 +7,7 @@ import type BusinessRuleError from '#exceptions/business_rule_error'
 import EmailVerification from '#models/email_verification'
 import User from '#models/user'
 import VerifyEmailNotification from '#mails/verify_email_notification'
+import AuthController from '#controllers/auth_controller'
 import { MAX_ATTEMPTS, issueCode, verifyCode } from '#services/email_verification'
 
 test.group('verificación de correo', (group) => {
@@ -86,6 +88,40 @@ test.group('verificación de correo', (group) => {
     user.emailVerifiedAt = DateTime.now()
     await user.save()
     assert.isNull(await rejection(verifyCode(user, '999999')))
+    restore()
+  })
+
+  test('reenviar invalida el código anterior y el nuevo verifica', async ({ assert }) => {
+    const { user, code: oldCode, restore } = await newUserWithCode()
+    mail.restore()
+    const { mails } = mail.fake()
+    await issueCode(user)
+    const sent = mails.queued((m) => m instanceof VerifyEmailNotification)
+    const newCode = /\d{6}/.exec(sent[0].message.nodeMailerMessage.subject ?? '')![0]
+    if (newCode !== oldCode) {
+      const error = await rejection(verifyCode(user, oldCode))
+      assert.equal(error?.message, 'Código incorrecto')
+    }
+    await verifyCode(user, newCode)
+    await user.refresh()
+    assert.isNotNull(user.emailVerifiedAt)
+    restore()
+  })
+
+  test('un usuario verificado no recibe correo al reenviar', async ({ assert }) => {
+    const { user, restore } = await newUserWithCode()
+    mail.restore()
+    const { mails } = mail.fake()
+    user.emailVerifiedAt = DateTime.now()
+    await user.save()
+    await new AuthController().resendEmailCode({
+      auth: { getUserOrFail: () => user },
+      response: { noContent: () => null },
+    } as unknown as HttpContext)
+    assert.lengthOf(
+      mails.queued((m) => m instanceof VerifyEmailNotification),
+      0
+    )
     restore()
   })
 })
