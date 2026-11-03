@@ -27,3 +27,7 @@ Las visitas de página las registra la medición mejorada de GA4 ("Cambios de p�
 3. Variables de capa de datos: `category`, `match_type`, `max_players`, `source`.
 4. Etiqueta **Evento de GA4** con nombre `{{Event}}`, los parámetros anteriores y el activador del paso 2.
 5. En GA4, marcar `sign_up`, `publish_match` y `join_approved` como eventos clave.
+
+## CSP
+
+El sitio tiene una CSP (`frontend/next.config.ts`) con GTM y GA4 en lista blanca. Una etiqueta nueva en GTM que cargue scripts, imágenes o conexiones de otro dominio necesita agregar ese origen a `buildCsp()`; si no, la consola mostrará la violación (y cuando la CSP se aplique, la etiqueta no funcionará).

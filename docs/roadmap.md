@@ -29,7 +29,11 @@
 - [x] Registro con verificación de correo: código de 6 dígitos con expiración e intentos limitados; la cuenta no publica ni se une hasta verificar. Incluye el envío con Resend en `matchpa.app` (SPF/DKIM/DMARC)
 - [x] Recuperación de contraseña por correo
 - [x] Google desactivado detrás de un flag (botón oculto y rutas apagadas)
-- [ ] Endurecer seguridad del backend: CSP y headers con Shield, rate limit en endpoints de escritura, sesión regenerada al login, `npm audit` en CI
+- [ ] Endurecer seguridad
+  - [x] Headers de seguridad y CSP en Next (Report-Only)
+  - [ ] Aplicar la CSP (`Content-Security-Policy`) tras una semana sin violaciones
+  - [ ] Rate limit por cuenta en endpoints de escritura
+  - [ ] Dependencias sin vulnerabilidades altas (`npm audit`)
 - [ ] Endurecer seguridad de la BD: rol de app sin permisos de DDL (las migraciones con otro rol), backups/PITR de Neon verificados
 - [ ] Catálogo completo de sucursales de Panamá con coordenadas, y "Sugerir sucursal" con aprobación del admin
 - [ ] Lanzamiento de la beta
