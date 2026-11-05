@@ -41,21 +41,60 @@ const branches: Branch[] = [
     id: 1,
     name: "WePadel",
     slug: "wepadel",
-    phone: "+507 200-0001",
+    phone: null,
     locationLabel: "Centennial",
-    mapsUrl: "https://maps.google.com/?q=WePadel+Centennial",
-    website: "https://wepadel.com",
+    mapsUrl: "https://www.google.com/maps/place/WePadel/@9.0280882,-79.5353089,17z/data=!4m6!3m5!1s0x8faca9c6402a50f5:0xd64aab20f44eb01e!8m2!3d9.0280882!4d-79.5353089!16s%2Fg%2F11xvxdkcjw",
+    website: null,
+    latitude: 9.028088,
+    longitude: -79.535309,
   },
   {
     id: 2,
-    name: "XForce",
-    slug: "xforce",
-    phone: "+507 200-0002",
-    locationLabel: "Costa del Este",
-    mapsUrl: "https://maps.google.com/?q=XForce+Costa+del+Este",
-    website: "https://xforce.com",
+    name: "Padel X Force Club",
+    slug: "padel-x-force-club",
+    phone: "+507 6834-0936",
+    locationLabel: "Vía Ricardo J. Alfaro",
+    mapsUrl: "https://www.google.com/maps/search/?api=1&query=Padel+X+Force+Club+V%C3%ADa+Ricardo+J.+Alfaro+Panam%C3%A1",
+    website: "https://www.padelxforce.com/",
+    latitude: 8.992255,
+    longitude: -79.534391,
+  },
+  {
+    id: 3,
+    name: "Viper Padel Club",
+    slug: "viper-padel-club",
+    phone: "+507 6133-8357",
+    locationLabel: "Vía Transístmica",
+    mapsUrl: "https://www.google.com/maps/search/?api=1&query=Viper+Padel+Club+V%C3%ADa+Trans%C3%ADstmica+Panam%C3%A1",
+    website: "https://www.instagram.com/viperpadelclub/",
+    latitude: 8.993688,
+    longitude: -79.527906,
+  },
+  {
+    id: 4,
+    name: "Sky Padel",
+    slug: "sky-padel",
+    phone: "+507 6747-2335",
+    locationLabel: "Costa Sur",
+    mapsUrl: "https://www.google.com/maps/search/?api=1&query=Sky+Padel+Costa+Sur+Panam%C3%A1",
+    website: "https://www.skypadelpty.com",
+    latitude: 9.037025,
+    longitude: -79.419306,
+  },
+  {
+    id: 5,
+    name: "Royal Padel Club",
+    slug: "royal-padel-club",
+    phone: "+507 6679-7004",
+    locationLabel: "David, Chiriquí",
+    mapsUrl: "https://www.google.com/maps/search/?api=1&query=Royal+Padel+Club+David%2C+Chiriqu%C3%AD+Panam%C3%A1",
+    website: "https://www.instagram.com/royalpadelclub/",
+    latitude: null,
+    longitude: null,
   },
 ];
+
+let pendingSuggestionUserId: number | null = null;
 
 const users: (User & { password: string })[] = [
   {
@@ -296,6 +335,18 @@ export async function mockRequest<T>(method: Method, fullPath: string, body?: un
   });
 
   on(/^GET \/branches$/, () => branches);
+  on(/^POST \/branch-suggestions$/, () => {
+    const id = requireMe().id;
+    if (pendingSuggestionUserId === id) fail(409, "Ya tienes una sugerencia en revisión");
+    pendingSuggestionUserId = id;
+    return {
+      id: 1,
+      name: String(input.name),
+      locationLabel: String(input.locationLabel),
+      mapsUrl: (input.mapsUrl as string | undefined) ?? null,
+      status: "pending",
+    };
+  });
 
   on(/^GET \/players$/, () => {
     requireMe();

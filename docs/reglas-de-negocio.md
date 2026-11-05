@@ -10,7 +10,7 @@ Especificación de qué debe cumplir el backend y el frontend. Si el código se 
 - Las cuentas creadas con Google nacen verificadas si Google reporta el correo como verificado.
 - Reenvío: espera de 60 s entre códigos y máximo 5 por hora, por usuario.
 - Mientras no esté verificado, el perfil muestra un aviso con el botón "Verificar correo", que envía un código al tocarlo.
-- Publicar, pedir unirse y aceptar una invitación exigen correo verificado. Lobby, perfil y disponibilidad no: "Hacerlo después" deja explorar.
+- Publicar, pedir unirse, aceptar una invitación y sugerir una sucursal exigen correo verificado. Lobby, perfil y disponibilidad no: "Hacerlo después" deja explorar.
 - Las acciones del organizador sobre sus partidos (aprobar, rechazar, sacar, editar, cerrar) e invitar no lo exigen: publicar ya lo exigió, y así los partidos de cuentas anteriores a la verificación no quedan congelados.
 - El organizador no puede aprobar una solicitud de un jugador sin verificar (solicitudes creadas antes de la verificación): responde "Este jugador aún no verifica su correo".
 
@@ -21,7 +21,7 @@ Especificación de qué debe cumplir el backend y el frontend. Si el código se 
 ## Eliminar cuenta
 
 - Desde el final del perfil, escribiendo `ELIMINAR` para confirmar. No se puede deshacer.
-- Se anonimiza, no se borra la fila: nombre "Jugador eliminado", correo `deleted-<id>@matchpa.invalid`, y contraseña, Google, foto, WhatsApp, categoría, género y verificación en `null`. Se borran su disponibilidad, suscripciones push y códigos.
+- Se anonimiza, no se borra la fila: nombre "Jugador eliminado", correo `deleted-<id>@matchpa.invalid`, y contraseña, Google, foto, WhatsApp, categoría, género y verificación en `null`. Se borran su disponibilidad, suscripciones push, códigos y sugerencias de sucursal.
 - Sus partidos futuros `open` o `full` se cierran y sus solicitudes pendientes se cancelan.
 - Sus solicitudes pendientes en partidos de otros se cancelan, y sus puestos aceptados en partidos futuros se liberan como si saliera (el partido vuelve a `open` si corresponde).
 - Los partidos pasados no cambian y lo muestran como "Jugador eliminado".
@@ -100,8 +100,25 @@ Una sola entidad, `match_requests`, con `kind`:
 
 ## Sucursales
 
-- Pool global; la ubicación de un partido es la sucursal. Sin direcciones.
-- Catálogo fijo por seed. Inicial: WePadel y XForce.
+- Pool global; la ubicación de un partido es la sucursal. Sin direcciones: la zona (`location_label`) y las coordenadas bastan.
+- Catálogo de todo el país por seed, con upsert por `slug`. `name` es la marca, sin la zona; la UI muestra `name · zona`. Dos sedes de una marca llevan nombres distintos (PPA Condado, PPA Marina Sur).
+- Teléfono, website (o Instagram) y coordenadas son opcionales: si el club no los publica, quedan vacíos.
+
+### Ficha en el detalle del partido
+
+| Botón | Se muestra si | Abre |
+|---|---|---|
+| Cómo llegar | Hay coordenadas o `maps_url` | Google Maps con ruta a las coordenadas; si no hay, `maps_url` |
+| WhatsApp | El teléfono es celular (8 dígitos que empiezan con 6) | `wa.me` |
+| Llamar | Hay teléfono | `tel:` |
+| Website / Instagram | Hay website | La URL |
+
+### Sugerir sucursal
+
+- Desde el selector de sucursal al crear un partido o marcar disponibilidad: "¿No está tu sucursal? Sugerirla", con nombre, zona y enlace de Maps opcional.
+- Requiere sesión y correo verificado. Máximo 1 sugerencia `pending` por usuario; otra responde "Ya tienes una sugerencia en revisión".
+- Avisa por correo al dueño (`ADMIN_EMAIL`) con el nombre y correo de quien sugiere. Sin `ADMIN_EMAIL` se guarda igual, sin correo.
+- El dueño la agrega al seed a mano. Aprobar y rechazar en la app llega con el admin dashboard para empresas.
 
 ## Estados del jugador (UI)
 

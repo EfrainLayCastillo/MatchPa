@@ -23,7 +23,8 @@ Base `/api`. Las escrituras con sesión tienen límite por cuenta y responden 42
 
 | Método | Endpoint | Descripción |
 |---|---|---|
-| `GET` | `/branches` | Catálogo de sucursales |
+| `GET` | `/branches` | Catálogo de sucursales por `name`: `id`, `name`, `slug`, `locationLabel`, `mapsUrl`, `phone`, `website`, `latitude`, `longitude` (los cuatro últimos pueden ser `null`). La `branch` de un partido trae lo mismo |
+| `POST` | `/branch-suggestions` | Sugerir sucursal `{ name, locationLabel, mapsUrl? }` (2–80, 2–80, URL ≤500). 201; `403` sin correo verificado; `409` si ya tienes una `pending` |
 | `GET` | `/players` | Jugadores disponibles (`date`, `branchId`, horario) |
 | `GET` | `/me/availabilities` | Mis disponibilidades futuras |
 | `PUT` | `/me/availabilities/:date` | Crear o actualizar (`fromTime`, `toTime`, `branchId`; horario `null` = todo el día) |
@@ -57,4 +58,4 @@ Base `/api`. Las escrituras con sesión tienen límite por cuenta y responden 42
 | `POST` | `/push-subscriptions` | Registrar dispositivo |
 | `DELETE` | `/push-subscriptions` | Quitar dispositivo |
 
-Errores: `422` de VineJS con `errors[]`, `403` si no tienes permiso para la acción.
+Errores: `422` de VineJS con `errors[]`, `403` si no tienes permiso para la acción, `409` si la acción choca con un estado vigente (una sugerencia en revisión).

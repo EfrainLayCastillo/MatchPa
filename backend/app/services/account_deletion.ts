@@ -30,6 +30,7 @@ export async function deleteAccount(user: User): Promise<AccountDeletionResult> 
     await db.from('availabilities').useTransaction(trx).where('user_id', user.id).delete()
     await db.from('push_subscriptions').useTransaction(trx).where('user_id', user.id).delete()
     await db.from('email_verifications').useTransaction(trx).where('user_id', user.id).delete()
+    await db.from('branch_suggestions').useTransaction(trx).where('user_id', user.id).delete()
     await anonymize(user, trx)
     return result
   })

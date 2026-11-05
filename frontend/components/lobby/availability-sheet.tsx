@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { BranchPicker } from "@/components/branch/branch-picker";
+import { SuggestBranchDialog } from "@/components/branch/suggest-branch-dialog";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
@@ -51,6 +53,7 @@ function AvailabilityForm({ dateKey, current, branches, onOpenChange, onSaved }:
     if (toTime <= next) setToTime(endAfter(next));
   }
   const [branchId, setBranchId] = useState(current?.branchId?.toString() ?? ANY_BRANCH);
+  const [suggestQuery, setSuggestQuery] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -138,20 +141,20 @@ function AvailabilityForm({ dateKey, current, branches, onOpenChange, onSaved }:
 
       <div className="space-y-1.5">
         <Label htmlFor="branch">Sucursal (opcional)</Label>
-        <Select value={branchId} onValueChange={setBranchId}>
-          <SelectTrigger id="branch" className="w-full">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value={ANY_BRANCH}>Cualquiera</SelectItem>
-            {branches.map((branch) => (
-              <SelectItem key={branch.id} value={branch.id.toString()}>
-                {branch.name} · {branch.locationLabel}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <BranchPicker
+          id="branch"
+          branches={branches}
+          value={branchId}
+          onChange={setBranchId}
+          emptyOption={{ value: ANY_BRANCH, label: "Cualquiera" }}
+          onSuggest={setSuggestQuery}
+        />
       </div>
+      <SuggestBranchDialog
+        open={suggestQuery !== null}
+        onOpenChange={(open) => !open && setSuggestQuery(null)}
+        initialName={suggestQuery ?? ""}
+      />
 
       {noSlotsLeft ? <p role="alert" className="text-sm font-medium text-destructive">Por hoy ya no puede haber disponibilidad. Elige otro día.</p> : null}
       {error ? <p role="alert" className="text-sm text-destructive">{error}</p> : null}

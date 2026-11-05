@@ -1,6 +1,7 @@
 "use client";
 
 import { DetailSkeleton } from "@/components/matchpa/skeletons";
+import { whatsappUrl } from "@/lib/whatsapp";
 import Link from "next/link";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -16,6 +17,7 @@ import { shouldAskForPush } from "@/lib/push";
 import { useMatch, useMatchRealtime, useRefreshMatch } from "@/lib/match-queries";
 import { useSession } from "@/lib/session";
 import type { Match, MatchRequest } from "@/lib/types";
+import { BranchContact } from "./branch-contact";
 import { ShareMatch } from "./share-match";
 
 export function MatchDetail({ code, serverMatch }: { code: string; serverMatch?: Match }) {
@@ -56,7 +58,7 @@ export function MatchDetail({ code, serverMatch }: { code: string; serverMatch?:
   }
 
   const summary = `Partido de pádel en ${match.branch.name}, cancha ${match.courtNumber}. Faltan ${match.spotsLeft} puestos.`;
-  const whatsappHref = match.organizer.phone ? `https://wa.me/${match.organizer.phone.replace(/\D/g, "")}` : null;
+  const whatsappHref = match.organizer.phone ? whatsappUrl(match.organizer.phone) : null;
 
   return (
     <div className="mx-auto w-full max-w-2xl space-y-6 px-4 pb-16 pt-6">
@@ -68,6 +70,7 @@ export function MatchDetail({ code, serverMatch }: { code: string; serverMatch?:
         <p className="text-muted-foreground">
           {match.branch.name} · Cancha {match.courtNumber} · {formatDuration(match.durationMinutes)}
         </p>
+        <BranchContact branch={match.branch} />
         <div className="flex flex-wrap gap-2 text-xs font-semibold">
           <span className="rounded-md bg-brand-lime/60 px-2 py-1 text-brand-teal dark:bg-brand-lime dark:text-brand-teal">
             {shortCategory(match.category)} categoría

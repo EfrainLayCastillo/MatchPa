@@ -34,8 +34,7 @@
   - [ ] Aplicar la CSP (`Content-Security-Policy`) tras una semana sin violaciones
   - [x] Rate limit por cuenta en endpoints de escritura
   - [x] Dependencias sin vulnerabilidades altas (`npm audit`)
-- [ ] Endurecer seguridad de la BD: rol de app sin permisos de DDL (las migraciones con otro rol), backups/PITR de Neon verificados
-- [ ] Catálogo completo de sucursales de Panamá con coordenadas, y "Sugerir sucursal" con aprobación del admin
+- [x] Catálogo completo de sucursales de Panamá con coordenadas, y "Sugerir sucursal" (aprobación manual en el seed)
 - [ ] Lanzamiento de la beta
 
 ## Beta: segunda etapa
@@ -45,7 +44,7 @@
 ## Después
 
 - [ ] Panel administrativo `/admin` para catálogos y datos estáticos
-  - [ ] Rol `admin` de plataforma (el dueño): CRUD de sucursales, aprobar "Sugerir sucursal" y cargar eventos especiales
+  - [ ] Rol `admin` de plataforma (el dueño): CRUD de sucursales, aprobar o rechazar "Sugerir sucursal" en la app y cargar eventos especiales
   - [ ] Rol de admin de sucursal: cuenta ligada a una o más sucursales asociadas; edita solo sus datos (teléfono, website, `maps_url`) y sus eventos
   - [ ] Invitación del admin de plataforma para asociar una sucursal, sin autoregistro
   - [ ] Auditoría: quién cambió qué y cuándo

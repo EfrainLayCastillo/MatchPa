@@ -13,6 +13,8 @@ export function serializeBranch(branch: Branch) {
     locationLabel: branch.locationLabel,
     mapsUrl: branch.mapsUrl,
     website: branch.website,
+    latitude: branch.latitude,
+    longitude: branch.longitude,
   }
 }
 

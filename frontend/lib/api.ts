@@ -4,6 +4,7 @@ import type {
   Availability,
   Category,
   Branch,
+  BranchSuggestionInput,
   Gender,
   Match,
   MatchRequest,
@@ -95,6 +96,12 @@ export const api = {
   deleteAccount: (confirm: string) => request<void>("DELETE", "/me", { confirm }),
 
   branches: () => request<Branch[]>("GET", "/branches"),
+  suggestBranch: (input: BranchSuggestionInput) =>
+    request<{ id: number; name: string; locationLabel: string; mapsUrl: string | null; status: string }>(
+      "POST",
+      "/branch-suggestions",
+      input,
+    ),
 
   players: (filters: PlayerFilters) =>
     request<Player[]>("GET", `/players?${query(filters)}`),

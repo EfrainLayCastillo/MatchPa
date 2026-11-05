@@ -1,5 +1,6 @@
 import app from '@adonisjs/core/services/app'
 import { type HttpContext, ExceptionHandler } from '@adonisjs/core/http'
+import { isUniqueViolation } from '#exceptions/unique_violation'
 
 export default class HttpExceptionHandler extends ExceptionHandler {
   /**
@@ -30,9 +31,4 @@ export default class HttpExceptionHandler extends ExceptionHandler {
   async report(error: unknown, ctx: HttpContext) {
     return super.report(error, ctx)
   }
-}
-
-/** PostgreSQL 23505: a unique constraint was violated (e.g. a race on a duplicate email). */
-function isUniqueViolation(error: unknown): boolean {
-  return typeof error === 'object' && error !== null && 'code' in error && error.code === '23505'
 }

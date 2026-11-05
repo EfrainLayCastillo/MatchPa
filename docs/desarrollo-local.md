@@ -51,6 +51,7 @@ Los seeders usan `updateOrCreate`, así que se pueden correr varias veces.
 | `MAIL_MAILER` | `smtp` (Mailpit) |
 | `SMTP_HOST` / `SMTP_PORT` | `localhost` / `1025` |
 | `MAIL_FROM` | `MatchPa <no-reply@matchpa.app>` |
+| `ADMIN_EMAIL` | `hola@matchpa.app` (opcional: recibe las sugerencias de sucursal; en local llegan a Mailpit) |
 
 | Frontend (`.env.local`) | Ejemplo |
 |---|---|

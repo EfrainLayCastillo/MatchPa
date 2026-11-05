@@ -5,16 +5,10 @@ import { LoadFailed } from "@/components/matchpa/load-failed";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { BranchPicker } from "@/components/branch/branch-picker";
 import { Button } from "@/components/ui/button";
 import { PageTitle } from "@/components/matchpa/page-title";
 import { PushPrompt } from "@/components/matchpa/push-prompt";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { track } from "@/lib/analytics";
 import { useVerifiedAction } from "@/components/auth/verify-email-dialog";
@@ -175,19 +169,13 @@ export function LobbyView() {
       <DateStrip value={date} onChange={setDate} />
 
       <div className="flex items-center gap-2">
-        <Select value={branchFilter} onValueChange={setBranchFilter}>
-          <SelectTrigger className="w-full sm:w-64" aria-label="Sucursal">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value={ALL_BRANCHES}>Todas las sucursales</SelectItem>
-            {branches.map((branch) => (
-              <SelectItem key={branch.id} value={branch.id.toString()}>
-                {branch.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <BranchPicker
+          branches={branches}
+          value={branchFilter}
+          onChange={setBranchFilter}
+          emptyOption={{ value: ALL_BRANCHES, label: "Todas las sucursales" }}
+          className="sm:w-72"
+        />
       </div>
 
       {error ? (

@@ -1,25 +1,257 @@
 import { BaseSeeder } from '@adonisjs/lucid/seeders'
 import Branch from '#models/branch'
 
+const BRANCHES = [
+  {
+    name: 'WePadel',
+    slug: 'wepadel',
+    locationLabel: 'Centennial',
+    latitude: 9.028088,
+    longitude: -79.535309,
+    phone: null,
+    website: null,
+    mapsUrl:
+      'https://www.google.com/maps/place/WePadel/@9.0280882,-79.5353089,17z/data=!4m6!3m5!1s0x8faca9c6402a50f5:0xd64aab20f44eb01e!8m2!3d9.0280882!4d-79.5353089!16s%2Fg%2F11xvxdkcjw',
+  },
+  {
+    name: 'Padel X Force Club',
+    slug: 'padel-x-force-club',
+    locationLabel: 'Vía Ricardo J. Alfaro',
+    latitude: 8.992255,
+    longitude: -79.534391,
+    phone: '+507 6834-0936',
+    website: 'https://www.padelxforce.com/',
+    mapsUrl:
+      'https://www.google.com/maps/search/?api=1&query=Padel+X+Force+Club+V%C3%ADa+Ricardo+J.+Alfaro+Panam%C3%A1',
+  },
+  {
+    name: 'Viper Padel Club',
+    slug: 'viper-padel-club',
+    locationLabel: 'Vía Transístmica',
+    latitude: 8.993688,
+    longitude: -79.527906,
+    phone: '+507 6133-8357',
+    website: 'https://www.instagram.com/viperpadelclub/',
+    mapsUrl:
+      'https://www.google.com/maps/search/?api=1&query=Viper+Padel+Club+V%C3%ADa+Trans%C3%ADstmica+Panam%C3%A1',
+  },
+  {
+    name: 'PPA Condado',
+    slug: 'panama-padel-academy-condado-del-rey',
+    locationLabel: 'Condado del Rey',
+    latitude: 9.027213,
+    longitude: -79.523542,
+    phone: '+507 6999-2887',
+    website: 'https://www.instagram.com/panamapadelacademy/',
+    mapsUrl: 'https://www.google.com/maps/search/?api=1&query=PPA+Condado+del+Rey+Panam%C3%A1',
+  },
+  {
+    name: 'PPA Costa del Mar',
+    slug: 'panama-padel-academy-costa-del-mar',
+    locationLabel: 'Costa del Este',
+    latitude: 9.009552,
+    longitude: -79.479011,
+    phone: '+507 6999-2887',
+    website: 'https://www.instagram.com/panamapadelacademy/',
+    mapsUrl:
+      'https://www.google.com/maps/search/?api=1&query=Panama+Padel+Academy+Costa+del+Este+Panam%C3%A1',
+  },
+  {
+    name: 'PPA Marina Sur',
+    slug: 'panama-padel-academy-marina-sur',
+    locationLabel: 'Costa del Este',
+    latitude: 9.011936,
+    longitude: -79.461997,
+    phone: null,
+    website: 'https://www.instagram.com/panamapadelacademy/',
+    mapsUrl:
+      'https://www.google.com/maps/search/?api=1&query=Panama+Padel+Academy+Costa+del+Este+Panam%C3%A1',
+  },
+  {
+    name: 'Padel World',
+    slug: 'padel-world',
+    locationLabel: 'Costa del Este',
+    latitude: 9.015069,
+    longitude: -79.467618,
+    phone: '+507 6395-2220',
+    website: null,
+    mapsUrl:
+      'https://www.google.com/maps/search/?api=1&query=Padel+World+Costa+del+Este+Panam%C3%A1',
+  },
+  {
+    name: 'Indoor Padel Club',
+    slug: 'indoor-padel-club',
+    locationLabel: 'Costa del Este',
+    latitude: 9.013008,
+    longitude: -79.467248,
+    phone: '+507 6422-0580',
+    website: null,
+    mapsUrl:
+      'https://www.google.com/maps/search/?api=1&query=Indoor+Padel+Club+Costa+del+Este+Panam%C3%A1',
+  },
+  {
+    name: 'Le Club Fit',
+    slug: 'le-club-fit',
+    locationLabel: 'Costa del Este',
+    latitude: 9.015168,
+    longitude: -79.468762,
+    phone: '+507 6784-1243',
+    website: 'https://www.leclub.fit',
+    mapsUrl:
+      'https://www.google.com/maps/search/?api=1&query=Le+Club+Fit+Costa+del+Este+Panam%C3%A1',
+  },
+  {
+    name: 'Sky Padel',
+    slug: 'sky-padel',
+    locationLabel: 'Costa Sur',
+    latitude: 9.037025,
+    longitude: -79.419306,
+    phone: '+507 6747-2335',
+    website: 'https://www.skypadelpty.com',
+    mapsUrl: 'https://www.google.com/maps/search/?api=1&query=Sky+Padel+Costa+Sur+Panam%C3%A1',
+  },
+  {
+    name: 'Costa Sur Padel Center',
+    slug: 'costa-sur-padel-center',
+    locationLabel: 'Costa Sur',
+    latitude: 9.033915,
+    longitude: -79.422447,
+    phone: '+507 6739-7951',
+    website: 'https://www.instagram.com/costasurpadelcenter/',
+    mapsUrl:
+      'https://www.google.com/maps/search/?api=1&query=Costa+Sur+Padel+Center+Costa+Sur+Panam%C3%A1',
+  },
+  {
+    name: 'Padel Spot',
+    slug: 'padel-spot',
+    locationLabel: 'Obarrio',
+    latitude: 8.991792,
+    longitude: -79.518697,
+    phone: '+507 264-5344',
+    website: null,
+    mapsUrl: 'https://www.google.com/maps/search/?api=1&query=Padel+Spot+Obarrio+Panam%C3%A1',
+  },
+  {
+    name: 'Fairplay Padel',
+    slug: 'fairplay-padel',
+    locationLabel: 'Obarrio',
+    latitude: 8.986979,
+    longitude: -79.521281,
+    phone: '+507 6560-8740',
+    website: null,
+    mapsUrl: 'https://www.google.com/maps/search/?api=1&query=Fairplay+Padel+Obarrio+Panam%C3%A1',
+  },
+  {
+    name: 'Park & Padel',
+    slug: 'park-and-padel',
+    locationLabel: 'Obarrio',
+    latitude: 8.98623,
+    longitude: -79.516493,
+    phone: '+507 6687-5705',
+    website: 'http://www.parknpadel.com',
+    mapsUrl: 'https://www.google.com/maps/search/?api=1&query=Park+%26+Padel+Obarrio+Panam%C3%A1',
+  },
+  {
+    name: 'Proplay',
+    slug: 'proplay',
+    locationLabel: 'Paitilla',
+    latitude: 8.977033,
+    longitude: -79.513788,
+    phone: '+507 6948-7932',
+    website: 'https://www.instagram.com/proplaypa/',
+    mapsUrl: 'https://www.google.com/maps/search/?api=1&query=Proplay+Paitilla+Panam%C3%A1',
+  },
+  {
+    name: 'Racket Center',
+    slug: 'racket-center',
+    locationLabel: 'Vía Israel',
+    latitude: 8.984395,
+    longitude: -79.513967,
+    phone: '+507 6672-1246',
+    website: 'https://www.instagram.com/racketcenter.pty/',
+    mapsUrl:
+      'https://www.google.com/maps/search/?api=1&query=Racket+Center+V%C3%ADa+Israel+Panam%C3%A1',
+  },
+  {
+    name: 'Panama Sport Club',
+    slug: 'panama-sport-club',
+    locationLabel: 'Vía Israel',
+    latitude: 8.982373,
+    longitude: -79.515917,
+    phone: '+507 6990-4321',
+    website: 'https://www.sinerqki.com',
+    mapsUrl:
+      'https://www.google.com/maps/search/?api=1&query=Panama+Sport+Club+V%C3%ADa+Israel+Panam%C3%A1',
+  },
+  {
+    name: 'Golfers Inc. Club',
+    slug: 'golfers-inc-club',
+    locationLabel: 'Vía Israel',
+    latitude: 8.982417,
+    longitude: -79.515043,
+    phone: '+507 6567-2112',
+    website: 'https://www.instagram.com/golfersinc/',
+    mapsUrl:
+      'https://www.google.com/maps/search/?api=1&query=Golfers+Inc.+Club+V%C3%ADa+Israel+Panam%C3%A1',
+  },
+  {
+    name: 'Sheraton Wellness & Social Club',
+    slug: 'sheraton-wellness-social-club',
+    locationLabel: 'Vía Israel',
+    latitude: 8.989151,
+    longitude: -79.5018,
+    phone: null,
+    website: 'https://www.instagram.com/sheratonpanama/',
+    mapsUrl:
+      'https://www.google.com/maps/search/?api=1&query=Sheraton+Wellness+%26+Social+Club+V%C3%ADa+Israel+Panam%C3%A1',
+  },
+  {
+    name: 'Albrook Padel',
+    slug: 'albrook-padel',
+    locationLabel: 'Albrook',
+    latitude: 8.978069,
+    longitude: -79.542464,
+    phone: '+507 6848-3651',
+    website: null,
+    mapsUrl: 'https://www.google.com/maps/search/?api=1&query=Albrook+Padel+Albrook+Panam%C3%A1',
+  },
+  {
+    name: 'Padel Central',
+    slug: 'padel-central-costa-verde',
+    locationLabel: 'Costa Verde, La Chorrera',
+    latitude: 8.887615,
+    longitude: -79.748081,
+    phone: '+507 6884-9129',
+    website: 'https://www.instagram.com/padelcentral.pa/',
+    mapsUrl:
+      'https://www.google.com/maps/search/?api=1&query=Padel+Central+Costa+Verde%2C+La+Chorrera+Panam%C3%A1',
+  },
+  {
+    name: 'Playa Escondida Padel Club',
+    slug: 'playa-escondida-padel-club',
+    locationLabel: 'María Chiquita, Colón',
+    latitude: 9.442766,
+    longitude: -79.776743,
+    phone: '+507 264-9471',
+    website: 'https://www.playaescondidaresort.com',
+    mapsUrl:
+      'https://www.google.com/maps/search/?api=1&query=Playa+Escondida+Padel+Club+Mar%C3%ADa+Chiquita%2C+Col%C3%B3n+Panam%C3%A1',
+  },
+  {
+    name: 'Royal Padel Club',
+    slug: 'royal-padel-club',
+    locationLabel: 'David, Chiriquí',
+    latitude: null,
+    longitude: null,
+    phone: '+507 6679-7004',
+    website: 'https://www.instagram.com/royalpadelclub/',
+    mapsUrl:
+      'https://www.google.com/maps/search/?api=1&query=Royal+Padel+Club+David%2C+Chiriqu%C3%AD+Panam%C3%A1',
+  },
+]
+
 export default class BranchSeeder extends BaseSeeder {
   async run() {
-    await Branch.updateOrCreateMany('slug', [
-      {
-        name: 'WePadel',
-        slug: 'wepadel',
-        phone: '+507 200-0001',
-        locationLabel: 'Centennial',
-        mapsUrl: 'https://maps.google.com/?q=WePadel+Centennial',
-        website: 'https://wepadel.com',
-      },
-      {
-        name: 'XForce',
-        slug: 'xforce',
-        phone: '+507 200-0002',
-        locationLabel: 'Costa del Este',
-        mapsUrl: 'https://maps.google.com/?q=XForce+Costa+del+Este',
-        website: 'https://xforce.com',
-      },
-    ])
+    await Branch.updateOrCreateMany('slug', BRANCHES)
   }
 }

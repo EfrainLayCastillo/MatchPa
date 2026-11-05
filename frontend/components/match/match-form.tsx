@@ -2,6 +2,8 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { BranchPicker } from "@/components/branch/branch-picker";
+import { SuggestBranchDialog } from "@/components/branch/suggest-branch-dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -37,6 +39,7 @@ function MatchFormBody({ match }: { match?: Match }) {
   const [time, setTime] = useState(() => (match ? formatClock(match.startsAt) : "18:00"));
   const [duration, setDuration] = useState<"90" | "120">(match ? (String(match.durationMinutes) as "90" | "120") : "90");
   const [branchId, setBranchId] = useState(match ? String(match.branch.id) : "");
+  const [suggestQuery, setSuggestQuery] = useState<string | null>(null);
   const [courtNumber, setCourtNumber] = useState(match ? String(match.courtNumber) : "");
   const [category, setCategory] = useState<Category>(match?.category ?? user?.category ?? 4);
   const [type, setType] = useState<MatchType>(match?.type ?? "mixed");
@@ -176,18 +179,14 @@ function MatchFormBody({ match }: { match?: Match }) {
             <Input id="court" type="number" inputMode="numeric" min={1} placeholder="Ej. 3" value={courtNumber} onChange={(e) => setCourtNumber(e.target.value)} required />
           </Field>
         </div>
-        <Field label="Sucursal">
-          <Select value={branchId} onValueChange={setBranchId}>
-            <SelectTrigger className="w-full"><SelectValue placeholder="Elige una sucursal" /></SelectTrigger>
-            <SelectContent>
-              {branches.map((branch) => (
-                <SelectItem key={branch.id} value={branch.id.toString()}>
-                  {branch.name} · {branch.locationLabel}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+        <Field label="Sucursal" htmlFor="branch">
+          <BranchPicker id="branch" branches={branches} value={branchId} onChange={setBranchId} onSuggest={setSuggestQuery} />
         </Field>
+        <SuggestBranchDialog
+          open={suggestQuery !== null}
+          onOpenChange={(open) => !open && setSuggestQuery(null)}
+          initialName={suggestQuery ?? ""}
+        />
       </Section>
       ) : null}
 

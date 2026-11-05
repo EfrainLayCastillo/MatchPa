@@ -16,10 +16,18 @@ export interface Branch {
   id: number;
   name: string;
   slug: string;
-  phone: string;
+  phone: string | null;
   locationLabel: string;
   mapsUrl: string;
-  website: string;
+  website: string | null;
+  latitude: number | null;
+  longitude: number | null;
+}
+
+export interface BranchSuggestionInput {
+  name: string;
+  locationLabel: string;
+  mapsUrl?: string;
 }
 
 export interface User {
