@@ -32,6 +32,7 @@ export type ScannedRoutes = {
     'join_requests.store': { paramsTuple: [ParamValue]; params: {'code': ParamValue} }
     'invitations.store': { paramsTuple: [ParamValue]; params: {'code': ParamValue} }
     'match_requests.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'branch_suggestions.store': { paramsTuple?: []; params?: {} }
     'push_subscriptions.store': { paramsTuple?: []; params?: {} }
     'push_subscriptions.destroy': { paramsTuple?: []; params?: {} }
   }
@@ -71,6 +72,7 @@ export type ScannedRoutes = {
     'matches.close': { paramsTuple: [ParamValue]; params: {'code': ParamValue} }
     'join_requests.store': { paramsTuple: [ParamValue]; params: {'code': ParamValue} }
     'invitations.store': { paramsTuple: [ParamValue]; params: {'code': ParamValue} }
+    'branch_suggestions.store': { paramsTuple?: []; params?: {} }
     'push_subscriptions.store': { paramsTuple?: []; params?: {} }
   }
   PATCH: {

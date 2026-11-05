@@ -5,7 +5,7 @@ Plataformas en plan gratuito: frontend en Vercel, backend en Render y base de da
 | Pieza | Plataforma | Configuración |
 |---|---|---|
 | Frontend (Next.js) | Vercel (Hobby) | Root directory `frontend`. Reenvía `/api` y `/__transmit` a Render con `BACKEND_URL`, así el navegador ve un solo origen (`matchpa.app`) y la cookie de sesión es de primera parte. El backend no tiene subdominio público. El servidor de Next (metadata e imagen OG del partido) llama a `BACKEND_URL` directo, porque `/api` es relativo. |
-| Backend (AdonisJS) | Render (web service, Free) | Root directory `backend`. Build: `npm ci --include=dev && node ace build`. Start: `cd build && npm ci --omit=dev && node ace migration:run --force && node bin/server.js`. |
+| Backend (AdonisJS) | Render (web service, Free) | Root directory `backend`. Build: `npm ci --include=dev && node ace build`. Start: `cd build && npm ci --omit=dev && node ace migration:run --force && node ace db:seed --files ./database/seeders/branch_seeder.js && node bin/server.js`. |
 | PostgreSQL | Neon (Free) | Conexión con SSL obligatorio en producción. Usar el endpoint directo, sin `-pooler`. |
 
 ## Variables de producción
@@ -33,4 +33,4 @@ Plataformas en plan gratuito: frontend en Vercel, backend en Render y base de da
 
 ## Seed en producción
 
-Solo se corre `branch_seeder`. `user_seeder` crea cuentas de prueba y no debe correrse ahí.
+Solo se corre `branch_seeder`, en cada deploy desde el start command. Hace upsert por `slug`, así que es idempotente y sincroniza el catálogo; no borra sucursales que se quiten del seed. `user_seeder` crea cuentas de prueba y no debe correrse ahí.

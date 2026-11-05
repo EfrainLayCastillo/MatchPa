@@ -139,6 +139,22 @@ const matches: StoredMatch[] = [
     guests: [{ id: 1, name: "Efrain Lay", category: 4, gender: "male" }],
     requests: [],
   },
+  {
+    id: 2,
+    code: "wp8birra",
+    organizerId: 1,
+    branchId: 1,
+    courtNumber: 2,
+    startsAt: laterToday(3),
+    durationMinutes: 90,
+    category: 4,
+    type: "mixed",
+    maxPlayers: 4,
+    updatedAt: new Date().toISOString(),
+    closed: false,
+    guests: [],
+    requests: [],
+  },
 ];
 
 let me: number | null = 1;
@@ -156,6 +172,11 @@ function seedPlayer(id: number, fullName: string, category: Category, gender: Ge
     category,
     gender,
   };
+}
+
+function laterToday(hours: number): string {
+  const halfHour = 30 * 60_000;
+  return new Date(Math.ceil((Date.now() + hours * 3_600_000) / halfHour) * halfHour).toISOString();
 }
 
 function at(dateKey: string, time: string): string {
