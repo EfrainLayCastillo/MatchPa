@@ -204,6 +204,15 @@ test.group('flujo de partidos', (group) => {
     )
   })
 
+  test('el organizador no puede invitarse a su propio partido', async ({ assert }) => {
+    const { match, organizer } = await fixtures(0)
+
+    await assert.rejects(
+      () => inviteToMatch(match.code, organizer.id),
+      'No puedes invitarte a tu propio partido'
+    )
+  })
+
   test('un invitado sin verificar no puede aceptar la invitación', async ({ assert }) => {
     const { match, players } = await fixtures(0)
     const invitation = await inviteToMatch(match.code, players[0].id)

@@ -129,6 +129,8 @@ export async function requestToJoin(user: User, code: string): Promise<MatchRequ
 export async function inviteToMatch(code: string, userId: number): Promise<MatchRequest> {
   return db.transaction(async (trx) => {
     const match = await lockMatchByCode(code, trx)
+    if (match.organizerId === userId)
+      throw new BusinessRuleError('No puedes invitarte a tu propio partido')
     assertOpen(match)
     const invitee = await User.findOrFail(userId, { client: trx })
     if (invitee.deletedAt) throw new BusinessRuleError('Este jugador ya no existe')

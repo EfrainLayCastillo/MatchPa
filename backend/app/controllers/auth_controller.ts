@@ -13,7 +13,7 @@ import { serializeUser } from '#serializers/match_serializer'
 import { safeNextPath } from '#services/next_path'
 import { issueCode, verifyCode } from '#services/email_verification'
 import { requestReset, resetPassword } from '#services/password_reset'
-import { startSession } from '#services/session'
+import { endAllSessions, startSession } from '#services/session'
 import { emailCandidates } from '#services/account_lookup'
 import { findOrLinkGoogleUser } from '#services/google_account'
 
@@ -69,6 +69,7 @@ export default class AuthController {
   }
 
   async logout({ auth, response }: HttpContext) {
+    await endAllSessions(auth.getUserOrFail())
     await auth.use('web').logout()
     return response.noContent()
   }

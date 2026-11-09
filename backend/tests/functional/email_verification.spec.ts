@@ -9,6 +9,7 @@ import User from '#models/user'
 import CodeNotification from '#mails/code_notification'
 import AuthController from '#controllers/auth_controller'
 import { MAX_ATTEMPTS, issueCode, verifyCode } from '#services/email_verification'
+import { MAX_DAILY_FAILURES } from '#services/one_time_codes'
 
 test.group('verificación de correo', (group) => {
   group.each.setup(() => testUtils.db().wrapInGlobalTransaction())
@@ -70,6 +71,20 @@ test.group('verificación de correo', (group) => {
     assert.equal(error?.message, 'El código venció o se agotaron los intentos. Pide uno nuevo')
     await user.refresh()
     assert.isNull(user.emailVerifiedAt)
+    restore()
+  })
+
+  test('pedir otro código no reinicia los fallos del día', async ({ assert }) => {
+    const { user, code, restore } = await newUserWithCode()
+    const wrong = code === '000000' ? '000001' : '000000'
+    for (let i = 0; i < MAX_ATTEMPTS; i++) await rejection(verifyCode(user, wrong))
+    await issueCode(user)
+    for (let i = 0; i < MAX_DAILY_FAILURES - MAX_ATTEMPTS; i++) {
+      await rejection(verifyCode(user, '999999'))
+    }
+
+    const error = await rejection(verifyCode(user, '999998'))
+    assert.equal(error?.message, 'El código venció o se agotaron los intentos. Pide uno nuevo')
     restore()
   })
 

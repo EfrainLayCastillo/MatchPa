@@ -11,6 +11,12 @@ export function isSessionStale({ session }: HttpContext, user: User) {
   return session.get('session_version', 0) !== user.sessionVersion
 }
 
+/** A cookie session outlives logout otherwise: a copied cookie would stay valid until it expires. */
+export async function endAllSessions(user: User) {
+  bumpSessionVersion(user)
+  await user.save()
+}
+
 /** Every other device's session goes stale on its next request. */
 export function bumpSessionVersion(user: User) {
   user.sessionVersion = (user.sessionVersion ?? 0) + 1

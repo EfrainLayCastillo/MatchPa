@@ -34,6 +34,9 @@
   - [ ] Aplicar la CSP (`Content-Security-Policy`) tras una semana sin violaciones
   - [x] Rate limit por cuenta en endpoints de escritura
   - [x] Dependencias sin vulnerabilidades altas (`npm audit`)
+  - [x] Auditoría de seguridad, primera ronda (auth, API, cliente)
+  - [ ] Límite por IP real detrás del proxy (`trustProxy` según los saltos de Render)
+  - [ ] Auditoría, segunda ronda: templates de correo, migraciones, Transmit y headers de Vercel
 - [x] Catálogo completo de sucursales de Panamá con coordenadas, y "Sugerir sucursal" (aprobación manual en el seed)
 - [ ] Lanzamiento de la beta
 

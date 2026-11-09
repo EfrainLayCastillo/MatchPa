@@ -37,7 +37,7 @@ Especificación de qué debe cumplir el backend y el frontend. Si el código se 
 - El organizador cuenta como jugador. Los que ya tiene son **invitados** (nombre, categoría, género), sin cuenta.
 - **Puestos disponibles** = máximo − organizador − invitados − aceptados.
 - Sin puestos → `full`. El organizador puede cerrar antes (`closed`), por ejemplo con 4 de 6.
-- Solo el organizador aprueba, invita, saca jugadores, edita y cierra.
+- Solo el organizador aprueba, invita, saca jugadores, edita y cierra. No puede invitarse a sí mismo.
 - Si un jugador sale o lo sacan, se libera el puesto; un partido `full` que no ha empezado vuelve a `open`.
 - No puedes unirte a tu propio partido ni tener dos solicitudes activas en el mismo.
 - Al salir de `open`, las solicitudes pendientes pasan a `cancelled`.

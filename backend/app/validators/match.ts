@@ -43,8 +43,12 @@ export const requestActionValidator = vine.create({
   action: vine.enum(['accept', 'reject', 'leave', 'remove'] as const),
 })
 
+/** Only browser push services: the server POSTs to this URL, so any other host is an SSRF target. */
+const PUSH_SERVICE_URL =
+  /^https:\/\/(fcm\.googleapis\.com|([a-z0-9-]+\.)*push\.services\.mozilla\.com|web\.push\.apple\.com|[a-z0-9-]+\.notify\.windows\.com)\//
+
 export const pushSubscriptionValidator = vine.create({
-  endpoint: vine.string().url(),
+  endpoint: vine.string().url().regex(PUSH_SERVICE_URL),
   keys: vine.object({
     p256dh: vine.string(),
     auth: vine.string(),
