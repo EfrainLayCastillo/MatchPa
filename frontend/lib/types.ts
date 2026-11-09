@@ -47,7 +47,7 @@ export interface Availability {
   date: string;
   fromTime: string | null;
   toTime: string | null;
-  branchId: number | null;
+  branchId: number;
 }
 
 export interface Player {

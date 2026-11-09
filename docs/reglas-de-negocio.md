@@ -87,7 +87,9 @@ Una sola entidad, `match_requests`, con `kind`:
 
 - Una por jugador por fecha (hoy o futura).
 - **Horario opcional.** Sin horario = disponible todo el día; si es hoy, el resto del día. Si se indica, `Desde` y `Hasta` van juntos.
-- Sucursal opcional; vacía = cualquiera.
+- **Sucursal obligatoria:** el jugador elige dónde puede jugar ese día. Sin sucursal no se guarda.
+- Si organizas partidos abiertos ese día, la pestaña Jugadores (y Partidos) viene filtrada por sus sucursales (todas, si son varias). Con la fecha en "Todos (próximos)", Partidos no se filtra porque abarca varios días. Se puede cambiar a mano; al cambiar de fecha vuelve a la automática. Al crear un partido se avisa: "Los jugadores disponibles de ese día se mostrarán filtrados por la sucursal de este partido."
+- "Invitar" en un jugador ofrece solo tus partidos abiertos de la misma fecha y sucursal que su disponibilidad. Si no hay ninguno, propone publicar uno con esa fecha, esa sucursal y la invitación precargadas.
 - **Horarios cada 30 minutos** (`:00` o `:30`, la API también lo valida), mostrados en formato de 12 horas (`8:30 a. m.`). El fin del día se guarda como `24:00` y se muestra como `12:00 a. m.`.
 - Hoy, `Desde` no puede ser antes de la próxima media hora (redondeada hacia arriba). Si ya no quedan medias horas hoy, no se puede guardar, con o sin horario. La API valida lo mismo.
 - Un jugador comprometido ese día (organiza o tiene una solicitud aceptada en un partido abierto o completo) no aparece en la lista de disponibles de ese día.
@@ -104,7 +106,7 @@ Una sola entidad, `match_requests`, con `kind`:
 ## Sucursales
 
 - Pool global; la ubicación de un partido es la sucursal. Sin direcciones: la zona (`location_label`) y las coordenadas bastan.
-- **Cerca de ti:** el lobby ordena por distancia en línea recta desde la ubicación del jugador, o desde la zona que elija a mano, hasta la sucursal. En un partido es su sucursal; en un jugador del pool, la de su disponibilidad. "Cualquiera" o una sucursal sin coordenadas van al final. Con la misma distancia redondeada (km) se desempata por nivel.
+- **Cerca de ti:** el lobby ordena por distancia en línea recta desde la ubicación del jugador, o desde la zona que elija a mano, hasta la sucursal. En un partido es su sucursal; en un jugador del pool, la de su disponibilidad. Una sucursal sin coordenadas va al final. Con la misma distancia redondeada (km) se desempata por nivel.
 - La ubicación se pide al tocar "Usar mi ubicación", nunca al cargar, y no sale del navegador. Una zona es un `location_label` de sucursales con coordenadas, y su punto es el promedio de esas sucursales.
 - Catálogo de todo el país por seed, con upsert por `slug`. `name` es la marca, sin la zona; la UI muestra `name · zona`. Dos sedes de una marca llevan nombres distintos (PPA Condado, PPA Marina Sur).
 - Teléfono, website (o Instagram) y coordenadas son opcionales: si el club no los publica, quedan vacíos.

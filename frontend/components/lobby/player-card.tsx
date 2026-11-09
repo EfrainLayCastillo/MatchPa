@@ -8,12 +8,13 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { useVerifiedAction } from "@/components/auth/verify-email-dialog";
 import { api } from "@/lib/api";
 import { GENDER_LABELS, firstName, formatAvailabilityWindow, formatCategory } from "@/lib/format";
+import { dateKey } from "@/lib/panamaFormatDate";
 import type { Match, Player } from "@/lib/types";
 import { DistanceTag } from "./distance-tag";
 
 interface PlayerCardProps {
   player: Player;
-  branchName: (branchId: number | null) => string;
+  branchName: (branchId: number) => string;
   distanceKm?: number | null;
 }
 
@@ -28,7 +29,7 @@ export function PlayerCard({ player, branchName, distanceKm }: PlayerCardProps) 
     setBusy(true);
     const mine = await api
       .myMatches()
-      .then((all) => all.filter((match) => match.isOrganizer && match.status === "open"))
+      .then((all) => all.filter(fitsAvailability))
       .catch(() => []);
     setBusy(false);
 
@@ -39,8 +40,23 @@ export function PlayerCard({ player, branchName, distanceKm }: PlayerCardProps) 
     setMatches(mine);
   }
 
+  function fitsAvailability(match: Match) {
+    return (
+      match.isOrganizer &&
+      match.status === "open" &&
+      dateKey(new Date(match.startsAt)) === availability.date &&
+      match.branch.id === availability.branchId
+    );
+  }
+
   function publishWithInvite() {
-    const params = new URLSearchParams({ invitar: String(player.id), nombre: player.fullName, n: String(Date.now()) });
+    const params = new URLSearchParams({
+      invitar: String(player.id),
+      nombre: player.fullName,
+      fecha: availability.date,
+      sucursal: String(availability.branchId),
+      n: String(Date.now()),
+    });
     router.push(`/partidos/nuevo?${params.toString()}`);
   }
 

@@ -121,9 +121,9 @@ const users: (User & { password: string })[] = [
 const availabilities = new Map<number, Availability[]>();
 const today = dateKey(new Date());
 availabilities.set(2, [{ date: today, fromTime: "17:00", toTime: "21:00", branchId: 1 }]);
-availabilities.set(3, [{ date: today, fromTime: "18:00", toTime: "22:00", branchId: null }]);
+availabilities.set(3, [{ date: today, fromTime: "18:00", toTime: "22:00", branchId: 2 }]);
 availabilities.set(4, [{ date: today, fromTime: "16:00", toTime: "20:00", branchId: 2 }]);
-availabilities.set(6, [{ date: today, fromTime: null, toTime: null, branchId: null }]);
+availabilities.set(6, [{ date: today, fromTime: null, toTime: null, branchId: 1 }]);
 
 const matches: StoredMatch[] = [
   {
@@ -299,7 +299,7 @@ function playersFor(date: string, branchId?: number): Player[] {
     .filter((u) => u.id !== me && u.category && u.gender)
     .flatMap((u) => {
       const slot = (availabilities.get(u.id) ?? []).find((a) => a.date === date);
-      if (!slot || (branchId !== undefined && slot.branchId !== null && slot.branchId !== branchId)) return [];
+      if (!slot || (branchId !== undefined && slot.branchId !== branchId)) return [];
       return [{ id: u.id, fullName: u.fullName, category: u.category!, categoryTier: u.categoryTier, gender: u.gender!, avatarUrl: null, availability: slot }];
     });
 }
@@ -385,8 +385,10 @@ export async function mockRequest<T>(method: Method, fullPath: string, body?: un
   on(/^PUT \/me\/availabilities\/(.+)$/, (m) => {
     const id = requireMe().id;
     const date = m[1];
+    const branchId = Number(input.branchId);
+    if (!branches.some((branch) => branch.id === branchId)) fail(422, "La sucursal no existe");
     const rest = (availabilities.get(id) ?? []).filter((a) => a.date !== date);
-    const slot: Availability = { date, fromTime: (input.fromTime as string | null) ?? null, toTime: (input.toTime as string | null) ?? null, branchId: (input.branchId as number | null) ?? null };
+    const slot: Availability = { date, fromTime: (input.fromTime as string | null) ?? null, toTime: (input.toTime as string | null) ?? null, branchId };
     availabilities.set(id, [...rest, slot]);
     return slot;
   });

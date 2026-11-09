@@ -16,8 +16,6 @@ import { InfoIcon } from "lucide-react";
 import { earliestSlotToday, formatClock12, formatDay, halfHourTimes, todayKey } from "@/lib/panamaFormatDate";
 import type { Availability, Branch } from "@/lib/types";
 
-const ANY_BRANCH = "any";
-
 interface AvailabilitySheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -56,12 +54,14 @@ function AvailabilityForm({ dateKey, current, branches, onOpenChange, onSaved }:
     setFromTime(next);
     if (toTime <= next) setToTime(endAfter(next));
   }
-  const [branchId, setBranchId] = useState(current?.branchId?.toString() ?? ANY_BRANCH);
+  const [branchId, setBranchId] = useState(current?.branchId.toString() ?? "");
+  const [branchError, setBranchError] = useState<string | null>(null);
   const [suggestQuery, setSuggestQuery] = useState<string | null>(null);
   const [toError, setToError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
   async function save() {
+    if (!branchId) return setBranchError("Elige la sucursal donde quieres jugar");
     if (hasWindow && toTime <= fromTime) return setToError("La hora de fin debe ser después de la de inicio");
     setBusy(true);
     setToError(null);
@@ -69,7 +69,7 @@ function AvailabilityForm({ dateKey, current, branches, onOpenChange, onSaved }:
       await api.setAvailability(dateKey, {
         fromTime: hasWindow ? fromTime : null,
         toTime: hasWindow ? toTime : null,
-        branchId: branchId === ANY_BRANCH ? null : Number(branchId),
+        branchId: Number(branchId),
       });
       onSaved();
       onOpenChange(false);
@@ -145,15 +145,17 @@ function AvailabilityForm({ dateKey, current, branches, onOpenChange, onSaved }:
       ) : null}
 
       <div className="space-y-1.5">
-        <Label htmlFor="branch">Sucursal (opcional)</Label>
+        <Label htmlFor="branch">Sucursal</Label>
         <BranchPicker
           id="branch"
           branches={branches}
           value={branchId}
-          onChange={setBranchId}
-          emptyOption={{ value: ANY_BRANCH, label: "Cualquiera" }}
+          onChange={(value) => { setBranchId(value); setBranchError(null); }}
           onSuggest={setSuggestQuery}
+          aria-invalid={branchError ? true : undefined}
+          aria-describedby={branchError ? "branch-error" : undefined}
         />
+        <FieldError id="branch-error">{branchError}</FieldError>
       </div>
       <SuggestBranchDialog
         open={suggestQuery !== null}

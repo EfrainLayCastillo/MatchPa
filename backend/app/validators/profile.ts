@@ -25,5 +25,5 @@ export const availabilityValidator = vine.create({
     .string()
     .regex(/^(([01]\d|2[0-3]):(00|30)|24:00)$/)
     .nullable(),
-  branchId: vine.number().positive().nullable(),
+  branchId: vine.number().positive().exists({ table: 'branches', column: 'id' }),
 })

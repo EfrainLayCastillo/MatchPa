@@ -21,7 +21,7 @@ export default class Availability extends BaseModel {
   declare toTime: string | null
 
   @column()
-  declare branchId: number | null
+  declare branchId: number
 
   @belongsTo(() => User)
   declare user: BelongsTo<typeof User>

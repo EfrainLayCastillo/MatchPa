@@ -27,7 +27,7 @@ import {
   useRefreshLobby,
   useUpcomingMatches,
 } from "@/lib/lobby-queries";
-import { formatDateTime, todayKey } from "@/lib/panamaFormatDate";
+import { dateKey, formatDateTime, todayKey } from "@/lib/panamaFormatDate";
 import { shouldAskForPush } from "@/lib/push";
 import { useSession } from "@/lib/session";
 import type { Availability, Match, Player } from "@/lib/types";
@@ -39,6 +39,7 @@ import { PlayerCard } from "./player-card";
 import { UpcomingMatches } from "./upcoming-matches";
 
 const ALL_BRANCHES = "all";
+const MY_MATCHES = "mine";
 
 export function LobbyView() {
   const router = useRouter();
@@ -46,20 +47,34 @@ export function LobbyView() {
   const { user } = useSession();
   const [date, setDate] = useState<string | null>(null);
   const playerDate = date ?? todayKey();
-  const [branchFilter, setBranchFilter] = useState(ALL_BRANCHES);
-  const branchId =
-    branchFilter === ALL_BRANCHES ? undefined : Number(branchFilter);
+  const [pickedFilter, setPickedFilter] = useState<string | null>(null);
+
+  const upcomingQuery = useUpcomingMatches();
+  const upcomingMatches = upcomingQuery.data ?? [];
+  const myBranchIds = useMemo(
+    () => myOpenBranchIds(upcomingQuery.data ?? [], playerDate),
+    [upcomingQuery.data, playerDate],
+  );
+  const hasMyBranches = myBranchIds.length > 0;
+  const stalePick = pickedFilter === MY_MATCHES && !hasMyBranches;
+  const branchFilter =
+    (stalePick ? null : pickedFilter) ?? (hasMyBranches ? MY_MATCHES : ALL_BRANCHES);
+  const branchId = isBranchValue(branchFilter) ? Number(branchFilter) : undefined;
 
   const branchesQuery = useBranches();
   const matchesQuery = useLobbyMatches(date, branchId);
   const playersQuery = useLobbyPlayers(playerDate, branchId);
   const availabilitiesQuery = useAvailabilities();
   const invitations = useInvitations().data ?? [];
-  const upcomingMatches = useUpcomingMatches().data ?? [];
 
   const branches = branchesQuery.data ?? [];
-  const matches = matchesQuery.data;
-  const players = playersQuery.data;
+  const onlyMine = branchFilter === MY_MATCHES;
+  const matches = onlyMine && date !== null
+    ? matchesQuery.data?.filter((match) => myBranchIds.includes(match.branch.id))
+    : matchesQuery.data;
+  const players = onlyMine
+    ? playersQuery.data?.filter((player) => myBranchIds.includes(player.availability.branchId))
+    : playersQuery.data;
   const availability: Availability | null =
     availabilitiesQuery.data?.find((slot) => slot.date === playerDate) ?? null;
 
@@ -77,8 +92,8 @@ export function LobbyView() {
   const byDistanceActive = nearby.origin !== null && sort === "distance";
   const origin = byDistanceActive ? nearby.origin!.point : null;
 
-  const findBranch = (id: number | null) => branches.find((c) => c.id === id);
-  const branchName = (id: number | null) => findBranch(id)?.name ?? "Cualquiera";
+  const findBranch = (id: number) => branches.find((c) => c.id === id);
+  const branchName = (id: number) => findBranch(id)?.name ?? "";
   const matchKm = (match: Match) => distanceToBranch(origin, match.branch);
   const playerKm = (player: Player) => distanceToBranch(origin, findBranch(player.availability.branchId));
   const byLevel = byCategoryDistance({ category: user?.category ?? null, categoryTier: user?.categoryTier });
@@ -162,7 +177,13 @@ export function LobbyView() {
         </section>
       ) : null}
 
-      <DateStrip value={date} onChange={setDate} />
+      <DateStrip
+        value={date}
+        onChange={(next) => {
+          setDate(next);
+          setPickedFilter(null);
+        }}
+      />
 
       <NearbyBar
         origin={nearby.origin}
@@ -179,8 +200,16 @@ export function LobbyView() {
         <BranchPicker
           branches={branches}
           value={branchFilter}
-          onChange={setBranchFilter}
+          onChange={setPickedFilter}
           emptyOption={{ value: ALL_BRANCHES, label: "Todas las sucursales" }}
+          extraOption={
+            myBranchIds.length > 0
+              ? {
+                  value: MY_MATCHES,
+                  label: myBranchIds.length > 1 ? "Sucursales de tus partidos" : "Sucursal de tu partido",
+                }
+              : undefined
+          }
           className="sm:w-72"
         />
       </div>
@@ -260,6 +289,17 @@ export function LobbyView() {
       />
     </div>
   );
+}
+
+function isBranchValue(value: string): boolean {
+  return value !== ALL_BRANCHES && value !== MY_MATCHES;
+}
+
+function myOpenBranchIds(matches: Match[], day: string): number[] {
+  const ids = matches
+    .filter((m) => m.isOrganizer && m.status === "open" && dateKey(new Date(m.startsAt)) === day)
+    .map((m) => m.branch.id);
+  return [...new Set(ids)];
 }
 
 function formatWindow(slot: Availability): string {

@@ -20,6 +20,7 @@ interface BranchPickerProps {
   value: string;
   onChange: (value: string) => void;
   emptyOption?: { value: string; label: string };
+  extraOption?: { value: string; label: string };
   onSuggest?: (query: string) => void;
   id?: string;
   "aria-invalid"?: boolean;
@@ -27,16 +28,15 @@ interface BranchPickerProps {
   className?: string;
 }
 
-export function BranchPicker({ branches, value, onChange, emptyOption, onSuggest, id, className, ...aria }: BranchPickerProps) {
+export function BranchPicker({ branches, value, onChange, emptyOption, extraOption, onSuggest, id, className, ...aria }: BranchPickerProps) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
 
+  const specialOptions = [emptyOption, extraOption].filter((option) => option !== undefined);
   const selected = branches.find((branch) => branch.id.toString() === value);
   const triggerLabel = selected
     ? `${selected.name} · ${selected.locationLabel}`
-    : value === emptyOption?.value
-      ? emptyOption.label
-      : "Elige una sucursal";
+    : (specialOptions.find((option) => option.value === value)?.label ?? "Elige una sucursal");
 
   const choose = (next: string) => {
     onChange(next);
@@ -77,11 +77,11 @@ export function BranchPicker({ branches, value, onChange, emptyOption, onSuggest
               <p className="px-2 py-1 text-sm text-muted-foreground">No encontramos esa sucursal.</p>
             </CommandEmpty>
             <CommandGroup>
-              {emptyOption ? (
-                <PickerItem value={emptyOption.label} selected={value === emptyOption.value} onSelect={() => choose(emptyOption.value)}>
-                  {emptyOption.label}
+              {specialOptions.map((option) => (
+                <PickerItem key={option.value} value={option.label} selected={value === option.value} onSelect={() => choose(option.value)}>
+                  {option.label}
                 </PickerItem>
-              ) : null}
+              ))}
               {branches.map((branch) => (
                 <PickerItem
                   key={branch.id}

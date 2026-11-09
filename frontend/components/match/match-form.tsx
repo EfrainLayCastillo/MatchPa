@@ -67,9 +67,13 @@ function MatchFormBody({ match }: { match?: Match }) {
   const searchParams = useSearchParams();
   const inviteeId = match ? null : Number(searchParams.get("invitar")) || null;
   const inviteeName = searchParams.get("nombre");
+  const presetDate = match ? null : searchParams.get("fecha");
+  const presetBranch = match ? null : searchParams.get("sucursal");
   const [branches, setBranches] = useState<Branch[]>([]);
   const [date, setDate] = useState(() =>
-    match ? dateKey(new Date(match.startsAt)) : todayKey(),
+    match
+      ? dateKey(new Date(match.startsAt))
+      : validDate(presetDate) ?? todayKey(),
   );
   const [time, setTime] = useState(() =>
     match ? formatClock(match.startsAt) : "18:00",
@@ -78,7 +82,7 @@ function MatchFormBody({ match }: { match?: Match }) {
     match ? (String(match.durationMinutes) as "90" | "120") : "90",
   );
   const [branchId, setBranchId] = useState(
-    match ? String(match.branch.id) : "",
+    match ? String(match.branch.id) : (presetBranch ?? ""),
   );
   const [suggestQuery, setSuggestQuery] = useState<string | null>(null);
   const [courtNumber, setCourtNumber] = useState(
@@ -115,7 +119,12 @@ function MatchFormBody({ match }: { match?: Match }) {
   useEffect(() => {
     api
       .branches()
-      .then(setBranches)
+      .then((loaded) => {
+        setBranches(loaded);
+        setBranchId((current) =>
+          loaded.some((branch) => String(branch.id) === current) ? current : "",
+        );
+      })
       .catch(() => {});
   }, []);
 
@@ -315,6 +324,12 @@ function MatchFormBody({ match }: { match?: Match }) {
               {...invalidProps("branch", errors.fields.branchId)}
             />
           </Field>
+          {match ? null : (
+            <p className="-mt-1 text-xs text-muted-foreground">
+              Los jugadores disponibles de ese día se mostrarán filtrados por la
+              sucursal de este partido.
+            </p>
+          )}
           <SuggestBranchDialog
             open={suggestQuery !== null}
             onOpenChange={(open) => !open && setSuggestQuery(null)}
@@ -586,6 +601,10 @@ function whereErrors(branchId: string, courtNumber: string): FieldErrors {
     ...(branchId ? {} : { branchId: "Elige la sucursal de la cancha" }),
     ...(courtNumber ? {} : { courtNumber: "Indica el número de cancha" }),
   };
+}
+
+function validDate(value: string | null): string | null {
+  return value && /^\d{4}-\d{2}-\d{2}$/.test(value) && value >= todayKey() ? value : null;
 }
 
 function guestErrors(guests: GuestDraft[]): FieldErrors {

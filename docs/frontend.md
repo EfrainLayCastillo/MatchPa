@@ -19,7 +19,7 @@ Las URLs son visibles para el usuario, así que van en español.
 | `/verificar` | Sí | Código de 6 dígitos para verificar el correo, con reenvío |
 | `/recuperar` | No | Recuperar contraseña: correo, luego código y contraseña nueva |
 | `/onboarding` | Sí | Categoría (con subnivel opcional), género y teléfono. Obligatorio antes del lobby |
-| `/lobby` | Sí | Carrusel de tus próximos partidos (abiertos o completos, el más cercano primero). Selector de fecha y pestañas **Partidos** / **Jugadores**. Botón fijo "Estoy disponible" (bottom sheet) |
+| `/lobby` | Sí | Carrusel de tus próximos partidos (abiertos o completos, el más cercano primero). Selector de fecha, filtro de sucursal (preseleccionado con las de tus partidos del día) y pestañas **Partidos** / **Jugadores**. Botón fijo "Estoy disponible" (bottom sheet) |
 | `/partidos/nuevo` | Sí | Publicar partido |
 | `/partidos/[code]` | Para actuar | Detalle público. El organizador gestiona solicitudes, invita, saca y cierra; el jugador puede salirse |
 | `/perfil` | Sí | Editar categoría y subnivel, género y WhatsApp, activar/desactivar push |

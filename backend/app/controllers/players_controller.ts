@@ -19,9 +19,7 @@ export default class PlayersController {
       .whereHas('user', (query) => {
         query.whereNotNull('category').whereNotNull('gender')
       })
-      .if(branchId, (query) =>
-        query.where((inner) => inner.whereNull('branch_id').orWhere('branch_id', branchId!))
-      )
+      .if(branchId, (query) => query.where('branch_id', branchId!))
     return slots.map(serializePlayerAvailability)
   }
 }
