@@ -1,5 +1,5 @@
 import { ImageResponse } from "next/og";
-import { shortCategory, TYPE_LABELS } from "@/lib/format";
+import { formatCategory, TYPE_LABELS } from "@/lib/format";
 import { formatDateTime } from "@/lib/panamaFormatDate";
 import { fetchPublicMatch } from "@/lib/public-match";
 
@@ -32,7 +32,7 @@ export default async function Image({ params }: { params: Promise<{ code: string
               {formatDateTime(match.startsAt)}
             </div>
             <div style={{ display: "flex", fontSize: 36 }}>
-              {`${match.branch.name} · Cancha ${match.courtNumber} · ${TYPE_LABELS[match.type]} · ${shortCategory(match.category)} categoría`}
+              {`${match.branch.name} · Cancha ${match.courtNumber} · ${TYPE_LABELS[match.type]} · ${formatCategory(match.category, match.categoryTier)} categoría`}
             </div>
           </div>
         ) : (

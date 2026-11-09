@@ -12,6 +12,10 @@ export const matchValidator = vine.create({
   startsAt: vine.string().trim(),
   durationMinutes: vine.number().in([90, 120]),
   category: vine.number().in([1, 2, 3, 4, 5, 6, 7]),
+  categoryTier: vine
+    .enum(['high', 'entry'] as const)
+    .nullable()
+    .optional(),
   type: vine.enum(['male', 'female', 'mixed'] as const),
   maxPlayers: vine.number().in([4, 5, 6]),
   guests: vine.array(guest).maxLength(5).optional(),

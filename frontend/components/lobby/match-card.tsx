@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/matchpa/status-badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { formatDuration, shortCategory, TYPE_LABELS } from "@/lib/format";
+import { formatCategory, formatDuration, TYPE_LABELS } from "@/lib/format";
 import { formatDateTime } from "@/lib/panamaFormatDate";
 import type { Match } from "@/lib/types";
 
@@ -30,7 +30,7 @@ export function MatchCard({ match, onJoin, joining }: MatchCardProps) {
 
         <div className="flex flex-wrap gap-2 text-xs font-semibold">
           <span className="rounded-md bg-brand-lime/60 px-2 py-1 text-brand-teal dark:bg-brand-lime dark:text-brand-teal">
-            {shortCategory(match.category)}
+            {formatCategory(match.category, match.categoryTier)}
           </span>
           <span className="rounded-md bg-muted px-2 py-1">{TYPE_LABELS[match.type]}</span>
           <span className="rounded-md bg-muted px-2 py-1">

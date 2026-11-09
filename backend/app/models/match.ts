@@ -35,6 +35,9 @@ export default class Match extends BaseModel {
   declare category: number
 
   @column()
+  declare categoryTier: 'high' | 'entry' | null
+
+  @column()
   declare type: MatchType
 
   @column()

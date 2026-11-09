@@ -3,6 +3,10 @@ import vine from '@vinejs/vine'
 export const updateProfileValidator = vine.create({
   fullName: vine.string().trim().minLength(2).maxLength(120).optional(),
   category: vine.number().in([1, 2, 3, 4, 5, 6, 7]).optional(),
+  categoryTier: vine
+    .enum(['high', 'entry'] as const)
+    .nullable()
+    .optional(),
   gender: vine.enum(['male', 'female'] as const).optional(),
   phone: vine
     .string()

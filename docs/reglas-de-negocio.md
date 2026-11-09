@@ -21,7 +21,7 @@ Especificación de qué debe cumplir el backend y el frontend. Si el código se 
 ## Eliminar cuenta
 
 - Desde el final del perfil, escribiendo `ELIMINAR` para confirmar. No se puede deshacer.
-- Se anonimiza, no se borra la fila: nombre "Jugador eliminado", correo `deleted-<id>@matchpa.invalid`, y contraseña, Google, foto, WhatsApp, categoría, género y verificación en `null`. Se borran su disponibilidad, suscripciones push, códigos y sugerencias de sucursal.
+- Se anonimiza, no se borra la fila: nombre "Jugador eliminado", correo `deleted-<id>@matchpa.invalid`, y contraseña, Google, foto, WhatsApp, categoría, subnivel, género y verificación en `null`. Se borran su disponibilidad, suscripciones push, códigos y sugerencias de sucursal.
 - Sus partidos futuros `open` o `full` se cierran y sus solicitudes pendientes se cancelan.
 - Sus solicitudes pendientes en partidos de otros se cancelan, y sus puestos aceptados en partidos futuros se liberan como si saliera (el partido vuelve a `open` si corresponde).
 - Los partidos pasados no cambian y lo muestran como "Jugador eliminado".
@@ -96,7 +96,9 @@ Una sola entidad, `match_requests`, con `kind`:
 
 - 1ra (más alta) a 7ma, guardadas como entero `1`–`7`.
 - La elige el jugador y la actualiza en su perfil.
-- No filtra, ordena: primero tu categoría, luego las más cercanas (`ORDER BY abs(category - :mine)`).
+- Subnivel opcional (`category_tier`) en el jugador y en el partido: `high` = "alta" ("5ta alta"), `entry` = "de entrada" ("5ta de entrada"), `null` = sin precisar.
+- Nivel efectivo: `category − ⅓` si es alta, `category + ⅓` si es de entrada. 5ta alta queda más cerca de 4ta que de 5ta de entrada.
+- No filtra, ordena: el lobby muestra primero lo más cercano a tu nivel efectivo (`abs(nivel − mío)`).
 
 ## Sucursales
 

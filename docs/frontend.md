@@ -18,11 +18,11 @@ Las URLs son visibles para el usuario, así que van en español.
 | `/registro` | No | Registro básico |
 | `/verificar` | Sí | Código de 6 dígitos para verificar el correo, con reenvío |
 | `/recuperar` | No | Recuperar contraseña: correo, luego código y contraseña nueva |
-| `/onboarding` | Sí | Categoría, género y teléfono. Obligatorio antes del lobby |
+| `/onboarding` | Sí | Categoría (con subnivel opcional), género y teléfono. Obligatorio antes del lobby |
 | `/lobby` | Sí | Carrusel de tus próximos partidos (abiertos o completos, el más cercano primero). Selector de fecha y pestañas **Partidos** / **Jugadores**. Botón fijo "Estoy disponible" (bottom sheet) |
 | `/partidos/nuevo` | Sí | Publicar partido |
 | `/partidos/[code]` | Para actuar | Detalle público. El organizador gestiona solicitudes, invita, saca y cierra; el jugador puede salirse |
-| `/perfil` | Sí | Editar categoría, género y WhatsApp, activar/desactivar push |
+| `/perfil` | Sí | Editar categoría y subnivel, género y WhatsApp, activar/desactivar push |
 | `/mis-partidas` | Sí | Partidos que organizas o juegas, con estado y filtros por sucursal y orden (por defecto, última actualización) |
 
-Ambas pestañas del lobby se ordenan por cercanía a tu categoría. **Partidos** filtra por sucursal, tipo y hora; **Jugadores** por sucursal y horario, y al tocar uno aparece "Ey Pa, ¿juegas?".
+Ambas pestañas del lobby se ordenan por cercanía a tu nivel efectivo (categoría y subnivel). **Partidos** filtra por sucursal, tipo y hora; **Jugadores** por sucursal y horario, y al tocar uno aparece "Ey Pa, ¿juegas?".

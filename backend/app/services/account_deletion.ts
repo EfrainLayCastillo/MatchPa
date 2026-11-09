@@ -131,6 +131,7 @@ async function anonymize(user: User, trx: TransactionClientContract): Promise<vo
     avatarUrl: null,
     whatsapp: null,
     category: null,
+    categoryTier: null,
     gender: null,
     emailVerifiedAt: null,
     deletedAt: DateTime.now(),

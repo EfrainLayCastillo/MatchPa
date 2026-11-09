@@ -10,19 +10,49 @@ import { Input } from "@/components/ui/input";
 import { DateField } from "@/components/matchpa/date-field";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { PushPrompt } from "@/components/matchpa/push-prompt";
 import { track } from "@/lib/analytics";
 import { useVerifiedAction } from "@/components/auth/verify-email-dialog";
 import { api } from "@/lib/api";
-import { invalidProps, toFormErrors, useFormErrors, type FieldErrors } from "@/lib/form-errors";
+import {
+  invalidProps,
+  toFormErrors,
+  useFormErrors,
+  type FieldErrors,
+} from "@/lib/form-errors";
 import { FormAlert } from "@/components/matchpa/form-alert";
 import { FieldError } from "@/components/ui/field";
-import { CATEGORIES, GENDER_LABELS, shortCategory, TYPE_LABELS } from "@/lib/format";
-import { dateKey, formatClock, formatClock12, todayKey } from "@/lib/panamaFormatDate";
+import { CategoryTierPicker } from "@/components/matchpa/category-tier-picker";
+import {
+  CATEGORIES,
+  GENDER_LABELS,
+  shortCategory,
+  TYPE_LABELS,
+} from "@/lib/format";
+import {
+  dateKey,
+  formatClock,
+  formatClock12,
+  todayKey,
+} from "@/lib/panamaFormatDate";
 import { shouldAskForPush } from "@/lib/push";
 import { useSession } from "@/lib/session";
-import type { Category, Branch, Gender, Match, MatchType, NewMatchInput } from "@/lib/types";
+import type {
+  Category,
+  CategoryTier,
+  Branch,
+  Gender,
+  Match,
+  MatchType,
+  NewMatchInput,
+} from "@/lib/types";
 
 interface GuestDraft {
   name: string;
@@ -38,17 +68,40 @@ function MatchFormBody({ match }: { match?: Match }) {
   const inviteeId = match ? null : Number(searchParams.get("invitar")) || null;
   const inviteeName = searchParams.get("nombre");
   const [branches, setBranches] = useState<Branch[]>([]);
-  const [date, setDate] = useState(() => (match ? dateKey(new Date(match.startsAt)) : todayKey()));
-  const [time, setTime] = useState(() => (match ? formatClock(match.startsAt) : "18:00"));
-  const [duration, setDuration] = useState<"90" | "120">(match ? (String(match.durationMinutes) as "90" | "120") : "90");
-  const [branchId, setBranchId] = useState(match ? String(match.branch.id) : "");
+  const [date, setDate] = useState(() =>
+    match ? dateKey(new Date(match.startsAt)) : todayKey(),
+  );
+  const [time, setTime] = useState(() =>
+    match ? formatClock(match.startsAt) : "18:00",
+  );
+  const [duration, setDuration] = useState<"90" | "120">(
+    match ? (String(match.durationMinutes) as "90" | "120") : "90",
+  );
+  const [branchId, setBranchId] = useState(
+    match ? String(match.branch.id) : "",
+  );
   const [suggestQuery, setSuggestQuery] = useState<string | null>(null);
-  const [courtNumber, setCourtNumber] = useState(match ? String(match.courtNumber) : "");
-  const [category, setCategory] = useState<Category>(match?.category ?? user?.category ?? 4);
+  const [courtNumber, setCourtNumber] = useState(
+    match ? String(match.courtNumber) : "",
+  );
+  const [category, setCategory] = useState<Category>(
+    match?.category ?? user?.category ?? 4,
+  );
+  const [categoryTier, setCategoryTier] = useState<CategoryTier | null>(
+    match?.categoryTier ?? null,
+  );
   const [type, setType] = useState<MatchType>(match?.type ?? "mixed");
-  const [maxPlayers, setMaxPlayers] = useState(match ? String(match.maxPlayers) : "4");
+  const [maxPlayers, setMaxPlayers] = useState(
+    match ? String(match.maxPlayers) : "4",
+  );
   const [guests, setGuests] = useState<GuestDraft[]>(() =>
-    match ? match.guests.map(({ name, category, gender }) => ({ name, category, gender })) : [],
+    match
+      ? match.guests.map(({ name, category, gender }) => ({
+          name,
+          category,
+          gender,
+        }))
+      : [],
   );
   const { errors, formRef, fail, reset, clearField } = useFormErrors();
   const [busy, setBusy] = useState(false);
@@ -60,11 +113,16 @@ function MatchFormBody({ match }: { match?: Match }) {
   const seatsForGuests = Number(maxPlayers) - 1;
 
   useEffect(() => {
-    api.branches().then(setBranches).catch(() => {});
+    api
+      .branches()
+      .then(setBranches)
+      .catch(() => {});
   }, []);
 
   function updateGuest(index: number, patch: Partial<GuestDraft>) {
-    setGuests((current) => current.map((guest, i) => (i === index ? { ...guest, ...patch } : guest)));
+    setGuests((current) =>
+      current.map((guest, i) => (i === index ? { ...guest, ...patch } : guest)),
+    );
   }
 
   function buildInput(): NewMatchInput {
@@ -74,6 +132,7 @@ function MatchFormBody({ match }: { match?: Match }) {
       startsAt: new Date(`${date}T${time}:00-05:00`).toISOString(),
       durationMinutes: Number(duration) as 90 | 120,
       category,
+      categoryTier,
       type,
       maxPlayers: Number(maxPlayers),
       guests: guests.map((guest) => ({ ...guest, name: guest.name.trim() })),
@@ -95,8 +154,12 @@ function MatchFormBody({ match }: { match?: Match }) {
     // Only the explicit publish button may create the match.
     const submitter = (event.nativeEvent as SubmitEvent).submitter;
     if (!submitter?.hasAttribute("data-publish")) return;
-    const fields = { ...whereErrors(branchId, courtNumber), ...guestErrors(guests) };
-    if (Object.keys(fields).length > 0) return showErrors({ fields, form: null });
+    const fields = {
+      ...whereErrors(branchId, courtNumber),
+      ...guestErrors(guests),
+    };
+    if (Object.keys(fields).length > 0)
+      return showErrors({ fields, form: null });
 
     setBusy(true);
     reset();
@@ -107,8 +170,13 @@ function MatchFormBody({ match }: { match?: Match }) {
         return;
       }
       const published = await api.createMatch(buildInput());
-      track("publish_match", { match_type: published.type, category: published.category, max_players: published.maxPlayers });
-      if (inviteeId) await api.invite(published.code, inviteeId).catch(() => null);
+      track("publish_match", {
+        match_type: published.type,
+        category: published.category,
+        max_players: published.maxPlayers,
+      });
+      if (inviteeId)
+        await api.invite(published.code, inviteeId).catch(() => null);
       if (shouldAskForPush()) {
         setCreated(published);
         return;
@@ -123,14 +191,17 @@ function MatchFormBody({ match }: { match?: Match }) {
   }
 
   function showErrors(next: { fields: FieldErrors; form: string | null }) {
-    if (Object.keys(next.fields).some((name) => STEP_ONE_FIELDS.has(name))) setStep(0);
+    if (Object.keys(next.fields).some((name) => STEP_ONE_FIELDS.has(name)))
+      setStep(0);
     fail(next);
   }
 
   if (created) {
     return (
       <div className="space-y-4">
-        <p className="font-script text-3xl text-brand-teal dark:text-brand-lime">¡Listo!</p>
+        <p className="font-script text-3xl text-brand-teal dark:text-brand-lime">
+          ¡Listo!
+        </p>
         <PushPrompt
           open
           onOpenChange={(open) => {
@@ -146,175 +217,322 @@ function MatchFormBody({ match }: { match?: Match }) {
     <form ref={formRef} onSubmit={submit} noValidate className="space-y-6">
       {inviteeId ? (
         <p className="rounded-xl bg-brand-lime/40 p-3 text-sm">
-          Al publicar le enviaremos la invitación a <strong>{inviteeName}</strong>.
+          Al publicar le enviaremos la invitación a{" "}
+          <strong>{inviteeName}</strong>.
         </p>
       ) : null}
-      <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Paso {step + 1} de 2</p>
+      <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+        Paso {step + 1} de 2
+      </p>
 
       {step === 0 ? (
-      <Section title="Cuándo y dónde">
-        <div className="grid grid-cols-2 gap-3">
-          <Field label="Fecha" htmlFor="date">
-            <DateField id="date" value={date} min={todayKey()} onChange={setDate} />
+        <Section title="Cuándo y dónde">
+          <div className="grid grid-cols-2 gap-3">
+            <Field label="Fecha" htmlFor="date">
+              <DateField
+                id="date"
+                value={date}
+                min={todayKey()}
+                onChange={setDate}
+              />
+            </Field>
+            <Field label="Hora" htmlFor="time" error={errors.fields.startsAt}>
+              <Select
+                value={time}
+                onValueChange={(value) => {
+                  setTime(value);
+                  clearField("startsAt");
+                }}
+              >
+                <SelectTrigger
+                  id="time"
+                  className="w-full"
+                  aria-label="Hora"
+                  {...invalidProps("time", errors.fields.startsAt)}
+                >
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {timeOptions(time).map((option) => (
+                    <SelectItem key={option} value={option}>
+                      {formatClock12(option)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </Field>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <Field label="Duración">
+              <Select
+                value={duration}
+                onValueChange={(value) => setDuration(value as "90" | "120")}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="90">1h 30min</SelectItem>
+                  <SelectItem value="120">2 horas</SelectItem>
+                </SelectContent>
+              </Select>
+            </Field>
+            <Field
+              label="Cancha"
+              htmlFor="court"
+              error={errors.fields.courtNumber}
+            >
+              <Input
+                id="court"
+                type="number"
+                inputMode="numeric"
+                min={1}
+                placeholder="Ej. 3"
+                value={courtNumber}
+                onChange={(e) => {
+                  setCourtNumber(e.target.value);
+                  clearField("courtNumber");
+                }}
+                required
+                {...invalidProps("court", errors.fields.courtNumber)}
+              />
+            </Field>
+          </div>
+          <Field
+            label="Sucursal"
+            htmlFor="branch"
+            error={errors.fields.branchId}
+          >
+            <BranchPicker
+              id="branch"
+              branches={branches}
+              value={branchId}
+              onChange={(value) => {
+                setBranchId(value);
+                clearField("branchId");
+              }}
+              onSuggest={setSuggestQuery}
+              {...invalidProps("branch", errors.fields.branchId)}
+            />
           </Field>
-          <Field label="Hora" htmlFor="time" error={errors.fields.startsAt}>
-            <Select value={time} onValueChange={(value) => { setTime(value); clearField("startsAt"); }}>
-              <SelectTrigger id="time" className="w-full" aria-label="Hora" {...invalidProps("time", errors.fields.startsAt)}>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {timeOptions(time).map((option) => (
-                  <SelectItem key={option} value={option}>
-                    {formatClock12(option)}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </Field>
-        </div>
-        <div className="grid grid-cols-2 gap-3">
-          <Field label="Duración">
-            <Select value={duration} onValueChange={(value) => setDuration(value as "90" | "120")}>
-              <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="90">1h 30min</SelectItem>
-                <SelectItem value="120">2 horas</SelectItem>
-              </SelectContent>
-            </Select>
-          </Field>
-          <Field label="Cancha" htmlFor="court" error={errors.fields.courtNumber}>
-            <Input id="court" type="number" inputMode="numeric" min={1} placeholder="Ej. 3" value={courtNumber} onChange={(e) => { setCourtNumber(e.target.value); clearField("courtNumber"); }} required {...invalidProps("court", errors.fields.courtNumber)} />
-          </Field>
-        </div>
-        <Field label="Sucursal" htmlFor="branch" error={errors.fields.branchId}>
-          <BranchPicker
-            id="branch"
-            branches={branches}
-            value={branchId}
-            onChange={(value) => { setBranchId(value); clearField("branchId"); }}
-            onSuggest={setSuggestQuery}
-            {...invalidProps("branch", errors.fields.branchId)}
+          <SuggestBranchDialog
+            open={suggestQuery !== null}
+            onOpenChange={(open) => !open && setSuggestQuery(null)}
+            initialName={suggestQuery ?? ""}
           />
-        </Field>
-        <SuggestBranchDialog
-          open={suggestQuery !== null}
-          onOpenChange={(open) => !open && setSuggestQuery(null)}
-          initialName={suggestQuery ?? ""}
-        />
-      </Section>
+        </Section>
       ) : null}
 
       {step === 1 ? (
-      <>
-      <Section title="El partido">
-        <Field label="Categoría">
-          <Select value={category.toString()} onValueChange={(value) => setCategory(Number(value) as Category)}>
-            <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
-            <SelectContent>
-              {CATEGORIES.map((value) => (
-                <SelectItem key={value} value={value.toString()}>{shortCategory(value)} categoría</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </Field>
-        <Field label="Tipo">
-          <RadioGroup value={type} onValueChange={(value) => setType(value as MatchType)} className="grid grid-cols-3 gap-2">
-            {(Object.keys(TYPE_LABELS) as MatchType[]).map((value) => (
-              <Label key={value} className="flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-border bg-card px-3 py-2.5 text-sm font-medium has-[[data-state=checked]]:border-brand-teal has-[[data-state=checked]]:bg-brand-lime/40 dark:has-[[data-state=checked]]:border-brand-lime">
-                <RadioGroupItem value={value} />
-                {TYPE_LABELS[value]}
-              </Label>
-            ))}
-          </RadioGroup>
-        </Field>
-        <Field label="Jugadores en el partido">
-          <Select value={maxPlayers} onValueChange={(value) => {
-            setMaxPlayers(value);
-            setGuests((current) => current.slice(0, Number(value) - 1));
-          }}>
-            <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="4">4 jugadores</SelectItem>
-              <SelectItem value="5">5 jugadores (rotación)</SelectItem>
-              <SelectItem value="6">6 jugadores (rotación)</SelectItem>
-            </SelectContent>
-          </Select>
-        </Field>
-      </Section>
+        <>
+          <Section title="El partido">
+            <Field label="Categoría">
+              <Select
+                value={category.toString()}
+                onValueChange={(value) =>
+                  setCategory(Number(value) as Category)
+                }
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {CATEGORIES.map((value) => (
+                    <SelectItem key={value} value={value.toString()}>
+                      {shortCategory(value)} categoría
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </Field>
 
-      <Section title="¿Ya tienes jugadores?">
-        <p className="text-sm text-muted-foreground">
-          Tú cuentas como uno. Agrega a quienes ya confirmaron; no necesitan cuenta en MatchPa.
-        </p>
-        <ul className="space-y-3">
-          {guests.map((guest, index) => (
-            <li key={index}>
-              <Card className="gap-3 py-3">
-                <CardContent className="grid gap-3">
-                  <div className="flex gap-2">
-                    <Input
-                      aria-label="Nombre"
-                      placeholder="Nombre"
-                      value={guest.name}
-                      onChange={(e) => { updateGuest(index, { name: e.target.value }); clearField(`guests.${index}.name`); }}
-                      {...invalidProps(`guest-${index}`, errors.fields[`guests.${index}.name`])}
-                    />
-                    <Button type="button" variant="ghost" onClick={() => setGuests((current) => current.filter((_, i) => i !== index))}>
-                      Quitar
-                    </Button>
-                  </div>
-                  <FieldError id={`guest-${index}-error`} className="-mt-1">{errors.fields[`guests.${index}.name`]}</FieldError>
-                  <div className="grid grid-cols-2 gap-2">
-                    <Select value={guest.category.toString()} onValueChange={(value) => updateGuest(index, { category: Number(value) as Category })}>
-                      <SelectTrigger className="w-full" aria-label="Categoría"><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        {CATEGORIES.map((value) => (
-                          <SelectItem key={value} value={value.toString()}>{shortCategory(value)}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <Select value={guest.gender} onValueChange={(value) => updateGuest(index, { gender: value as Gender })}>
-                      <SelectTrigger className="w-full" aria-label="Género"><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        {(Object.keys(GENDER_LABELS) as Gender[]).map((value) => (
-                          <SelectItem key={value} value={value}>{GENDER_LABELS[value]}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </CardContent>
-              </Card>
-            </li>
-          ))}
-        </ul>
-        <Button
-          type="button"
-          variant="outline"
-          className="w-full"
-          disabled={guests.length >= seatsForGuests}
-          onClick={() => setGuests((current) => [...current, { name: "", category, gender: "male" }])}
-        >
-          Agregar jugador
-        </Button>
-      </Section>
-      </>
+            <Field label="Tipo">
+              <RadioGroup
+                value={type}
+                onValueChange={(value) => setType(value as MatchType)}
+                className="grid grid-cols-3 gap-2"
+              >
+                {(Object.keys(TYPE_LABELS) as MatchType[]).map((value) => (
+                  <Label
+                    key={value}
+                    className="flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-border bg-card px-3 py-2.5 text-sm font-medium has-[[data-state=checked]]:border-brand-teal has-[[data-state=checked]]:bg-brand-lime/40 dark:has-[[data-state=checked]]:border-brand-lime"
+                  >
+                    <RadioGroupItem value={value} />
+                    {TYPE_LABELS[value]}
+                  </Label>
+                ))}
+              </RadioGroup>
+            </Field>
+            <CategoryTierPicker
+              id="categoryTier"
+              value={categoryTier}
+              onChange={(value) => {
+                setCategoryTier(value);
+                clearField("categoryTier");
+              }}
+              error={errors.fields.categoryTier}
+            />
+            <Field label="Jugadores en el partido">
+              <Select
+                value={maxPlayers}
+                onValueChange={(value) => {
+                  setMaxPlayers(value);
+                  setGuests((current) => current.slice(0, Number(value) - 1));
+                }}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="4">4 jugadores</SelectItem>
+                  <SelectItem value="5">5 jugadores (rotación)</SelectItem>
+                  <SelectItem value="6">6 jugadores (rotación)</SelectItem>
+                </SelectContent>
+              </Select>
+            </Field>
+          </Section>
+
+          <Section title="¿Ya tienes jugadores?">
+            <p className="text-sm text-muted-foreground">
+              Tú cuentas como uno. Agrega a quienes ya confirmaron; no necesitan
+              cuenta en MatchPa.
+            </p>
+            <ul className="space-y-3">
+              {guests.map((guest, index) => (
+                <li key={index}>
+                  <Card className="gap-3 py-3">
+                    <CardContent className="grid gap-3">
+                      <div className="flex gap-2">
+                        <Input
+                          aria-label="Nombre"
+                          placeholder="Nombre"
+                          value={guest.name}
+                          onChange={(e) => {
+                            updateGuest(index, { name: e.target.value });
+                            clearField(`guests.${index}.name`);
+                          }}
+                          {...invalidProps(
+                            `guest-${index}`,
+                            errors.fields[`guests.${index}.name`],
+                          )}
+                        />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          onClick={() =>
+                            setGuests((current) =>
+                              current.filter((_, i) => i !== index),
+                            )
+                          }
+                        >
+                          Quitar
+                        </Button>
+                      </div>
+                      <FieldError id={`guest-${index}-error`} className="-mt-1">
+                        {errors.fields[`guests.${index}.name`]}
+                      </FieldError>
+                      <div className="grid grid-cols-2 gap-2">
+                        <Select
+                          value={guest.category.toString()}
+                          onValueChange={(value) =>
+                            updateGuest(index, {
+                              category: Number(value) as Category,
+                            })
+                          }
+                        >
+                          <SelectTrigger
+                            className="w-full"
+                            aria-label="Categoría"
+                          >
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {CATEGORIES.map((value) => (
+                              <SelectItem key={value} value={value.toString()}>
+                                {shortCategory(value)}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <Select
+                          value={guest.gender}
+                          onValueChange={(value) =>
+                            updateGuest(index, { gender: value as Gender })
+                          }
+                        >
+                          <SelectTrigger className="w-full" aria-label="Género">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {(Object.keys(GENDER_LABELS) as Gender[]).map(
+                              (value) => (
+                                <SelectItem key={value} value={value}>
+                                  {GENDER_LABELS[value]}
+                                </SelectItem>
+                              ),
+                            )}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </li>
+              ))}
+            </ul>
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full"
+              disabled={guests.length >= seatsForGuests}
+              onClick={() =>
+                setGuests((current) => [
+                  ...current,
+                  { name: "", category, gender: "male" },
+                ])
+              }
+            >
+              Agregar jugador
+            </Button>
+          </Section>
+        </>
       ) : null}
 
       <FormAlert message={errors.form} />
 
       <div className="flex gap-2">
         {step === 1 ? (
-          <Button type="button" variant="outline" size="lg" className="h-12 flex-1" onClick={() => setStep(0)}>
+          <Button
+            type="button"
+            variant="outline"
+            size="lg"
+            className="h-12 flex-1"
+            onClick={() => setStep(0)}
+          >
             Atrás
           </Button>
         ) : null}
         {step === 0 ? (
-          <Button type="button" size="lg" className="h-12 flex-1 font-bold" onClick={goNext}>
+          <Button
+            type="button"
+            size="lg"
+            className="h-12 flex-1 font-bold"
+            onClick={goNext}
+          >
             Siguiente
           </Button>
         ) : (
-          <Button type="submit" data-publish size="lg" disabled={busy || !publishReady} className="h-12 flex-1 font-bold">
-            {busy ? "Guardando…" : match ? "Guardar cambios" : "Publicar partido"}
+          <Button
+            type="submit"
+            data-publish
+            size="lg"
+            disabled={busy || !publishReady}
+            className="h-12 flex-1 font-bold"
+          >
+            {busy
+              ? "Guardando…"
+              : match
+                ? "Guardar cambios"
+                : "Publicar partido"}
           </Button>
         )}
       </div>
@@ -322,7 +540,13 @@ function MatchFormBody({ match }: { match?: Match }) {
   );
 }
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function Section({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
   return (
     <section className="space-y-3">
       <h2 className="font-heading text-lg font-bold">{title}</h2>
@@ -343,12 +567,19 @@ function Field({ label, htmlFor, error, children }: FieldProps) {
     <div className="space-y-1.5">
       <Label htmlFor={htmlFor}>{label}</Label>
       {children}
-      <FieldError id={htmlFor ? `${htmlFor}-error` : undefined}>{error}</FieldError>
+      <FieldError id={htmlFor ? `${htmlFor}-error` : undefined}>
+        {error}
+      </FieldError>
     </div>
   );
 }
 
-const STEP_ONE_FIELDS = new Set(["branchId", "courtNumber", "startsAt", "durationMinutes"]);
+const STEP_ONE_FIELDS = new Set([
+  "branchId",
+  "courtNumber",
+  "startsAt",
+  "durationMinutes",
+]);
 
 function whereErrors(branchId: string, courtNumber: string): FieldErrors {
   return {
@@ -359,7 +590,11 @@ function whereErrors(branchId: string, courtNumber: string): FieldErrors {
 
 function guestErrors(guests: GuestDraft[]): FieldErrors {
   return Object.fromEntries(
-    guests.flatMap((guest, index) => (guest.name.trim() ? [] : [[`guests.${index}.name`, "Pon el nombre del jugador"]])),
+    guests.flatMap((guest, index) =>
+      guest.name.trim()
+        ? []
+        : [[`guests.${index}.name`, "Pon el nombre del jugador"]],
+    ),
   );
 }
 
@@ -375,5 +610,7 @@ function timeOptions(current: string): string[] {
     const hours = String(Math.floor(i / 2)).padStart(2, "0");
     return `${hours}:${i % 2 === 0 ? "00" : "30"}`;
   });
-  return halfHours.includes(current) ? halfHours : [current, ...halfHours].sort();
+  return halfHours.includes(current)
+    ? halfHours
+    : [current, ...halfHours].sort();
 }

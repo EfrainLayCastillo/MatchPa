@@ -15,6 +15,7 @@ export function serializePlayerAvailability(availability: Availability) {
     id: user.id,
     fullName: user.fullName,
     category: user.category,
+    categoryTier: user.categoryTier,
     gender: user.gender,
     avatarUrl: user.avatarUrl,
     availability: serializeAvailability(availability),

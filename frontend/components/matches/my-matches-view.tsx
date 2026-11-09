@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { api } from "@/lib/api";
-import { formatDuration, shortCategory, TYPE_LABELS } from "@/lib/format";
+import { formatCategory, formatDuration, TYPE_LABELS } from "@/lib/format";
 import { lobbyKeys } from "@/lib/lobby-queries";
 import { formatDateTime } from "@/lib/panamaFormatDate";
 import type { Match, MyRequest } from "@/lib/types";
@@ -146,7 +146,7 @@ function MatchRow({ match }: { match: Match }) {
           <span className="rounded-md bg-brand-teal px-2 py-1 text-brand-ivory">
             {match.isOrganizer ? "Organizas" : "Juegas"}
           </span>
-          <span className="rounded-md bg-muted px-2 py-1">{shortCategory(match.category)} categoría</span>
+          <span className="rounded-md bg-muted px-2 py-1">{formatCategory(match.category, match.categoryTier)} categoría</span>
           <span className="rounded-md bg-muted px-2 py-1">{TYPE_LABELS[match.type]}</span>
           <span className="rounded-md bg-muted px-2 py-1">
             {seated}/{match.maxPlayers} jugadores

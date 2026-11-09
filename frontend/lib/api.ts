@@ -3,6 +3,7 @@ import { mockRequest } from "./mock-api";
 import type {
   Availability,
   Category,
+  CategoryTier,
   Branch,
   BranchSuggestionInput,
   Gender,
@@ -76,6 +77,7 @@ interface MatchFilters {
 interface ProfileInput {
   fullName?: string;
   category?: Category;
+  categoryTier?: CategoryTier | null;
   gender?: Gender;
   phone?: string;
 }

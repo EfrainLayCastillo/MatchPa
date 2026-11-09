@@ -16,7 +16,7 @@ Base `/api`. Las escrituras con sesión tienen límite por cuenta y responden 42
 | `POST` | `/auth/email/resend` | Envía un código nuevo e invalida el anterior. 204 (también si ya está verificado, sin enviar). 429 si pidió otro hace menos de 60 s o más de 5 en una hora |
 | `POST` | `/auth/logout` | Logout |
 | `GET` | `/me` | Usuario actual, con `emailVerified` |
-| `PATCH` | `/me` | Actualizar perfil |
+| `PATCH` | `/me` | Actualizar perfil (`category`, `categoryTier`, `gender`, `phone`) |
 | `DELETE` | `/me` | Eliminar la cuenta con `{ confirm: "ELIMINAR" }`. Anonimiza, cierra o libera sus partidos futuros y cierra la sesión. 204 |
 
 ## Jugadores y disponibilidad
@@ -34,7 +34,7 @@ Base `/api`. Las escrituras con sesión tienen límite por cuenta y responden 42
 
 | Método | Endpoint | Descripción |
 |---|---|---|
-| `POST` | `/matches` | Publicar (con invitados). 403 `EMAIL_NOT_VERIFIED` si el correo no está verificado |
+| `POST` | `/matches` | Publicar (con invitados y `categoryTier` opcional). 403 `EMAIL_NOT_VERIFIED` si el correo no está verificado |
 | `GET` | `/matches` | Partidos `open` (`date`, `branchId`, `type`) |
 | `GET` | `/matches/:code` | Detalle público; incluye solicitudes si eres organizador |
 | `PATCH` | `/matches/:code` | Editar mientras está `open` |

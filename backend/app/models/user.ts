@@ -41,6 +41,9 @@ export default class User extends compose(BaseModel, withAuthFinder(hash)) {
   declare category: number | null
 
   @column()
+  declare categoryTier: 'high' | 'entry' | null
+
+  @column()
   declare gender: 'male' | 'female' | null
 
   @column({ serializeAs: null })

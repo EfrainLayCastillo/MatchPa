@@ -19,6 +19,7 @@ test.group('eliminar cuenta', (group) => {
       email: `${label}-${suffix()}@t.test`,
       password: 'secret123',
       category: 4,
+      categoryTier: 'high',
       gender: 'male',
       whatsapp: '+50760000000',
       emailVerifiedAt: DateTime.now(),
@@ -75,6 +76,7 @@ test.group('eliminar cuenta', (group) => {
     assert.isNull(user.password)
     assert.isNull(user.whatsapp)
     assert.isNull(user.category)
+    assert.isNull(user.categoryTier)
     assert.isNull(user.gender)
     assert.isNull(user.emailVerifiedAt)
     assert.isNotNull(user.deletedAt)

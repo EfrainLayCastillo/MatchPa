@@ -83,11 +83,14 @@ export default function HomePage() {
             </span>
           </h2>
           <p className="text-brand-ivory/80">
-            MatchPa está en beta: lo esencial ya funciona y vamos sumando lo que nos piden en la cancha.
+            Lo esencial ya funciona y vamos sumando lo que nos piden en la
+            cancha.
           </p>
         </div>
         <div className="flex items-center gap-4" aria-hidden>
-          <span className="font-script text-3xl text-brand-lime sm:text-4xl">esto es lo próximo</span>
+          <span className="font-script text-3xl text-brand-lime sm:text-4xl">
+            esto es lo próximo
+          </span>
           <span className="h-px flex-1 bg-gradient-to-r from-brand-lime/70 to-transparent" />
         </div>
         <UpcomingFeatures />

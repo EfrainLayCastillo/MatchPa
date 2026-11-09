@@ -11,6 +11,7 @@ export type RequestStatus =
   | "removed";
 
 export type Category = 1 | 2 | 3 | 4 | 5 | 6 | 7;
+export type CategoryTier = "high" | "entry";
 
 export interface Branch {
   id: number;
@@ -38,6 +39,7 @@ export interface User {
   avatarUrl: string | null;
   phone: string | null;
   category: Category | null;
+  categoryTier: CategoryTier | null;
   gender: Gender | null;
 }
 
@@ -52,6 +54,7 @@ export interface Player {
   id: number;
   fullName: string;
   category: Category;
+  categoryTier: CategoryTier | null;
   gender: Gender;
   avatarUrl: string | null;
   availability: Availability;
@@ -68,6 +71,7 @@ export interface MatchPlayer {
   id: number;
   fullName: string;
   category: Category;
+  categoryTier: CategoryTier | null;
   gender: Gender;
 }
 
@@ -95,6 +99,7 @@ export interface Match {
   updatedAt: string | null;
   durationMinutes: 90 | 120;
   category: Category;
+  categoryTier: CategoryTier | null;
   type: MatchType;
   maxPlayers: number;
   status: MatchStatus;
@@ -112,6 +117,7 @@ export interface NewMatchInput {
   startsAt: string;
   durationMinutes: 90 | 120;
   category: Category;
+  categoryTier?: CategoryTier | null;
   type: MatchType;
   maxPlayers: number;
   guests: Omit<Guest, "id">[];

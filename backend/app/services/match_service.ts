@@ -25,6 +25,7 @@ export interface MatchInput {
   startsAt: DateTime
   durationMinutes: 90 | 120
   category: number
+  categoryTier?: 'high' | 'entry' | null
   type: MatchType
   maxPlayers: number
   guests: GuestInput[]
@@ -208,6 +209,7 @@ function matchFields(input: MatchInput) {
     startsAt: input.startsAt,
     durationMinutes: input.durationMinutes,
     category: input.category,
+    categoryTier: input.categoryTier ?? null,
     type: input.type,
     maxPlayers: input.maxPlayers,
   }

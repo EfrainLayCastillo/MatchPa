@@ -72,10 +72,10 @@ export function LobbyView() {
     branches.find((c) => c.id === id)?.name ?? "Cualquiera";
   const sortedMatches = matches
     ?.slice()
-    .sort(byCategoryDistance(user?.category ?? null));
+    .sort(byCategoryDistance({ category: user?.category ?? null, categoryTier: user?.categoryTier }));
   const sortedPlayers = players
     ?.slice()
-    .sort(byCategoryDistance(user?.category ?? null));
+    .sort(byCategoryDistance({ category: user?.category ?? null, categoryTier: user?.categoryTier }));
 
   async function requestToJoin(match: Match) {
     setJoiningCode(match.code);

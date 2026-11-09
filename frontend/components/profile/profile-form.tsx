@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import { CategoryTierPicker } from "@/components/matchpa/category-tier-picker";
 import { FormAlert } from "@/components/matchpa/form-alert";
 import { Button } from "@/components/ui/button";
 import { FieldError } from "@/components/ui/field";
@@ -15,7 +16,7 @@ import { api } from "@/lib/api";
 import { invalidProps, toFormErrors, useFormErrors } from "@/lib/form-errors";
 import { CATEGORIES, GENDER_LABELS, shortCategory } from "@/lib/format";
 import { useSession } from "@/lib/session";
-import type { Category, Gender } from "@/lib/types";
+import type { Category, CategoryTier, Gender } from "@/lib/types";
 
 interface ProfileFormProps {
   mode: "onboarding" | "profile";
@@ -25,6 +26,7 @@ export function ProfileForm({ mode }: ProfileFormProps) {
   const router = useRouter();
   const { user, setUser } = useSession();
   const [category, setCategory] = useState<Category>(user?.category ?? 4);
+  const [categoryTier, setCategoryTier] = useState<CategoryTier | null>(user?.categoryTier ?? null);
   const [gender, setGender] = useState<Gender | null>(user?.gender ?? null);
   const [phone, setPhone] = useState(user?.phone ?? "");
   const { errors, formRef, fail, reset, clearField } = useFormErrors();
@@ -37,7 +39,7 @@ export function ProfileForm({ mode }: ProfileFormProps) {
     setBusy(true);
     reset();
     try {
-      setUser(await api.updateMe({ category, gender, phone: phone.trim() }));
+      setUser(await api.updateMe({ category, categoryTier, gender, phone: phone.trim() }));
       if (mode === "onboarding") {
         track("sign_up", { category });
         router.replace("/lobby");
@@ -84,6 +86,17 @@ export function ProfileForm({ mode }: ProfileFormProps) {
         </RadioGroup>
         <FieldError id="gender-error">{errors.fields.gender}</FieldError>
       </div>
+
+      <CategoryTierPicker
+        id="categoryTier"
+        description="¿En qué parte de tu categoría juegas?"
+        value={categoryTier}
+        onChange={(value) => {
+          setCategoryTier(value);
+          clearField("categoryTier");
+        }}
+        error={errors.fields.categoryTier}
+      />
 
       <div className="space-y-1.5">
         <Label htmlFor="phone">Teléfono (WhatsApp)</Label>

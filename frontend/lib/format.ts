@@ -1,5 +1,5 @@
 import { formatClock12, todayKey } from "./panamaFormatDate";
-import type { Availability, Category, Gender, MatchStatus, MatchType } from "./types";
+import type { Availability, Category, CategoryTier, Gender, MatchStatus, MatchType } from "./types";
 
 const CATEGORY_LABELS: Record<Category, string> = {
   1: "1ra",
@@ -35,14 +35,23 @@ export function shortCategory(category: Category): string {
   return CATEGORY_LABELS[category];
 }
 
-/** Orders by distance to the user's category: their own level first, then the closest ones. */
-export function byCategoryDistance(mine: Category | null) {
-  return <T extends { category: Category }>(a: T, b: T) =>
-    distance(a.category, mine) - distance(b.category, mine);
+export const CATEGORY_TIER_LABELS: Record<CategoryTier, string> = { high: "alta", entry: "de entrada" };
+
+export function formatCategory(category: Category, tier?: CategoryTier | null): string {
+  return tier ? `${shortCategory(category)} ${CATEGORY_TIER_LABELS[tier]}` : shortCategory(category);
 }
 
-function distance(category: Category, mine: Category | null): number {
-  return mine === null ? 0 : Math.abs(category - mine);
+const TIER_OFFSET: Record<CategoryTier, number> = { high: -1 / 3, entry: 1 / 3 };
+
+function effectiveLevel(category: Category, tier?: CategoryTier | null): number {
+  return category + (tier ? TIER_OFFSET[tier] : 0);
+}
+
+/** Orders by distance to the user's effective level: their own first, then the closest ones. */
+export function byCategoryDistance(mine: { category: Category | null; categoryTier?: CategoryTier | null }) {
+  const distance = (item: { category: Category; categoryTier?: CategoryTier | null }) =>
+    mine.category === null ? 0 : Math.abs(effectiveLevel(item.category, item.categoryTier) - effectiveLevel(mine.category, mine.categoryTier));
+  return <T extends { category: Category; categoryTier?: CategoryTier | null }>(a: T, b: T) => distance(a) - distance(b);
 }
 
 export function formatDuration(minutes: 90 | 120): string {

@@ -27,12 +27,21 @@ export function serializeUser(user: User) {
     avatarUrl: user.avatarUrl,
     phone: user.whatsapp,
     category: user.category,
+    categoryTier: user.categoryTier,
     gender: user.gender,
   }
 }
 
-function serializePlayer(user: Pick<User, 'id' | 'fullName' | 'category' | 'gender'>) {
-  return { id: user.id, fullName: user.fullName, category: user.category, gender: user.gender }
+function serializePlayer(
+  user: Pick<User, 'id' | 'fullName' | 'category' | 'categoryTier' | 'gender'>
+) {
+  return {
+    id: user.id,
+    fullName: user.fullName,
+    category: user.category,
+    categoryTier: user.categoryTier,
+    gender: user.gender,
+  }
 }
 
 function serializeRequest(request: MatchRequest) {
@@ -75,6 +84,7 @@ export function serializeMatch(match: Match, viewer: User | null) {
     updatedAt: match.updatedAt?.toISO() ?? null,
     durationMinutes: match.durationMinutes,
     category: match.category,
+    categoryTier: match.categoryTier,
     type: match.type,
     maxPlayers: match.maxPlayers,
     status: effectiveStatus(match),

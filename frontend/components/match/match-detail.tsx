@@ -13,7 +13,7 @@ import { useVerifiedAction } from "@/components/auth/verify-email-dialog";
 import { api, ApiError } from "@/lib/api";
 import { notifyError } from "@/lib/notify";
 import { LoadFailed } from "@/components/matchpa/load-failed";
-import { formatDuration, GENDER_LABELS, shortCategory, TYPE_LABELS } from "@/lib/format";
+import { formatDuration, GENDER_LABELS, formatCategory, shortCategory, TYPE_LABELS } from "@/lib/format";
 import { formatDateTime } from "@/lib/panamaFormatDate";
 import { shouldAskForPush } from "@/lib/push";
 import { useMatch, useMatchRealtime, useRefreshMatch } from "@/lib/match-queries";
@@ -77,7 +77,7 @@ export function MatchDetail({ code, serverMatch }: { code: string; serverMatch?:
         <BranchContact branch={match.branch} />
         <div className="flex flex-wrap gap-2 text-xs font-semibold">
           <span className="rounded-md bg-brand-lime/60 px-2 py-1 text-brand-teal dark:bg-brand-lime dark:text-brand-teal">
-            {shortCategory(match.category)} categoría
+            {formatCategory(match.category, match.categoryTier)} categoría
           </span>
           <span className="rounded-md bg-muted px-2 py-1">{TYPE_LABELS[match.type]}</span>
           <span className="rounded-md bg-muted px-2 py-1">
@@ -97,7 +97,7 @@ export function MatchDetail({ code, serverMatch }: { code: string; serverMatch?:
                   {player.id === match.organizer.id ? " · organizador" : ""}
                 </span>
                 <span className="text-muted-foreground">
-                  {shortCategory(player.category)} · {GENDER_LABELS[player.gender]}
+                  {formatCategory(player.category, player.categoryTier)} · {GENDER_LABELS[player.gender]}
                 </span>
               </li>
             ))}
@@ -337,7 +337,7 @@ function RequestRow({ request, children }: { request: MatchRequest; children: Re
       <div className="min-w-0">
         <p className="truncate font-medium">{request.user.fullName}</p>
         <p className="text-xs text-muted-foreground">
-          {shortCategory(request.user.category)} · {GENDER_LABELS[request.user.gender]}
+          {formatCategory(request.user.category, request.user.categoryTier)} · {GENDER_LABELS[request.user.gender]}
         </p>
       </div>
       <div className="flex shrink-0 gap-2">{children}</div>

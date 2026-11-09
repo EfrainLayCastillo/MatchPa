@@ -6,6 +6,7 @@ import { dateKey } from "./panamaFormatDate";
 import type {
   Availability,
   Category,
+  CategoryTier,
   Branch,
   Gender,
   Match,
@@ -29,6 +30,7 @@ interface StoredMatch {
   startsAt: string;
   durationMinutes: 90 | 120;
   category: Match["category"];
+  categoryTier: Match["categoryTier"];
   type: MatchType;
   maxPlayers: number;
   closed: boolean;
@@ -106,10 +108,11 @@ const users: (User & { password: string })[] = [
     avatarUrl: null,
     phone: "+507 6000-0001",
     category: 4,
+    categoryTier: "high",
     gender: "male",
   },
   seedPlayer(2, "Sacha Ortega", 4, "male"),
-  seedPlayer(3, "Esteban Mora", 5, "male"),
+  seedPlayer(3, "Esteban Mora", 5, "male", "entry"),
   seedPlayer(4, "Mariana Ruiz", 3, "female"),
   seedPlayer(5, "Lucía Ponce", 4, "female"),
   seedPlayer(6, "Andrés Vega", 2, "male"),
@@ -132,6 +135,7 @@ const matches: StoredMatch[] = [
     startsAt: at(dateKey(new Date(Date.now() + 86_400_000)), "18:00"),
     durationMinutes: 90,
     category: 4,
+    categoryTier: "entry",
     type: "mixed",
     maxPlayers: 4,
     updatedAt: new Date().toISOString(),
@@ -148,6 +152,7 @@ const matches: StoredMatch[] = [
     startsAt: laterToday(3),
     durationMinutes: 90,
     category: 4,
+    categoryTier: null,
     type: "mixed",
     maxPlayers: 4,
     updatedAt: new Date().toISOString(),
@@ -160,7 +165,7 @@ const matches: StoredMatch[] = [
 let me: number | null = 1;
 let nextId = 100;
 
-function seedPlayer(id: number, fullName: string, category: Category, gender: Gender): User & { password: string } {
+function seedPlayer(id: number, fullName: string, category: Category, gender: Gender, categoryTier: CategoryTier | null = null): User & { password: string } {
   return {
     id,
     fullName,
@@ -170,6 +175,7 @@ function seedPlayer(id: number, fullName: string, category: Category, gender: Ge
     avatarUrl: null,
     phone: `+507 6000-000`,
     category,
+    categoryTier,
     gender,
   };
 }
@@ -207,6 +213,7 @@ function publicUser(user: User & { password?: string }): User {
     avatarUrl: user.avatarUrl,
     phone: user.phone,
     category: user.category,
+    categoryTier: user.categoryTier,
     gender: user.gender,
   };
 }
@@ -229,7 +236,7 @@ function spotsLeft(match: StoredMatch): number {
 function playerOf(userId: number) {
   const user = users.find((u) => u.id === userId);
   if (!user) fail(404, "Jugador no encontrado");
-  return { id: user.id, fullName: user.fullName, category: user.category ?? 4, gender: user.gender ?? "male" };
+  return { id: user.id, fullName: user.fullName, category: user.category ?? 4, categoryTier: user.categoryTier, gender: user.gender ?? "male" };
 }
 
 function viewOf(match: StoredMatch): Match {
@@ -255,6 +262,7 @@ function viewOf(match: StoredMatch): Match {
     updatedAt: match.updatedAt,
     durationMinutes: match.durationMinutes,
     category: match.category,
+    categoryTier: match.categoryTier,
     type: match.type,
     maxPlayers: match.maxPlayers,
     status: statusOf(match),
@@ -292,7 +300,7 @@ function playersFor(date: string, branchId?: number): Player[] {
     .flatMap((u) => {
       const slot = (availabilities.get(u.id) ?? []).find((a) => a.date === date);
       if (!slot || (branchId !== undefined && slot.branchId !== null && slot.branchId !== branchId)) return [];
-      return [{ id: u.id, fullName: u.fullName, category: u.category!, gender: u.gender!, avatarUrl: null, availability: slot }];
+      return [{ id: u.id, fullName: u.fullName, category: u.category!, categoryTier: u.categoryTier, gender: u.gender!, avatarUrl: null, availability: slot }];
     });
 }
 
@@ -321,7 +329,7 @@ export async function mockRequest<T>(method: Method, fullPath: string, body?: un
   });
   on(/^POST \/auth\/register$/, () => {
     const user = seedPlayer(nextId++, String(input.fullName), 4, "male");
-    Object.assign(user, { email: String(input.email), password: String(input.password), category: null, gender: null, emailVerified: false });
+    Object.assign(user, { email: String(input.email), password: String(input.password), category: null, categoryTier: null, gender: null, emailVerified: false });
     users.push(user);
     me = user.id;
     return publicUser(user);
@@ -402,6 +410,7 @@ export async function mockRequest<T>(method: Method, fullPath: string, body?: un
       startsAt: String(input.startsAt),
       durationMinutes: input.durationMinutes as 90 | 120,
       category: input.category as Match["category"],
+      categoryTier: (input.categoryTier as Match["categoryTier"]) ?? null,
       type: input.type as MatchType,
       maxPlayers: Number(input.maxPlayers),
       updatedAt: new Date().toISOString(),
@@ -424,6 +433,7 @@ export async function mockRequest<T>(method: Method, fullPath: string, body?: un
       updatedAt: new Date().toISOString(),
       durationMinutes: input.durationMinutes as 90 | 120,
       category: input.category as Match["category"],
+      categoryTier: (input.categoryTier as Match["categoryTier"]) ?? null,
       type: input.type as MatchType,
       maxPlayers: Number(input.maxPlayers),
       guests: (input.guests as Omit<Match["guests"][number], "id">[]).map((g, i) => ({ id: i + 1, ...g })),

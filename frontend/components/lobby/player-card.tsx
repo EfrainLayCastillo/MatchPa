@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useVerifiedAction } from "@/components/auth/verify-email-dialog";
 import { api } from "@/lib/api";
-import { GENDER_LABELS, firstName, formatAvailabilityWindow, shortCategory } from "@/lib/format";
+import { GENDER_LABELS, firstName, formatAvailabilityWindow, formatCategory } from "@/lib/format";
 import type { Match, Player } from "@/lib/types";
 
 interface PlayerCardProps {
@@ -48,7 +48,7 @@ export function PlayerCard({ player, branchName }: PlayerCardProps) {
         <div className="min-w-0 space-y-1">
           <p className="truncate font-heading text-lg font-bold leading-tight">{player.fullName}</p>
           <p className="text-sm text-muted-foreground">
-            {shortCategory(player.category)} categoría · {GENDER_LABELS[player.gender]}
+            {formatCategory(player.category, player.categoryTier)} categoría · {GENDER_LABELS[player.gender]}
           </p>
           <p className="text-xs text-muted-foreground">
             {formatAvailabilityWindow(availability)} · {branchName(availability.branchId)}
