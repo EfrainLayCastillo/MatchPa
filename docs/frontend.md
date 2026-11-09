@@ -25,4 +25,4 @@ Las URLs son visibles para el usuario, así que van en español.
 | `/perfil` | Sí | Editar categoría y subnivel, género y WhatsApp, activar/desactivar push |
 | `/mis-partidas` | Sí | Partidos que organizas o juegas, con estado y filtros por sucursal y orden (por defecto, última actualización) |
 
-Ambas pestañas del lobby se ordenan por cercanía a tu nivel efectivo (categoría y subnivel). **Partidos** filtra por sucursal, tipo y hora; **Jugadores** por sucursal y horario, y al tocar uno aparece "Ey Pa, ¿juegas?".
+Ambas pestañas del lobby tienen "Ordenar por: Cercanía · Nivel". Cercanía usa tu ubicación o la zona que elijas y muestra "a 3 km" en cada tarjeta; Nivel ordena por cercanía a tu nivel efectivo (categoría y subnivel). Sin ubicación ni zona, una tarjeta ofrece "Usar mi ubicación" o "Elegir mi zona". La zona elegida queda en `localStorage`. **Partidos** filtra por sucursal, tipo y hora; **Jugadores** por sucursal y horario, y al tocar uno aparece "Ey Pa, ¿juegas?".

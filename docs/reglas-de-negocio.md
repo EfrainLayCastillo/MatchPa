@@ -103,6 +103,8 @@ Una sola entidad, `match_requests`, con `kind`:
 ## Sucursales
 
 - Pool global; la ubicación de un partido es la sucursal. Sin direcciones: la zona (`location_label`) y las coordenadas bastan.
+- **Cerca de ti:** el lobby ordena por distancia en línea recta desde la ubicación del jugador, o desde la zona que elija a mano, hasta la sucursal. En un partido es su sucursal; en un jugador del pool, la de su disponibilidad. "Cualquiera" o una sucursal sin coordenadas van al final. Con la misma distancia redondeada (km) se desempata por nivel.
+- La ubicación se pide al tocar "Usar mi ubicación", nunca al cargar, y no sale del navegador. Una zona es un `location_label` de sucursales con coordenadas, y su punto es el promedio de esas sucursales.
 - Catálogo de todo el país por seed, con upsert por `slug`. `name` es la marca, sin la zona; la UI muestra `name · zona`. Dos sedes de una marca llevan nombres distintos (PPA Condado, PPA Marina Sur).
 - Teléfono, website (o Instagram) y coordenadas son opcionales: si el club no los publica, quedan vacíos.
 

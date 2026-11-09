@@ -12,7 +12,7 @@
 - **Google:** no se vincula automáticamente a una cuenta con contraseña del mismo correo. Se podrá vincular cuando el correo de la cuenta esté verificado (segunda etapa de la beta).
 - **Errores:** en producción no se muestran detalles internos; en el frontend, los errores de servidor muestran un mensaje genérico.
 - **Llave `APP_KEY`:** no cambiarla nunca en producción; si cambia, los WhatsApp cifrados dejan de descifrarse.
-- **Headers del sitio (Next, `next.config.ts`):** `X-Frame-Options: DENY`, `nosniff`, `Referrer-Policy: strict-origin-when-cross-origin` y `Permissions-Policy` sin cámara, micrófono, ubicación ni pagos. HSTS lo pone Vercel.
+- **Headers del sitio (Next, `next.config.ts`):** `X-Frame-Options: DENY`, `nosniff`, `Referrer-Policy: strict-origin-when-cross-origin` y `Permissions-Policy` sin cámara, micrófono ni pagos; ubicación solo para el propio sitio (`geolocation=(self)`), para "cerca de ti" en el lobby. HSTS lo pone Vercel.
 - **CSP:** va en Next y no en Shield, porque el navegador la aplica a documentos HTML y la API solo responde JSON. Está en `Content-Security-Policy-Report-Only`: las violaciones salen en la consola del navegador. Lista blanca: GTM y GA4. Sin nonces porque con `cacheComponents` harían dinámicas todas las páginas, así que los scripts inline usan `'unsafe-inline'`. Cuando no haya violaciones, se cambia el header a `Content-Security-Policy`.
 - **Límites por cuenta** (`start/limiter.ts`, store `database`, clave por usuario):
 

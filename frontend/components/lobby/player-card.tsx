@@ -9,13 +9,15 @@ import { useVerifiedAction } from "@/components/auth/verify-email-dialog";
 import { api } from "@/lib/api";
 import { GENDER_LABELS, firstName, formatAvailabilityWindow, formatCategory } from "@/lib/format";
 import type { Match, Player } from "@/lib/types";
+import { DistanceTag } from "./distance-tag";
 
 interface PlayerCardProps {
   player: Player;
   branchName: (branchId: number | null) => string;
+  distanceKm?: number | null;
 }
 
-export function PlayerCard({ player, branchName }: PlayerCardProps) {
+export function PlayerCard({ player, branchName, distanceKm }: PlayerCardProps) {
   const router = useRouter();
   const { guard } = useVerifiedAction();
   const [matches, setMatches] = useState<Match[] | null>(null);
@@ -52,6 +54,7 @@ export function PlayerCard({ player, branchName }: PlayerCardProps) {
           </p>
           <p className="text-xs text-muted-foreground">
             {formatAvailabilityWindow(availability)} · {branchName(availability.branchId)}
+            {distanceKm != null ? <DistanceTag km={distanceKm} /> : null}
           </p>
         </div>
         <Button size="sm" variant="outline" onClick={invite} disabled={busy} className="shrink-0">

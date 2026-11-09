@@ -4,7 +4,7 @@ import { CardListSkeleton } from "@/components/matchpa/skeletons";
 import { LoadFailed } from "@/components/matchpa/load-failed";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { BranchPicker } from "@/components/branch/branch-picker";
 import { Button } from "@/components/ui/button";
 import { PageTitle } from "@/components/matchpa/page-title";
@@ -14,7 +14,9 @@ import { track } from "@/lib/analytics";
 import { useVerifiedAction } from "@/components/auth/verify-email-dialog";
 import { api } from "@/lib/api";
 import { notifyError } from "@/lib/notify";
+import { byDistance, distanceToBranch, zonesFrom } from "@/lib/distance";
 import { byCategoryDistance, formatAvailabilityWindow } from "@/lib/format";
+import { useNearby } from "@/lib/nearby";
 import {
   useAvailabilities,
   useBranches,
@@ -28,10 +30,11 @@ import {
 import { formatDateTime, todayKey } from "@/lib/panamaFormatDate";
 import { shouldAskForPush } from "@/lib/push";
 import { useSession } from "@/lib/session";
-import type { Availability, Match } from "@/lib/types";
+import type { Availability, Match, Player } from "@/lib/types";
 import { AvailabilitySheet } from "./availability-sheet";
 import { DateStrip } from "./date-strip";
 import { MatchCard } from "./match-card";
+import { NearbyBar, type LobbySort } from "./nearby-bar";
 import { PlayerCard } from "./player-card";
 import { UpcomingMatches } from "./upcoming-matches";
 
@@ -68,14 +71,19 @@ export function LobbyView() {
   const [availabilityOpen, setAvailabilityOpen] = useState(false);
   const [pushOpen, setPushOpen] = useState(false);
 
-  const branchName = (id: number | null) =>
-    branches.find((c) => c.id === id)?.name ?? "Cualquiera";
-  const sortedMatches = matches
-    ?.slice()
-    .sort(byCategoryDistance({ category: user?.category ?? null, categoryTier: user?.categoryTier }));
-  const sortedPlayers = players
-    ?.slice()
-    .sort(byCategoryDistance({ category: user?.category ?? null, categoryTier: user?.categoryTier }));
+  const nearby = useNearby();
+  const [sort, setSort] = useState<LobbySort>("distance");
+  const zones = useMemo(() => zonesFrom(branchesQuery.data ?? []), [branchesQuery.data]);
+  const byDistanceActive = nearby.origin !== null && sort === "distance";
+  const origin = byDistanceActive ? nearby.origin!.point : null;
+
+  const findBranch = (id: number | null) => branches.find((c) => c.id === id);
+  const branchName = (id: number | null) => findBranch(id)?.name ?? "Cualquiera";
+  const matchKm = (match: Match) => distanceToBranch(origin, match.branch);
+  const playerKm = (player: Player) => distanceToBranch(origin, findBranch(player.availability.branchId));
+  const byLevel = byCategoryDistance({ category: user?.category ?? null, categoryTier: user?.categoryTier });
+  const sortedMatches = matches?.slice().sort(byDistanceActive ? byDistance(matchKm, byLevel) : byLevel);
+  const sortedPlayers = players?.slice().sort(byDistanceActive ? byDistance(playerKm, byLevel) : byLevel);
 
   async function requestToJoin(match: Match) {
     setJoiningCode(match.code);
@@ -156,6 +164,17 @@ export function LobbyView() {
 
       <DateStrip value={date} onChange={setDate} />
 
+      <NearbyBar
+        origin={nearby.origin}
+        status={nearby.status}
+        zones={zones}
+        sort={sort}
+        onSortChange={setSort}
+        onLocate={nearby.locate}
+        onChooseZone={nearby.chooseZone}
+        onClear={nearby.clear}
+      />
+
       <div className="flex items-center gap-2">
         <BranchPicker
           branches={branches}
@@ -189,6 +208,7 @@ export function LobbyView() {
                     match={match}
                     onJoin={(match) => guard(() => requestToJoin(match))}
                     joining={joiningCode === match.code}
+                    distanceKm={matchKm(match)}
                   />
                 </li>
               ))}
@@ -205,7 +225,7 @@ export function LobbyView() {
             <ul className="grid gap-3 md:grid-cols-2">
               {sortedPlayers?.map((player) => (
                 <li key={player.id}>
-                  <PlayerCard player={player} branchName={branchName} />
+                  <PlayerCard player={player} branchName={branchName} distanceKm={playerKm(player)} />
                 </li>
               ))}
             </ul>

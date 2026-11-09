@@ -5,14 +5,16 @@ import { Card, CardContent } from "@/components/ui/card";
 import { formatCategory, formatDuration, TYPE_LABELS } from "@/lib/format";
 import { formatDateTime } from "@/lib/panamaFormatDate";
 import type { Match } from "@/lib/types";
+import { DistanceTag } from "./distance-tag";
 
 interface MatchCardProps {
   match: Match;
   onJoin: (match: Match) => void;
   joining: boolean;
+  distanceKm?: number | null;
 }
 
-export function MatchCard({ match, onJoin, joining }: MatchCardProps) {
+export function MatchCard({ match, onJoin, joining, distanceKm }: MatchCardProps) {
   const canJoin = match.status === "open" && !match.isOrganizer && !match.myRequest;
 
   return (
@@ -23,6 +25,7 @@ export function MatchCard({ match, onJoin, joining }: MatchCardProps) {
             <p className="font-heading text-lg font-bold leading-tight">{formatDateTime(match.startsAt)}</p>
             <p className="text-sm text-muted-foreground">
               {match.branch.name} · Cancha {match.courtNumber} · {formatDuration(match.durationMinutes)}
+              {distanceKm != null ? <DistanceTag km={distanceKm} /> : null}
             </p>
           </div>
           <StatusBadge status={match.status} />
