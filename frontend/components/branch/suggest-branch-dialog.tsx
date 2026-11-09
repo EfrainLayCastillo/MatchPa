@@ -11,9 +11,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { FormAlert } from "@/components/matchpa/form-alert";
+import { FieldError } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { api, ApiError } from "@/lib/api";
+import { invalidProps, toFormErrors, useFormErrors, type FormErrors } from "@/lib/form-errors";
 
 interface SuggestBranchDialogProps {
   open: boolean;
@@ -38,13 +41,13 @@ function SuggestForm({ initialName, onClose }: { initialName: string; onClose: (
   const [mapsUrl, setMapsUrl] = useState("");
   const [busy, setBusy] = useState(false);
   const [sent, setSent] = useState(false);
-  const [error, setError] = useState("");
+  const { errors, formRef, fail, reset, clearField } = useFormErrors();
 
   async function submit(event: React.FormEvent) {
     event.preventDefault();
     event.stopPropagation();
     setBusy(true);
-    setError("");
+    reset();
     try {
       await api.suggestBranch({
         name: name.trim(),
@@ -54,9 +57,7 @@ function SuggestForm({ initialName, onClose }: { initialName: string; onClose: (
       setSent(true);
     } catch (err) {
       if (handleError(err)) return;
-      if (err instanceof ApiError && err.status === 409) setError("Ya tienes una sugerencia en revisión.");
-      else if (err instanceof ApiError && err.status === 429) setError("Vas muy rápido. Intenta de nuevo en un rato.");
-      else setError(err instanceof ApiError ? err.message : "No se pudo enviar la sugerencia");
+      fail(suggestErrors(err));
     } finally {
       setBusy(false);
     }
@@ -75,20 +76,23 @@ function SuggestForm({ initialName, onClose }: { initialName: string; onClose: (
             <Button className="h-11" onClick={() => onClose()}>Listo</Button>
           </DialogFooter>
         ) : (
-          <form onSubmit={submit} className="space-y-4">
+          <form ref={formRef} onSubmit={submit} className="space-y-4">
             <div className="space-y-1.5">
               <Label htmlFor="suggest-name">Nombre</Label>
-              <Input id="suggest-name" className="h-11" value={name} onChange={(e) => setName(e.target.value)} minLength={2} maxLength={80} required />
+              <Input id="suggest-name" className="h-11" value={name} onChange={(e) => { setName(e.target.value); clearField("name"); }} minLength={2} maxLength={80} required {...invalidProps("suggest-name", errors.fields.name)} />
+              <FieldError id="suggest-name-error">{errors.fields.name}</FieldError>
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="suggest-zone">Zona</Label>
-              <Input id="suggest-zone" className="h-11" placeholder="Ej. Costa del Este" value={locationLabel} onChange={(e) => setLocationLabel(e.target.value)} minLength={2} maxLength={80} required />
+              <Input id="suggest-zone" className="h-11" placeholder="Ej. Costa del Este" value={locationLabel} onChange={(e) => { setLocationLabel(e.target.value); clearField("locationLabel"); }} minLength={2} maxLength={80} required {...invalidProps("suggest-zone", errors.fields.locationLabel)} />
+              <FieldError id="suggest-zone-error">{errors.fields.locationLabel}</FieldError>
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="suggest-maps">Enlace de Google Maps (opcional)</Label>
-              <Input id="suggest-maps" className="h-11" type="url" inputMode="url" placeholder="https://maps.app.goo.gl/…" value={mapsUrl} onChange={(e) => setMapsUrl(e.target.value)} maxLength={500} />
+              <Input id="suggest-maps" className="h-11" type="url" inputMode="url" placeholder="https://maps.app.goo.gl/…" value={mapsUrl} onChange={(e) => { setMapsUrl(e.target.value); clearField("mapsUrl"); }} maxLength={500} {...invalidProps("suggest-maps", errors.fields.mapsUrl)} />
+              <FieldError id="suggest-maps-error">{errors.fields.mapsUrl}</FieldError>
             </div>
-            {error ? <p role="alert" className="text-sm text-destructive">{error}</p> : null}
+            <FormAlert message={errors.form} />
             <DialogFooter>
               <Button type="submit" className="h-11" disabled={busy}>{busy ? "Enviando…" : "Enviar sugerencia"}</Button>
               <Button type="button" variant="outline" className="h-11" onClick={() => onClose()}>Cancelar</Button>
@@ -97,4 +101,10 @@ function SuggestForm({ initialName, onClose }: { initialName: string; onClose: (
         )}
     </>
   );
+}
+
+function suggestErrors(err: unknown): FormErrors {
+  if (err instanceof ApiError && err.status === 409) return { fields: {}, form: "Ya tienes una sugerencia en revisión." };
+  if (err instanceof ApiError && err.status === 429) return { fields: {}, form: "Vas muy rápido. Intenta de nuevo en un rato." };
+  return toFormErrors(err, "No se pudo enviar la sugerencia");
 }

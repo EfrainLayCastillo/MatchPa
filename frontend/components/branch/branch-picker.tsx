@@ -22,10 +22,12 @@ interface BranchPickerProps {
   emptyOption?: { value: string; label: string };
   onSuggest?: (query: string) => void;
   id?: string;
+  "aria-invalid"?: boolean;
+  "aria-describedby"?: string;
   className?: string;
 }
 
-export function BranchPicker({ branches, value, onChange, emptyOption, onSuggest, id, className }: BranchPickerProps) {
+export function BranchPicker({ branches, value, onChange, emptyOption, onSuggest, id, className, ...aria }: BranchPickerProps) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
 
@@ -60,6 +62,7 @@ export function BranchPicker({ branches, value, onChange, emptyOption, onSuggest
           variant="outline"
           role="combobox"
           aria-expanded={open}
+          {...aria}
           className={cn("h-11 w-full justify-between font-normal", !selected && !emptyOption && "text-muted-foreground", className)}
         >
           <span className="truncate">{triggerLabel}</span>

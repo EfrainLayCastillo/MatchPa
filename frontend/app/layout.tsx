@@ -11,6 +11,7 @@ import { SiteHeader } from "@/components/matchpa/site-header";
 import { VerifiedActionProvider } from "@/components/auth/verify-email-dialog";
 import { SessionProvider } from "@/lib/session";
 import { QueryProvider } from "@/components/matchpa/query-provider";
+import { Toaster } from "@/components/ui/sonner";
 
 const inter = Inter({ variable: "--font-inter", subsets: ["latin"] });
 const bricolage = Bricolage_Grotesque({
@@ -54,6 +55,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             </VerifiedActionProvider>
           </SessionProvider>
         </QueryProvider>
+        <Toaster />
         <SpeedInsights />
       </body>
       {GTM_ID ? <GoogleTagManager gtmId={GTM_ID} /> : null}

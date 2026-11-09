@@ -1,6 +1,7 @@
 "use client";
 
 import { DetailSkeleton } from "@/components/matchpa/skeletons";
+import { LoadFailed } from "@/components/matchpa/load-failed";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -12,6 +13,7 @@ import { MatchForm } from "./match-form";
 export function MatchEdit({ code }: { code: string }) {
   const [match, setMatch] = useState<Match | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
     let active = true;
@@ -22,9 +24,18 @@ export function MatchEdit({ code }: { code: string }) {
     return () => {
       active = false;
     };
-  }, [code]);
+  }, [code, attempt]);
 
-  if (error) return <p role="alert" className="text-sm text-destructive">{error}</p>;
+  if (error)
+    return (
+      <LoadFailed
+        message={error}
+        onRetry={async () => {
+          setError(null);
+          setAttempt((n) => n + 1);
+        }}
+      />
+    );
   if (!match) return <DetailSkeleton />;
 
   if (!match.isOrganizer || match.status !== "open") {

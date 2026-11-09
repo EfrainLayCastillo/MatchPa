@@ -8,7 +8,11 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { api, ApiError } from "@/lib/api";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { FieldError } from "@/components/ui/field";
+import { api } from "@/lib/api";
+import { notifyError } from "@/lib/notify";
+import { InfoIcon } from "lucide-react";
 import { earliestSlotToday, formatClock12, formatDay, halfHourTimes, todayKey } from "@/lib/panamaFormatDate";
 import type { Availability, Branch } from "@/lib/types";
 
@@ -54,13 +58,13 @@ function AvailabilityForm({ dateKey, current, branches, onOpenChange, onSaved }:
   }
   const [branchId, setBranchId] = useState(current?.branchId?.toString() ?? ANY_BRANCH);
   const [suggestQuery, setSuggestQuery] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [toError, setToError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
   async function save() {
-    if (hasWindow && toTime <= fromTime) return setError("La hora de fin debe ser después de la de inicio");
+    if (hasWindow && toTime <= fromTime) return setToError("La hora de fin debe ser después de la de inicio");
     setBusy(true);
-    setError(null);
+    setToError(null);
     try {
       await api.setAvailability(dateKey, {
         fromTime: hasWindow ? fromTime : null,
@@ -70,7 +74,7 @@ function AvailabilityForm({ dateKey, current, branches, onOpenChange, onSaved }:
       onSaved();
       onOpenChange(false);
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : "No se pudo guardar");
+      notifyError(err, "No se pudo guardar");
     } finally {
       setBusy(false);
     }
@@ -123,8 +127,8 @@ function AvailabilityForm({ dateKey, current, branches, onOpenChange, onSaved }:
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="to">Hasta</Label>
-          <Select value={toTime} onValueChange={setToTime}>
-            <SelectTrigger id="to" className="w-full" aria-label="Hasta">
+          <Select value={toTime} onValueChange={(next) => { setToTime(next); setToError(null); }}>
+            <SelectTrigger id="to" className="w-full" aria-label="Hasta" aria-invalid={toError ? true : undefined} aria-describedby={toError ? "to-error" : undefined}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -135,6 +139,7 @@ function AvailabilityForm({ dateKey, current, branches, onOpenChange, onSaved }:
                 ))}
             </SelectContent>
           </Select>
+          <FieldError id="to-error">{toError}</FieldError>
         </div>
       </div>
       ) : null}
@@ -156,8 +161,12 @@ function AvailabilityForm({ dateKey, current, branches, onOpenChange, onSaved }:
         initialName={suggestQuery ?? ""}
       />
 
-      {noSlotsLeft ? <p role="alert" className="text-sm font-medium text-destructive">Por hoy ya no puede haber disponibilidad. Elige otro día.</p> : null}
-      {error ? <p role="alert" className="text-sm text-destructive">{error}</p> : null}
+      {noSlotsLeft ? (
+        <Alert variant="info">
+          <InfoIcon />
+          <AlertDescription>Por hoy ya no puede haber disponibilidad. Elige otro día.</AlertDescription>
+        </Alert>
+      ) : null}
 
       <SheetFooter>
         {current ? (

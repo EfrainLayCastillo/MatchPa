@@ -14,7 +14,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { PushPrompt } from "@/components/matchpa/push-prompt";
 import { track } from "@/lib/analytics";
 import { useVerifiedAction } from "@/components/auth/verify-email-dialog";
-import { api, ApiError } from "@/lib/api";
+import { api } from "@/lib/api";
+import { invalidProps, toFormErrors, useFormErrors, type FieldErrors } from "@/lib/form-errors";
+import { FormAlert } from "@/components/matchpa/form-alert";
+import { FieldError } from "@/components/ui/field";
 import { CATEGORIES, GENDER_LABELS, shortCategory, TYPE_LABELS } from "@/lib/format";
 import { dateKey, formatClock, formatClock12, todayKey } from "@/lib/panamaFormatDate";
 import { shouldAskForPush } from "@/lib/push";
@@ -47,7 +50,7 @@ function MatchFormBody({ match }: { match?: Match }) {
   const [guests, setGuests] = useState<GuestDraft[]>(() =>
     match ? match.guests.map(({ name, category, gender }) => ({ name, category, gender })) : [],
   );
-  const [error, setError] = useState<string | null>(null);
+  const { errors, formRef, fail, reset, clearField } = useFormErrors();
   const [busy, setBusy] = useState(false);
   const [created, setCreated] = useState<Match | null>(null);
   const [step, setStep] = useState(0);
@@ -78,9 +81,9 @@ function MatchFormBody({ match }: { match?: Match }) {
   }
 
   function goNext() {
-    if (!branchId) return setError("Elige la sucursal de la cancha");
-    if (!courtNumber) return setError("Indica el número de cancha");
-    setError(null);
+    const fields = whereErrors(branchId, courtNumber);
+    if (Object.keys(fields).length > 0) return fail({ fields, form: null });
+    reset();
     setStep(1);
     setPublishReady(false);
     window.setTimeout(() => setPublishReady(true), 1000);
@@ -92,12 +95,11 @@ function MatchFormBody({ match }: { match?: Match }) {
     // Only the explicit publish button may create the match.
     const submitter = (event.nativeEvent as SubmitEvent).submitter;
     if (!submitter?.hasAttribute("data-publish")) return;
-    if (!branchId) return setError("Elige la sucursal de la cancha");
-    if (!courtNumber) return setError("Indica el número de cancha");
-    if (guests.some((guest) => guest.name.trim() === "")) return setError("Pon el nombre de cada jugador");
+    const fields = { ...whereErrors(branchId, courtNumber), ...guestErrors(guests) };
+    if (Object.keys(fields).length > 0) return showErrors({ fields, form: null });
 
     setBusy(true);
-    setError(null);
+    reset();
     try {
       if (match) {
         const updated = await api.updateMatch(match.code, buildInput());
@@ -114,10 +116,15 @@ function MatchFormBody({ match }: { match?: Match }) {
       router.push(`/partidos/${published.code}`);
     } catch (err) {
       if (handleError(err)) return;
-      setError(err instanceof ApiError ? err.message : "No se pudo publicar el partido");
+      showErrors(toFormErrors(err, "No se pudo publicar el partido"));
     } finally {
       setBusy(false);
     }
+  }
+
+  function showErrors(next: { fields: FieldErrors; form: string | null }) {
+    if (Object.keys(next.fields).some((name) => STEP_ONE_FIELDS.has(name))) setStep(0);
+    fail(next);
   }
 
   if (created) {
@@ -136,7 +143,7 @@ function MatchFormBody({ match }: { match?: Match }) {
   }
 
   return (
-    <form onSubmit={submit} className="space-y-6">
+    <form ref={formRef} onSubmit={submit} noValidate className="space-y-6">
       {inviteeId ? (
         <p className="rounded-xl bg-brand-lime/40 p-3 text-sm">
           Al publicar le enviaremos la invitación a <strong>{inviteeName}</strong>.
@@ -150,9 +157,9 @@ function MatchFormBody({ match }: { match?: Match }) {
           <Field label="Fecha" htmlFor="date">
             <DateField id="date" value={date} min={todayKey()} onChange={setDate} />
           </Field>
-          <Field label="Hora" htmlFor="time">
-            <Select value={time} onValueChange={setTime}>
-              <SelectTrigger id="time" className="w-full" aria-label="Hora">
+          <Field label="Hora" htmlFor="time" error={errors.fields.startsAt}>
+            <Select value={time} onValueChange={(value) => { setTime(value); clearField("startsAt"); }}>
+              <SelectTrigger id="time" className="w-full" aria-label="Hora" {...invalidProps("time", errors.fields.startsAt)}>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -175,12 +182,19 @@ function MatchFormBody({ match }: { match?: Match }) {
               </SelectContent>
             </Select>
           </Field>
-          <Field label="Cancha" htmlFor="court">
-            <Input id="court" type="number" inputMode="numeric" min={1} placeholder="Ej. 3" value={courtNumber} onChange={(e) => setCourtNumber(e.target.value)} required />
+          <Field label="Cancha" htmlFor="court" error={errors.fields.courtNumber}>
+            <Input id="court" type="number" inputMode="numeric" min={1} placeholder="Ej. 3" value={courtNumber} onChange={(e) => { setCourtNumber(e.target.value); clearField("courtNumber"); }} required {...invalidProps("court", errors.fields.courtNumber)} />
           </Field>
         </div>
-        <Field label="Sucursal" htmlFor="branch">
-          <BranchPicker id="branch" branches={branches} value={branchId} onChange={setBranchId} onSuggest={setSuggestQuery} />
+        <Field label="Sucursal" htmlFor="branch" error={errors.fields.branchId}>
+          <BranchPicker
+            id="branch"
+            branches={branches}
+            value={branchId}
+            onChange={(value) => { setBranchId(value); clearField("branchId"); }}
+            onSuggest={setSuggestQuery}
+            {...invalidProps("branch", errors.fields.branchId)}
+          />
         </Field>
         <SuggestBranchDialog
           open={suggestQuery !== null}
@@ -238,11 +252,18 @@ function MatchFormBody({ match }: { match?: Match }) {
               <Card className="gap-3 py-3">
                 <CardContent className="grid gap-3">
                   <div className="flex gap-2">
-                    <Input aria-label="Nombre" placeholder="Nombre" value={guest.name} onChange={(e) => updateGuest(index, { name: e.target.value })} />
+                    <Input
+                      aria-label="Nombre"
+                      placeholder="Nombre"
+                      value={guest.name}
+                      onChange={(e) => { updateGuest(index, { name: e.target.value }); clearField(`guests.${index}.name`); }}
+                      {...invalidProps(`guest-${index}`, errors.fields[`guests.${index}.name`])}
+                    />
                     <Button type="button" variant="ghost" onClick={() => setGuests((current) => current.filter((_, i) => i !== index))}>
                       Quitar
                     </Button>
                   </div>
+                  <FieldError id={`guest-${index}-error`} className="-mt-1">{errors.fields[`guests.${index}.name`]}</FieldError>
                   <div className="grid grid-cols-2 gap-2">
                     <Select value={guest.category.toString()} onValueChange={(value) => updateGuest(index, { category: Number(value) as Category })}>
                       <SelectTrigger className="w-full" aria-label="Categoría"><SelectValue /></SelectTrigger>
@@ -279,7 +300,7 @@ function MatchFormBody({ match }: { match?: Match }) {
       </>
       ) : null}
 
-      {error ? <p role="alert" className="text-sm text-destructive">{error}</p> : null}
+      <FormAlert message={errors.form} />
 
       <div className="flex gap-2">
         {step === 1 ? (
@@ -310,12 +331,35 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   );
 }
 
-function Field({ label, htmlFor, children }: { label: string; htmlFor?: string; children: React.ReactNode }) {
+interface FieldProps {
+  label: string;
+  htmlFor?: string;
+  error?: string;
+  children: React.ReactNode;
+}
+
+function Field({ label, htmlFor, error, children }: FieldProps) {
   return (
     <div className="space-y-1.5">
       <Label htmlFor={htmlFor}>{label}</Label>
       {children}
+      <FieldError id={htmlFor ? `${htmlFor}-error` : undefined}>{error}</FieldError>
     </div>
+  );
+}
+
+const STEP_ONE_FIELDS = new Set(["branchId", "courtNumber", "startsAt", "durationMinutes"]);
+
+function whereErrors(branchId: string, courtNumber: string): FieldErrors {
+  return {
+    ...(branchId ? {} : { branchId: "Elige la sucursal de la cancha" }),
+    ...(courtNumber ? {} : { courtNumber: "Indica el número de cancha" }),
+  };
+}
+
+function guestErrors(guests: GuestDraft[]): FieldErrors {
+  return Object.fromEntries(
+    guests.flatMap((guest, index) => (guest.name.trim() ? [] : [[`guests.${index}.name`, "Pon el nombre del jugador"]])),
   );
 }
 

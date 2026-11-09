@@ -15,3 +15,14 @@ Los colores vienen de una paleta de referencia visual. El logo de esa referencia
 - **Logo:** **Match** en bold + **Pa** en script.
 - **Gráficos:** estrella de 4 puntas, globo en alambre, carita sonriente en línea, trazos de la pelota.
 - **Tono:** casual y panameño: "Ey Pa, ¿juegas?", "Buscando Pa's...", "¡Match! Ya están los 4".
+
+## Errores y avisos
+
+El error usa el naranja `destructive` (`#c2410c`), nunca texto rojo suelto. Los avisos de éxito usan lima e íconos en verde profundo, sin verdes nuevos.
+
+| Caso | Patrón |
+|---|---|
+| Campo inválido (validación local o 422 con `field`) | Borde y anillo naranja en el campo, mensaje debajo y foco en el primer campo inválido |
+| Error de formulario sin campo (credenciales, código, 409) | Alerta en bloque dentro del formulario: fondo naranja tenue e ícono |
+| Acción puntual fallida (unirse, salir, cancelar, red) o éxito | Toast abajo a la derecha. En mobile ocupa el ancho y queda sobre la barra de acción |
+| Falla al cargar una pantalla | Tarjeta con "Reintentar" |

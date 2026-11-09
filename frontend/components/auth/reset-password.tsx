@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { api } from "@/lib/api";
 import { isProfileComplete, useSession } from "@/lib/session";
+import { FormAlert } from "@/components/matchpa/form-alert";
 
 const RESEND_COOLDOWN_SECONDS = 60;
 const RATE_LIMITED = "Ya pediste varios códigos. Intenta más tarde.";
@@ -59,7 +60,7 @@ function EmailStep({ email, onEmailChange, onSent }: EmailStepProps) {
           <Label htmlFor="email">Correo</Label>
           <Input id="email" type="email" autoComplete="email" inputMode="email" value={email} onChange={(e) => onEmailChange(e.target.value)} required />
         </div>
-        {error ? <p role="alert" className="text-sm text-destructive">{error}</p> : null}
+        <FormAlert message={error} />
         <Button type="submit" size="lg" className="h-12 w-full text-base font-bold" disabled={busy}>
           {busy ? "Enviando…" : "Enviar código"}
         </Button>
@@ -121,7 +122,7 @@ function NewPasswordStep({ email, onChangeEmail }: { email: string; onChangeEmai
           <Label htmlFor="password">Contraseña nueva</Label>
           <Input id="password" type="password" autoComplete="new-password" minLength={8} maxLength={72} value={password} onChange={(e) => setPassword(e.target.value)} required />
         </div>
-        {error ? <p id="code-error" role="alert" className="text-sm text-destructive">{error}</p> : null}
+        <FormAlert id="code-error" message={error} />
         {notice ? <p role="status" className="text-sm text-brand-teal dark:text-brand-lime">{notice}</p> : null}
         <Button type="submit" size="lg" className="h-12 w-full text-base font-bold" disabled={busy || code.length < CODE_LENGTH || password.length < 8}>
           {busy ? "Cambiando…" : "Cambiar contraseña"}

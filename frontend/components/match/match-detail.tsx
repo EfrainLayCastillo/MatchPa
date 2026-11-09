@@ -11,6 +11,8 @@ import { StatusBadge } from "@/components/matchpa/status-badge";
 import { track } from "@/lib/analytics";
 import { useVerifiedAction } from "@/components/auth/verify-email-dialog";
 import { api, ApiError } from "@/lib/api";
+import { notifyError } from "@/lib/notify";
+import { LoadFailed } from "@/components/matchpa/load-failed";
 import { formatDuration, GENDER_LABELS, shortCategory, TYPE_LABELS } from "@/lib/format";
 import { formatDateTime } from "@/lib/panamaFormatDate";
 import { shouldAskForPush } from "@/lib/push";
@@ -28,25 +30,27 @@ export function MatchDetail({ code, serverMatch }: { code: string; serverMatch?:
   const refresh = useRefreshMatch(code);
   useMatchRealtime(code);
   const match = query.data ?? null;
-  const [actionError, setActionError] = useState<string | null>(null);
   const loadError = query.error ? (query.error instanceof ApiError ? query.error.message : "No encontramos este partido") : null;
-  const error = actionError ?? loadError;
   const [busy, setBusy] = useState(false);
   const [pushOpen, setPushOpen] = useState(false);
 
-  if (loadError && !match) return <p role="alert" className="p-6 text-sm text-destructive">{loadError}</p>;
+  if (loadError && !match)
+    return (
+      <div className="p-6">
+        <LoadFailed message={loadError} onRetry={query.refetch} />
+      </div>
+    );
   if (!match) return <DetailSkeleton />;
 
   async function run(action: () => Promise<unknown>, afterRequest = false) {
     setBusy(true);
-    setActionError(null);
     try {
       await action();
       if (afterRequest && shouldAskForPush()) setPushOpen(true);
       refresh();
     } catch (err) {
       if (handleError(err)) return;
-      setActionError(err instanceof ApiError ? err.message : "Algo salió mal, intenta de nuevo");
+      notifyError(err);
     } finally {
       setBusy(false);
     }
@@ -155,8 +159,6 @@ export function MatchDetail({ code, serverMatch }: { code: string; serverMatch?:
       ) : (
         <div aria-hidden className="h-12 animate-pulse rounded-lg bg-muted" />
       )}
-
-      {error ? <p role="alert" className="text-sm text-destructive">{error}</p> : null}
 
       <PushPrompt
         open={pushOpen}

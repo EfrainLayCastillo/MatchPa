@@ -18,6 +18,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Check, Copy } from "lucide-react";
 import { api, ApiError } from "@/lib/api";
+import { FormAlert } from "@/components/matchpa/form-alert";
 import { useSession } from "@/lib/session";
 
 const CONFIRM_WORD = "ELIMINAR";
@@ -98,11 +99,7 @@ export function DeleteAccount() {
               onChange={(e) => setText(e.target.value)}
               disabled={busy}
             />
-            {error ? (
-              <p role="alert" className="text-sm text-destructive">
-                {error}
-              </p>
-            ) : null}
+            <FormAlert message={error} />
           </div>
           <AlertDialogFooter>
             <AlertDialogCancel className="h-11" disabled={busy}>

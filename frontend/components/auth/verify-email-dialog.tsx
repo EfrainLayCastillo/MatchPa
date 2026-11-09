@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { api, ApiError } from "@/lib/api";
 import { useSession } from "@/lib/session";
+import { FormAlert } from "@/components/matchpa/form-alert";
 
 interface VerifiedActionValue {
   guard: (fn: () => unknown) => Promise<void>;
@@ -96,7 +97,7 @@ export function VerifyEmailDialog({ open, onOpenChange, email }: VerifyEmailDial
           <DialogTitle>Verifica tu correo para continuar</DialogTitle>
           <DialogDescription>Te enviaremos un código a {email}</DialogDescription>
         </DialogHeader>
-        {failed ? <p role="alert" className="text-sm text-destructive">No pudimos enviar el código. Intenta de nuevo.</p> : null}
+        <FormAlert message={failed ? "No pudimos enviar el código. Intenta de nuevo." : null} />
         <DialogFooter>
           <Button className="h-11" onClick={sendCode} disabled={busy}>
             {busy ? "Enviando…" : "Enviar código"}

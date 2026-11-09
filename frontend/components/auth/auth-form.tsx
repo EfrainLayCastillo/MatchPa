@@ -4,9 +4,12 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { FormAlert } from "@/components/matchpa/form-alert";
+import { FieldError } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { api, API_BASE, ApiError, USING_MOCKS } from "@/lib/api";
+import { invalidProps, toFormErrors, useFormErrors, type FormErrors } from "@/lib/form-errors";
 import { GOOGLE_AUTH_ENABLED } from "@/lib/config";
 import { safeNextPath } from "@/lib/next-path";
 import { isProfileComplete, useSession } from "@/lib/session";
@@ -37,7 +40,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(() => accountErrorMessage(params.get("error")));
+  const { errors, formRef, fail, reset, clearField } = useFormErrors(accountErrorMessage(params.get("error")));
   const [busy, setBusy] = useState(false);
   const copy = COPY[mode];
   const next = safeNextPath(params.get("next"));
@@ -45,7 +48,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
   async function submit(event: React.FormEvent) {
     event.preventDefault();
     setBusy(true);
-    setError(null);
+    reset();
     try {
       const user =
         mode === "login"
@@ -55,7 +58,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
       const destination = isProfileComplete(user) ? next : "/onboarding";
       router.replace(mode === "register" ? `/verificar?next=${encodeURIComponent(destination)}` : destination);
     } catch (err) {
-      setError(authErrorMessage(err));
+      fail(authErrors(err));
     } finally {
       setBusy(false);
     }
@@ -76,16 +79,18 @@ export function AuthForm({ mode }: { mode: Mode }) {
         </>
       ) : null}
 
-      <form onSubmit={submit} className="space-y-4">
+      <form ref={formRef} onSubmit={submit} className="space-y-4">
         {mode === "register" ? (
           <div className="space-y-1.5">
             <Label htmlFor="fullName">Nombre completo</Label>
-            <Input id="fullName" autoComplete="name" value={fullName} onChange={(e) => setFullName(e.target.value)} required />
+            <Input id="fullName" autoComplete="name" value={fullName} onChange={(e) => { setFullName(e.target.value); clearField("fullName"); }} required {...invalidProps("fullName", errors.fields.fullName)} />
+            <FieldError id="fullName-error">{errors.fields.fullName}</FieldError>
           </div>
         ) : null}
         <div className="space-y-1.5">
           <Label htmlFor="email">Correo</Label>
-          <Input id="email" type="email" autoComplete="email" inputMode="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+          <Input id="email" type="email" autoComplete="email" inputMode="email" value={email} onChange={(e) => { setEmail(e.target.value); clearField("email"); }} required {...invalidProps("email", errors.fields.email)} />
+          <FieldError id="email-error">{errors.fields.email}</FieldError>
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="password">Contraseña</Label>
@@ -95,9 +100,14 @@ export function AuthForm({ mode }: { mode: Mode }) {
             autoComplete={mode === "login" ? "current-password" : "new-password"}
             minLength={mode === "register" ? 8 : undefined}
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => {
+              setPassword(e.target.value);
+              clearField("password");
+            }}
             required
+            {...invalidProps("password", errors.fields.password)}
           />
+          <FieldError id="password-error">{errors.fields.password}</FieldError>
           {mode === "login" ? (
             <Link
               href={`/recuperar${email ? `?email=${encodeURIComponent(email)}` : ""}`}
@@ -108,7 +118,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
           ) : null}
         </div>
 
-        {error ? <p role="alert" className="text-sm text-destructive">{error}</p> : null}
+        <FormAlert message={errors.form} />
 
         <Button type="submit" size="lg" className="h-12 w-full text-base font-bold" disabled={busy}>
           {busy ? "Un momento…" : copy.submit}
@@ -123,6 +133,11 @@ export function AuthForm({ mode }: { mode: Mode }) {
       </p>
     </div>
   );
+}
+
+function authErrors(err: unknown): FormErrors {
+  if (err instanceof ApiError && err.status === 422) return toFormErrors(err, err.message);
+  return { fields: {}, form: authErrorMessage(err) };
 }
 
 /** Friendly text for auth failures. Server details (SQL, stack traces) never reach the screen. */

@@ -10,6 +10,7 @@ import { disablePush, enablePush, isPushEnabled, pushSupported } from "@/lib/pus
 import { useSession } from "@/lib/session";
 import { DeleteAccount } from "./delete-account";
 import { ProfileForm } from "./profile-form";
+import { FormAlert } from "@/components/matchpa/form-alert";
 
 type PushState = "loading" | "unsupported" | "on" | "off" | "denied";
 
@@ -72,7 +73,7 @@ function VerifyEmailNotice() {
     <Card role="status" className="gap-3 border-brand-lime/60 bg-brand-lime/10 py-4">
       <CardContent className="space-y-3">
         <p className="text-sm">Tu correo no está verificado. Verifícalo para publicar y unirte a partidos.</p>
-        {failed ? <p role="alert" className="text-sm text-destructive">No pudimos enviar el código. Intenta de nuevo.</p> : null}
+        <FormAlert message={failed ? "No pudimos enviar el código. Intenta de nuevo." : null} />
         <Button className="h-11 w-full" onClick={startVerification} disabled={busy}>
           {busy ? "Enviando…" : "Verificar correo"}
         </Button>

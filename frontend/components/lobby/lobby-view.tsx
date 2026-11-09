@@ -12,7 +12,8 @@ import { PushPrompt } from "@/components/matchpa/push-prompt";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { track } from "@/lib/analytics";
 import { useVerifiedAction } from "@/components/auth/verify-email-dialog";
-import { api, ApiError } from "@/lib/api";
+import { api } from "@/lib/api";
+import { notifyError } from "@/lib/notify";
 import { byCategoryDistance, formatAvailabilityWindow } from "@/lib/format";
 import {
   useAvailabilities,
@@ -62,9 +63,6 @@ export function LobbyView() {
   const refresh = useRefreshLobby();
   useLobbyRealtime(user?.id);
 
-  const [actionError, setActionError] = useState<string | null>(null);
-  const error = actionError;
-
   const [joiningCode, setJoiningCode] = useState<string | null>(null);
   const [cancelling, setCancelling] = useState(false);
   const [availabilityOpen, setAvailabilityOpen] = useState(false);
@@ -81,7 +79,6 @@ export function LobbyView() {
 
   async function requestToJoin(match: Match) {
     setJoiningCode(match.code);
-    setActionError(null);
     try {
       await api.requestToJoin(match.code);
       track("join_request", { source: "lobby" });
@@ -89,11 +86,7 @@ export function LobbyView() {
       refresh();
     } catch (err) {
       if (handleError(err)) return;
-      setActionError(
-        err instanceof ApiError
-          ? err.message
-          : "No se pudo enviar la solicitud",
-      );
+      notifyError(err, "No se pudo enviar la solicitud");
     } finally {
       setJoiningCode(null);
     }
@@ -101,16 +94,11 @@ export function LobbyView() {
 
   async function cancelOwnMatch(match: Match) {
     setCancelling(true);
-    setActionError(null);
     try {
       await api.closeMatch(match.code);
       refresh();
     } catch (err) {
-      setActionError(
-        err instanceof ApiError
-          ? err.message
-          : "No se pudo cancelar el partido",
-      );
+      notifyError(err, "No se pudo cancelar el partido");
     } finally {
       setCancelling(false);
     }
@@ -177,12 +165,6 @@ export function LobbyView() {
           className="sm:w-72"
         />
       </div>
-
-      {error ? (
-        <p role="alert" className="text-sm text-destructive">
-          {error}
-        </p>
-      ) : null}
 
       <Tabs defaultValue="matches">
         <TabsList className="w-full sm:w-auto">

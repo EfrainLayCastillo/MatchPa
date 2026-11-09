@@ -10,6 +10,7 @@ import { CODE_LENGTH, CodeField, apiErrorMessage, useCountdown } from "@/compone
 import { api } from "@/lib/api";
 import { safeNextPath } from "@/lib/next-path";
 import { useSession } from "@/lib/session";
+import { FormAlert } from "@/components/matchpa/form-alert";
 
 const RESEND_COOLDOWN_SECONDS = 60;
 
@@ -89,7 +90,7 @@ function VerifyEmailForm() {
       >
         <CodeField value={code} onChange={change} error={error} />
 
-        {error ? <p id="code-error" role="alert" className="text-sm text-destructive">{error}</p> : null}
+        <FormAlert id="code-error" message={error} />
 
         {notice ? <p role="status" className="text-sm text-brand-teal dark:text-brand-lime">{notice}</p> : null}
 
