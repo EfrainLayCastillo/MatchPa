@@ -28,6 +28,7 @@ transmit.registerRoutes()
 
 router
   .group(() => {
+    router.get('health', () => ({ ok: true }))
     router.get('branches', [BranchesController, 'index'])
     router.post('auth/register', [AuthController, 'register']).use(authThrottle)
     router.post('auth/login', [AuthController, 'login']).use(authThrottle)

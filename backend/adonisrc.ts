@@ -75,6 +75,7 @@ export default defineConfig({
     () => import('#start/kernel'),
     () => import('#start/validator'),
     () => import('#start/transmit'),
+    { file: () => import('#start/db_warmer'), environment: ['web'] },
   ],
 
   /*

@@ -28,6 +28,9 @@ Plataformas en plan gratuito: frontend en Vercel, backend en Render y base de da
 ## Limitaciones del plan gratuito
 
 - El backend se duerme tras 15 minutos sin tráfico; la primera petición tarda cerca de un minuto.
+- Neon suspende el cómputo tras 5 minutos sin consultas y despierta en menos de un segundo. El pool usa `min: 0` para no guardar conexiones que la suspensión deja muertas.
+- **Despierto en horas pico (hora de Panamá):** lunes a viernes de 17:00 a 23:00, y sábado y domingo de 07:00 a 23:00. El workflow `.github/workflows/keep-awake.yml` llama `GET /api/health` cada 10 minutos para que Render no se duerma, y `start/db_warmer.ts` hace `select 1` cada 4 minutos mientras el backend está despierto en esas horas. Fuera de esas horas, el primer usuario despierta todo. Las horas viven en `app/services/peak_hours.ts` y en el cron del workflow (en UTC): hay que cambiar los dos.
+- GitHub puede atrasar los cron varios minutos y desactiva los workflows programados tras 60 días sin actividad en el repo.
 - Transmit usa transporte en memoria: mientras haya una sola instancia del backend, el tiempo real funciona; con varias instancias haría falta Redis.
 - Vercel Hobby es para uso no comercial.
 

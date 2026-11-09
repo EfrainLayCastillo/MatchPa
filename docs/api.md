@@ -15,6 +15,7 @@ Base `/api`. Las escrituras con sesión tienen límite por cuenta y responden 42
 | `POST` | `/auth/password/reset` | `{ email, code, password }`. Cambia la contraseña, verifica el correo, cierra las demás sesiones e inicia sesión. Devuelve el usuario. 422 con un solo mensaje para cualquier fallo: `El código no es válido o venció. Pide uno nuevo` |
 | `POST` | `/auth/email/resend` | Envía un código nuevo e invalida el anterior. 204 (también si ya está verificado, sin enviar). 429 si pidió otro hace menos de 60 s o más de 5 en una hora |
 | `POST` | `/auth/logout` | Logout |
+| `GET` | `/health` | `{ ok: true }` sin tocar la base. Lo usa el workflow que mantiene despierto el backend |
 | `GET` | `/me` | Usuario actual, con `emailVerified` |
 | `PATCH` | `/me` | Actualizar perfil (`category`, `categoryTier`, `gender`, `phone`) |
 | `DELETE` | `/me` | Eliminar la cuenta con `{ confirm: "ELIMINAR" }`. Anonimiza, cierra o libera sus partidos futuros y cierra la sesión. 204 |
