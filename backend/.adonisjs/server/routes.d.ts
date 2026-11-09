@@ -12,6 +12,8 @@ export type ScannedRoutes = {
     'auth.login': { paramsTuple?: []; params?: {} }
     'auth.forgot_password': { paramsTuple?: []; params?: {} }
     'auth.reset_password': { paramsTuple?: []; params?: {} }
+    'auth.google_redirect': { paramsTuple?: []; params?: {} }
+    'auth.google_callback': { paramsTuple?: []; params?: {} }
     'matches.show': { paramsTuple: [ParamValue]; params: {'code': ParamValue} }
     'auth.logout': { paramsTuple?: []; params?: {} }
     'auth.verify_email': { paramsTuple?: []; params?: {} }
@@ -39,6 +41,8 @@ export type ScannedRoutes = {
   GET: {
     'event_stream': { paramsTuple?: []; params?: {} }
     'branches.index': { paramsTuple?: []; params?: {} }
+    'auth.google_redirect': { paramsTuple?: []; params?: {} }
+    'auth.google_callback': { paramsTuple?: []; params?: {} }
     'matches.show': { paramsTuple: [ParamValue]; params: {'code': ParamValue} }
     'me.show': { paramsTuple?: []; params?: {} }
     'availabilities.index': { paramsTuple?: []; params?: {} }
@@ -50,6 +54,8 @@ export type ScannedRoutes = {
   HEAD: {
     'event_stream': { paramsTuple?: []; params?: {} }
     'branches.index': { paramsTuple?: []; params?: {} }
+    'auth.google_redirect': { paramsTuple?: []; params?: {} }
+    'auth.google_callback': { paramsTuple?: []; params?: {} }
     'matches.show': { paramsTuple: [ParamValue]; params: {'code': ParamValue} }
     'me.show': { paramsTuple?: []; params?: {} }
     'availabilities.index': { paramsTuple?: []; params?: {} }
