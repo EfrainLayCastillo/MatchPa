@@ -83,6 +83,7 @@ export function LobbyView() {
 
   const [joiningCode, setJoiningCode] = useState<string | null>(null);
   const [cancelling, setCancelling] = useState(false);
+  const [rejectingId, setRejectingId] = useState<number | null>(null);
   const [availabilityOpen, setAvailabilityOpen] = useState(false);
   const [pushOpen, setPushOpen] = useState(false);
 
@@ -112,6 +113,18 @@ export function LobbyView() {
       notifyError(err, "No se pudo enviar la solicitud");
     } finally {
       setJoiningCode(null);
+    }
+  }
+
+  async function rejectInvitation(requestId: number) {
+    setRejectingId(requestId);
+    try {
+      await api.respondToRequest(requestId, "reject");
+      refresh();
+    } catch (err) {
+      notifyError(err, "No se pudo rechazar la invitación");
+    } finally {
+      setRejectingId(null);
     }
   }
 
@@ -157,10 +170,13 @@ export function LobbyView() {
           <h2 className="font-heading text-lg font-bold">Te invitaron</h2>
           <ul className="grid gap-2 md:grid-cols-2">
             {invitations.map((invitation) => (
-              <li key={invitation.id}>
+              <li
+                key={invitation.id}
+                className="flex items-center gap-2 rounded-xl border border-brand-lime bg-brand-lime/30 p-3 text-sm font-semibold"
+              >
                 <Link
                   href={`/partidos/${invitation.match.code}`}
-                  className="flex items-center justify-between gap-3 rounded-xl border border-brand-lime bg-brand-lime/30 p-3 text-sm font-semibold"
+                  className="flex min-w-0 flex-1 items-center justify-between gap-3"
                 >
                   <span>
                     {formatDateTime(invitation.match.startsAt)} · Cancha{" "}
@@ -171,6 +187,15 @@ export function LobbyView() {
                     Responder
                   </span>
                 </Link>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="shrink-0"
+                  onClick={() => rejectInvitation(invitation.id)}
+                  disabled={rejectingId === invitation.id}
+                >
+                  Rechazar
+                </Button>
               </li>
             ))}
           </ul>
