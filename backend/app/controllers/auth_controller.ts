@@ -1,5 +1,4 @@
 import type { HttpContext } from '@adonisjs/core/http'
-import { DateTime } from 'luxon'
 import BusinessRuleError from '#exceptions/business_rule_error'
 import env from '#start/env'
 import User from '#models/user'
@@ -15,6 +14,8 @@ import { safeNextPath } from '#services/next_path'
 import { issueCode, verifyCode } from '#services/email_verification'
 import { requestReset, resetPassword } from '#services/password_reset'
 import { startSession } from '#services/session'
+import { emailCandidates } from '#services/account_lookup'
+import { findOrLinkGoogleUser } from '#services/google_account'
 
 export default class AuthController {
   async register(ctx: HttpContext) {
@@ -86,48 +87,12 @@ export default class AuthController {
     }
 
     const profile = await google.user()
-    const user = await findOrCreateGoogleUser(profile)
+    if (!profile.email) return response.redirect(`${env.get('FRONTEND_URL')}/login`)
+
+    const user = await findOrLinkGoogleUser({ ...profile, email: profile.email })
     if (!user) return response.redirect(`${env.get('FRONTEND_URL')}/login?error=email_registrado`)
 
     await startSession(ctx, user)
     return response.redirect(`${env.get('FRONTEND_URL')}${next}`)
   }
-}
-
-/**
- * Only an existing Google link is reused. A password account with the same email is never
- * linked automatically: the password account may not have verified its email, so linking would
- * let a squatter inherit the owner's access. Returns null in that case.
- */
-async function findOrCreateGoogleUser(profile: {
-  id: string
-  email: string | null
-  name: string
-  avatarUrl: string | null
-  emailVerificationState: string
-}) {
-  const byGoogle = await User.findBy('googleId', profile.id)
-  if (byGoogle) return byGoogle
-
-  if (profile.email && (await User.findBy('email', profile.email))) return null
-
-  return User.create({
-    fullName: profile.name,
-    email: profile.email ?? `${profile.id}@google.matchpa`,
-    googleId: profile.id,
-    avatarUrl: profile.avatarUrl,
-    emailVerifiedAt: profile.emailVerificationState === 'verified' ? DateTime.now() : null,
-  })
-}
-
-/** Password sign-ups store the normalized email; Google accounts store it as Google sends it. */
-function emailCandidates(normalized: string, raw: unknown) {
-  return [
-    ...new Set([
-      normalized,
-      String(raw ?? '')
-        .trim()
-        .toLowerCase(),
-    ]),
-  ]
 }

@@ -8,7 +8,7 @@ import { issueCode, verifyCode } from '#services/email_verification'
 import { requestReset, resetPassword } from '#services/password_reset'
 
 test.group('recuperar contraseña', (group) => {
-  group.each.setup(() => testUtils.db().withGlobalTransaction())
+  group.each.setup(() => testUtils.db().wrapInGlobalTransaction())
   group.each.teardown(() => mail.restore())
 
   async function newUser() {

@@ -8,6 +8,7 @@ Especificación de qué debe cumplir el backend y el frontend. Si el código se 
 - El código vence a los 15 minutos y acepta 5 intentos; después hay que pedir otro. Pedir uno nuevo invalida el anterior.
 - El código se guarda como hash, nunca en claro.
 - Las cuentas creadas con Google nacen verificadas si Google reporta el correo como verificado.
+- Entrar con Google a un correo que ya tiene cuenta (también con las variantes de Gmail con puntos o `+`) vincula Google a esa cuenta solo si su correo está verificado, la cuenta no tiene otro Google y el correo es de Gmail o de un dominio de Google Workspace (`hd`) verificado por Google. Si no, vuelve a `/login` con "Ya tienes una cuenta con ese correo. Entra con tu contraseña o recupérala."
 - Reenvío: espera de 60 s entre códigos y máximo 5 por hora, por usuario.
 - Mientras no esté verificado, el perfil muestra un aviso con el botón "Verificar correo", que envía un código al tocarlo.
 - Publicar, pedir unirse, aceptar una invitación y sugerir una sucursal exigen correo verificado. Lobby, perfil y disponibilidad no: "Hacerlo después" deja explorar.

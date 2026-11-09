@@ -149,6 +149,6 @@ function authErrorMessage(err: unknown): string {
 }
 
 function accountErrorMessage(code: string | null): string | null {
-  if (code === "email_registrado") return "Ya tienes una cuenta con ese correo. Entra con tu contraseña.";
+  if (code === "email_registrado") return "Ya tienes una cuenta con ese correo. Entra con tu contraseña o recupérala.";
   return null;
 }

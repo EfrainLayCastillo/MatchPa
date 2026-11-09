@@ -5,7 +5,7 @@ import Branch from '#models/branch'
 import User from '#models/user'
 
 test.group('subnivel de categoría', (group) => {
-  group.each.setup(() => testUtils.db().withGlobalTransaction())
+  group.each.setup(() => testUtils.db().wrapInGlobalTransaction())
 
   const suffix = () => `${Date.now()}${Math.random().toString(36).slice(2, 6)}`
 

@@ -9,7 +9,7 @@ import { deleteAccount } from '#services/account_deletion'
 import { publishMatch, requestToJoin, respondToRequest } from '#services/match_service'
 
 test.group('eliminar cuenta', (group) => {
-  group.each.setup(() => testUtils.db().withGlobalTransaction())
+  group.each.setup(() => testUtils.db().wrapInGlobalTransaction())
 
   const suffix = () => `${Date.now()}${Math.random().toString(36).slice(2, 6)}`
 

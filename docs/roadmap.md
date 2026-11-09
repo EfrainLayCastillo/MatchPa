@@ -39,7 +39,7 @@
 
 ## Beta: segunda etapa
 
-- [ ] Reactivar Google y vincularlo a la cuenta con el mismo correo solo si ese correo está verificado
+- [x] Reactivar Google y vincularlo a la cuenta con el mismo correo solo si ese correo está verificado
 
 ## Después
 

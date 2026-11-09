@@ -11,7 +11,7 @@ import AuthController from '#controllers/auth_controller'
 import { MAX_ATTEMPTS, issueCode, verifyCode } from '#services/email_verification'
 
 test.group('verificación de correo', (group) => {
-  group.each.setup(() => testUtils.db().withGlobalTransaction())
+  group.each.setup(() => testUtils.db().wrapInGlobalTransaction())
 
   async function newUserWithCode() {
     const { mails } = mail.fake()

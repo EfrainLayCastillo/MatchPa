@@ -16,7 +16,7 @@ import {
 } from '#services/match_service'
 
 test.group('flujo de partidos', (group) => {
-  group.each.setup(() => testUtils.db().withGlobalTransaction())
+  group.each.setup(() => testUtils.db().wrapInGlobalTransaction())
 
   async function fixtures(guestCount: number) {
     const suffix = `${Date.now()}${Math.random().toString(36).slice(2, 6)}`

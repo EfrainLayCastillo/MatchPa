@@ -4,7 +4,7 @@ import { DateTime } from 'luxon'
 import User from '#models/user'
 
 test.group('límites por cuenta', (group) => {
-  group.each.setup(() => testUtils.db().withGlobalTransaction())
+  group.each.setup(() => testUtils.db().wrapInGlobalTransaction())
 
   test('publicar más de 10 veces en una hora responde 429', async ({ client }) => {
     const user = await User.create({

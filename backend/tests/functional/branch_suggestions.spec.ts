@@ -5,7 +5,7 @@ import BranchSuggestion from '#models/branch_suggestion'
 import User from '#models/user'
 
 test.group('sugerir sucursal', (group) => {
-  group.each.setup(() => testUtils.db().withGlobalTransaction())
+  group.each.setup(() => testUtils.db().wrapInGlobalTransaction())
 
   const payload = { name: 'Club Nuevo', locationLabel: 'Costa del Este' }
 
