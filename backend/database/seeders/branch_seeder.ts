@@ -162,6 +162,17 @@ const BRANCHES = [
     mapsUrl: 'https://www.google.com/maps/search/?api=1&query=Proplay+Paitilla+Panam%C3%A1',
   },
   {
+    name: 'Club Unión',
+    slug: 'club-union',
+    locationLabel: 'Paitilla',
+    latitude: 8.975384,
+    longitude: -79.510288,
+    phone: '+507 6378-5076',
+    website: 'https://www.club-union.com',
+    mapsUrl:
+      'https://www.google.com/maps/place/Club+Uni%C3%B3n/@8.9753839,-79.5102882,17z/data=!4m6!3m5!1s0x8faca91f2dd4aaab:0x938f4cd5c1f187af!8m2!3d8.9753839!4d-79.5102882',
+  },
+  {
     name: 'Racket Center',
     slug: 'racket-center',
     locationLabel: 'Vía Israel',
@@ -247,6 +258,61 @@ const BRANCHES = [
     website: 'https://www.instagram.com/royalpadelclub/',
     mapsUrl:
       'https://www.google.com/maps/search/?api=1&query=Royal+Padel+Club+David%2C+Chiriqu%C3%AD+Panam%C3%A1',
+  },
+  {
+    name: 'Santa María Country Club',
+    slug: 'santa-maria-country-club',
+    locationLabel: 'Santa María',
+    latitude: 9.028901,
+    longitude: -79.451174,
+    phone: '+507 304-5555',
+    website: null,
+    mapsUrl:
+      'https://www.google.com/maps/place/Santa+Mar%C3%ADa+Country+Club/@9.0289012,-79.4511738,17z/data=!4m6!3m5!1s0x8facabe63818f807:0xe66e30800267836d!8m2!3d9.0289012!4d-79.4511738',
+  },
+  {
+    name: 'Hacienda Country Club',
+    slug: 'hacienda-country-club',
+    locationLabel: 'Cerro Azul',
+    latitude: 9.134122,
+    longitude: -79.348705,
+    phone: null,
+    website: null,
+    mapsUrl:
+      'https://www.google.com/maps/place/Hacienda+Country+Club+Casa+Club/@9.1341218,-79.348705,17z/data=!4m6!3m5!1s0x8e54ac906560d1e9:0xbd4762ee11e1c314!8m2!3d9.1341218!4d-79.348705',
+  },
+  {
+    name: 'The Point Padel Social Club',
+    slug: 'the-point-padel-social-club',
+    locationLabel: 'San Francisco',
+    latitude: 8.981755,
+    longitude: -79.508691,
+    phone: null,
+    website: null,
+    mapsUrl:
+      'https://www.google.com/maps/place/The+Point+Padel+Social+Club/@8.9817554,-79.5086914,17z/data=!4m6!3m5!1s0x8faca98e2ff22b5d:0x81822e77216e1377!8m2!3d8.9817554!4d-79.5086914',
+  },
+  {
+    name: 'Buenaventura Sports Club',
+    slug: 'buenaventura-sports-club',
+    locationLabel: 'Buenaventura, Coclé',
+    latitude: 8.350466,
+    longitude: -80.162282,
+    phone: '+507 6415-8333',
+    website: 'https://buenaventura.com.pa',
+    mapsUrl:
+      'https://www.google.com/maps/place/Buenaventura+Sports+Club/@8.3504663,-80.1622816,17z/data=!4m6!3m5!1s0x8fadab8c56631e79:0xb09e804606bb6ba3!8m2!3d8.3504663!4d-80.1622816',
+  },
+  {
+    name: 'Padel Bar',
+    slug: 'padel-bar-chiriqui',
+    locationLabel: 'David, Chiriquí',
+    latitude: 8.448098,
+    longitude: -82.42222,
+    phone: null,
+    website: null,
+    mapsUrl:
+      'https://www.google.com/maps/place/Padel+Bar/@8.4480982,-82.4222201,17z/data=!4m6!3m5!1s0x8fa59d642b539ca9:0x5f2e6a3bf382ab06!8m2!3d8.4480982!4d-82.4222201',
   },
 ]
 
