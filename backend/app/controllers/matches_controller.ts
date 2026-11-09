@@ -42,7 +42,7 @@ export default class MatchesController {
     const match = await publishMatch(organizer, {
       ...data,
       startsAt,
-      durationMinutes: data.durationMinutes as 90 | 120,
+      durationMinutes: data.durationMinutes as 60 | 90 | 120,
       guests,
     })
     matchChanged(match.code)
@@ -66,7 +66,7 @@ export default class MatchesController {
     const updated = await updateMatch(params.code, {
       ...data,
       startsAt,
-      durationMinutes: data.durationMinutes as 90 | 120,
+      durationMinutes: data.durationMinutes as 60 | 90 | 120,
       guests,
     })
     matchChanged(updated.code)

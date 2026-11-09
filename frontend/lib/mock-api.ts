@@ -4,6 +4,7 @@ import { ApiError } from "./errors";
 import { dateKey } from "./panamaFormatDate";
 
 import type {
+  MatchDuration,
   Availability,
   Category,
   CategoryTier,
@@ -28,7 +29,7 @@ interface StoredMatch {
   branchId: number;
   courtNumber: number;
   startsAt: string;
-  durationMinutes: 90 | 120;
+  durationMinutes: MatchDuration;
   category: Match["category"];
   categoryTier: Match["categoryTier"];
   type: MatchType;
@@ -410,7 +411,7 @@ export async function mockRequest<T>(method: Method, fullPath: string, body?: un
       branchId: Number(input.branchId),
       courtNumber: Number(input.courtNumber),
       startsAt: String(input.startsAt),
-      durationMinutes: input.durationMinutes as 90 | 120,
+      durationMinutes: input.durationMinutes as MatchDuration,
       category: input.category as Match["category"],
       categoryTier: (input.categoryTier as Match["categoryTier"]) ?? null,
       type: input.type as MatchType,
@@ -433,7 +434,7 @@ export async function mockRequest<T>(method: Method, fullPath: string, body?: un
       courtNumber: Number(input.courtNumber),
       startsAt: String(input.startsAt),
       updatedAt: new Date().toISOString(),
-      durationMinutes: input.durationMinutes as 90 | 120,
+      durationMinutes: input.durationMinutes,
       category: input.category as Match["category"],
       categoryTier: (input.categoryTier as Match["categoryTier"]) ?? null,
       type: input.type as MatchType,

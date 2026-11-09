@@ -41,7 +41,7 @@ Especificación de qué debe cumplir el backend y el frontend. Si el código se 
 - Si un jugador sale o lo sacan, se libera el puesto; un partido `full` que no ha empezado vuelve a `open`.
 - No puedes unirte a tu propio partido ni tener dos solicitudes activas en el mismo.
 - Al salir de `open`, las solicitudes pendientes pasan a `cancelled`.
-- Duración: 90 o 120 minutos.
+- Duración: 60, 90 o 120 minutos.
 - **Sin solapamientos:** un jugador no puede tener dos partidos abiertos o completos que se crucen en horario. Cuenta tanto los que organiza como los que tiene aceptados. Aplica al pedir unirse, al recibir una invitación y al aceptar.
 - **Máximo 7 por día:** un jugador no puede tener más de 7 partidos el mismo día (hora de Panamá), contando los que organiza y los que tiene aceptados.
 - Un organizador con partido abierto o completo no puede sumarse a otro que se cruce en horario.

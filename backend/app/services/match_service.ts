@@ -23,7 +23,7 @@ export interface MatchInput {
   branchId: number
   courtNumber: number
   startsAt: DateTime
-  durationMinutes: 90 | 120
+  durationMinutes: 60 | 90 | 120
   category: number
   categoryTier?: 'high' | 'entry' | null
   type: MatchType

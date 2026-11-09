@@ -12,6 +12,7 @@ export type RequestStatus =
 
 export type Category = 1 | 2 | 3 | 4 | 5 | 6 | 7;
 export type CategoryTier = "high" | "entry";
+export type MatchDuration = 60 | 90 | 120;
 
 export interface Branch {
   id: number;
@@ -97,7 +98,7 @@ export interface Match {
   courtNumber: number;
   startsAt: string;
   updatedAt: string | null;
-  durationMinutes: 90 | 120;
+  durationMinutes: MatchDuration;
   category: Category;
   categoryTier: CategoryTier | null;
   type: MatchType;
@@ -115,7 +116,7 @@ export interface NewMatchInput {
   branchId: number;
   courtNumber: number;
   startsAt: string;
-  durationMinutes: 90 | 120;
+  durationMinutes: MatchDuration;
   category: Category;
   categoryTier?: CategoryTier | null;
   type: MatchType;

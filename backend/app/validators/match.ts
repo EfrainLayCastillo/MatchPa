@@ -10,7 +10,7 @@ export const matchValidator = vine.create({
   branchId: vine.number().positive(),
   courtNumber: vine.number().min(1).max(50),
   startsAt: vine.string().trim(),
-  durationMinutes: vine.number().in([90, 120]),
+  durationMinutes: vine.number().in([60, 90, 120]),
   category: vine.number().in([1, 2, 3, 4, 5, 6, 7]),
   categoryTier: vine
     .enum(['high', 'entry'] as const)

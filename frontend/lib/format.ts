@@ -1,5 +1,5 @@
 import { formatClock12, todayKey } from "./panamaFormatDate";
-import type { Availability, Category, CategoryTier, Gender, MatchStatus, MatchType } from "./types";
+import type { Availability, Category, CategoryTier, Gender, MatchDuration, MatchStatus, MatchType } from "./types";
 
 const CATEGORY_LABELS: Record<Category, string> = {
   1: "1ra",
@@ -54,8 +54,10 @@ export function byCategoryDistance(mine: { category: Category | null; categoryTi
   return <T extends { category: Category; categoryTier?: CategoryTier | null }>(a: T, b: T) => distance(a) - distance(b);
 }
 
-export function formatDuration(minutes: 90 | 120): string {
-  return minutes === 90 ? "1h 30min" : "2 horas";
+export const MATCH_DURATIONS: MatchDuration[] = [60, 90, 120];
+
+export function formatDuration(minutes: MatchDuration): string {
+  return `${minutes} minutos`;
 }
 
 export function firstName(fullName: string): string {

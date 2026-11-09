@@ -32,7 +32,9 @@ import { FieldError } from "@/components/ui/field";
 import { CategoryTierPicker } from "@/components/matchpa/category-tier-picker";
 import {
   CATEGORIES,
+  formatDuration,
   GENDER_LABELS,
+  MATCH_DURATIONS,
   shortCategory,
   TYPE_LABELS,
 } from "@/lib/format";
@@ -50,6 +52,7 @@ import type {
   Branch,
   Gender,
   Match,
+  MatchDuration,
   MatchType,
   NewMatchInput,
 } from "@/lib/types";
@@ -78,8 +81,8 @@ function MatchFormBody({ match }: { match?: Match }) {
   const [time, setTime] = useState(() =>
     match ? formatClock(match.startsAt) : "18:00",
   );
-  const [duration, setDuration] = useState<"90" | "120">(
-    match ? (String(match.durationMinutes) as "90" | "120") : "90",
+  const [duration, setDuration] = useState<MatchDuration>(
+    match?.durationMinutes ?? 90,
   );
   const [branchId, setBranchId] = useState(
     match ? String(match.branch.id) : (presetBranch ?? ""),
@@ -139,7 +142,7 @@ function MatchFormBody({ match }: { match?: Match }) {
       branchId: Number(branchId),
       courtNumber: Number(courtNumber),
       startsAt: new Date(`${date}T${time}:00-05:00`).toISOString(),
-      durationMinutes: Number(duration) as 90 | 120,
+      durationMinutes: duration,
       category,
       categoryTier,
       type,
@@ -274,15 +277,18 @@ function MatchFormBody({ match }: { match?: Match }) {
           <div className="grid grid-cols-2 gap-3">
             <Field label="Duración">
               <Select
-                value={duration}
-                onValueChange={(value) => setDuration(value as "90" | "120")}
+                value={String(duration)}
+                onValueChange={(value) => setDuration(Number(value) as MatchDuration)}
               >
                 <SelectTrigger className="w-full">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="90">1h 30min</SelectItem>
-                  <SelectItem value="120">2 horas</SelectItem>
+                  {MATCH_DURATIONS.map((minutes) => (
+                    <SelectItem key={minutes} value={String(minutes)}>
+                      {formatDuration(minutes)}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </Field>

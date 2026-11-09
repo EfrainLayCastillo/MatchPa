@@ -29,7 +29,7 @@ export default class Match extends BaseModel {
   declare startsAt: DateTime
 
   @column()
-  declare durationMinutes: 90 | 120
+  declare durationMinutes: 60 | 90 | 120
 
   @column()
   declare category: number
