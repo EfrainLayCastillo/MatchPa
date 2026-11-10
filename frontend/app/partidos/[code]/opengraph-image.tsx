@@ -1,4 +1,5 @@
 import { ImageResponse } from "next/og";
+import { BRAND } from "@/lib/brand-colors";
 import { formatCategory, TYPE_LABELS } from "@/lib/format";
 import { formatDateTime } from "@/lib/panamaFormatDate";
 import { fetchPublicMatch } from "@/lib/public-match";
@@ -21,8 +22,8 @@ export default async function Image({ params }: { params: Promise<{ code: string
           width: "100%",
           height: "100%",
           padding: 72,
-          background: "#003c3c",
-          color: "#f5f0f0",
+          background: BRAND.teal,
+          color: BRAND.ivory,
         }}
       >
         <div style={{ display: "flex", fontSize: 40, fontWeight: 800 }}>MatchPa</div>
@@ -45,8 +46,8 @@ export default async function Image({ params }: { params: Promise<{ code: string
               alignSelf: "flex-start",
               padding: "16px 32px",
               borderRadius: 999,
-              background: "#e6fa50",
-              color: "#003c3c",
+              background: BRAND.lime,
+              color: BRAND.teal,
               fontSize: 36,
               fontWeight: 800,
             }}
