@@ -5,9 +5,12 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { PageTitle } from "@/components/matchpa/page-title";
+import { PlayerSummary } from "@/components/matchpa/player-identity";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { api, ApiError } from "@/lib/api";
 import { disablePush, enablePush, isPushEnabled, pushSupported } from "@/lib/push";
 import { useSession } from "@/lib/session";
+import type { User } from "@/lib/types";
 import { DeleteAccount } from "./delete-account";
 import { ProfileForm } from "./profile-form";
 import { FormAlert } from "@/components/matchpa/form-alert";
@@ -25,20 +28,25 @@ export function ProfileView() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-md space-y-8 px-4 pb-16 pt-6">
-      <PageTitle hint={user?.email}>{user?.fullName}</PageTitle>
+    <div className="mx-auto w-full max-w-md space-y-6 px-4 pb-16 pt-6">
+      <PageTitle className="text-2xl sm:text-3xl">Mi perfil</PageTitle>
+
+      {user ? <ProfileSummary user={user} /> : null}
 
       {user?.emailVerified === false ? <VerifyEmailNotice /> : null}
 
-      <section className="space-y-4">
-        <h2 className="font-heading text-lg font-bold">Mis datos</h2>
-        <ProfileForm mode="profile" />
-      </section>
-
-      <section className="space-y-3">
-        <h2 className="font-heading text-lg font-bold">Notificaciones</h2>
-        <PushToggle />
-      </section>
+      <Tabs defaultValue="data">
+        <TabsList className="w-full">
+          <TabsTrigger value="data">Mis datos</TabsTrigger>
+          <TabsTrigger value="notifications">Notificaciones</TabsTrigger>
+        </TabsList>
+        <TabsContent value="data" className="mt-4">
+          <ProfileForm mode="profile" />
+        </TabsContent>
+        <TabsContent value="notifications" className="mt-4">
+          <PushToggle />
+        </TabsContent>
+      </Tabs>
 
       <Button variant="outline" className="w-full" onClick={logout}>
         Cerrar sesión
@@ -46,6 +54,21 @@ export function ProfileView() {
 
       <DeleteAccount />
     </div>
+  );
+}
+
+function ProfileSummary({ user }: { user: User }) {
+  return (
+    <Card className="px-4">
+      <PlayerSummary
+        name={user.fullName.trim() || user.email}
+        verified={user.emailVerified}
+        gender={user.gender}
+        category={user.category}
+        tier={user.categoryTier}
+        caption={<p className="truncate text-xs text-muted-foreground">{user.email}</p>}
+      />
+    </Card>
   );
 }
 

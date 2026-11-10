@@ -58,6 +58,7 @@ export interface Player {
   categoryTier: CategoryTier | null;
   gender: Gender;
   avatarUrl: string | null;
+  emailVerified: boolean;
   availability: Availability;
 }
 
@@ -65,6 +66,7 @@ export interface Guest {
   id: number;
   name: string;
   category: Category;
+  categoryTier: CategoryTier | null;
   gender: Gender;
 }
 
@@ -74,6 +76,7 @@ export interface MatchPlayer {
   category: Category;
   categoryTier: CategoryTier | null;
   gender: Gender;
+  emailVerified: boolean;
 }
 
 export interface MatchRequest {
@@ -87,7 +90,17 @@ export interface MyRequest {
   id: number;
   kind: RequestKind;
   status: RequestStatus;
-  match: { code: string; startsAt: string; courtNumber: number; branchName: string };
+  match: {
+    code: string;
+    startsAt: string;
+    courtNumber: number;
+    branchName: string;
+    status: MatchStatus;
+    category: Category;
+    categoryTier: CategoryTier | null;
+    durationMinutes: MatchDuration;
+    type: MatchType;
+  };
 }
 
 export interface Match {

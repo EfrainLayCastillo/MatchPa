@@ -33,7 +33,7 @@ export function serializeUser(user: User) {
 }
 
 function serializePlayer(
-  user: Pick<User, 'id' | 'fullName' | 'category' | 'categoryTier' | 'gender'>
+  user: Pick<User, 'id' | 'fullName' | 'category' | 'categoryTier' | 'gender' | 'emailVerifiedAt'>
 ) {
   return {
     id: user.id,
@@ -41,6 +41,7 @@ function serializePlayer(
     category: user.category,
     categoryTier: user.categoryTier,
     gender: user.gender,
+    emailVerified: Boolean(user.emailVerifiedAt),
   }
 }
 
@@ -93,6 +94,7 @@ export function serializeMatch(match: Match, viewer: User | null) {
       id: guest.id,
       name: guest.name,
       category: guest.category,
+      categoryTier: guest.categoryTier,
       gender: guest.gender,
     })),
     players: [match.organizer, ...accepted.map((request) => request.user)].map(serializePlayer),

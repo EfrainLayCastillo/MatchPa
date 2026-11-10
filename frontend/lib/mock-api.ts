@@ -141,7 +141,7 @@ const matches: StoredMatch[] = [
     maxPlayers: 4,
     updatedAt: new Date().toISOString(),
     closed: false,
-    guests: [{ id: 1, name: "Efrain Lay", category: 4, gender: "male" }],
+    guests: [{ id: 1, name: "Efrain Lay", category: 4, categoryTier: null, gender: "male" }],
     requests: [],
   },
   {
@@ -237,7 +237,7 @@ function spotsLeft(match: StoredMatch): number {
 function playerOf(userId: number) {
   const user = users.find((u) => u.id === userId);
   if (!user) fail(404, "Jugador no encontrado");
-  return { id: user.id, fullName: user.fullName, category: user.category ?? 4, categoryTier: user.categoryTier, gender: user.gender ?? "male" };
+  return { id: user.id, fullName: user.fullName, category: user.category ?? 4, categoryTier: user.categoryTier, gender: user.gender ?? "male", emailVerified: user.emailVerified };
 }
 
 function viewOf(match: StoredMatch): Match {
@@ -301,7 +301,7 @@ function playersFor(date: string, branchId?: number): Player[] {
     .flatMap((u) => {
       const slot = (availabilities.get(u.id) ?? []).find((a) => a.date === date);
       if (!slot || (branchId !== undefined && slot.branchId !== branchId)) return [];
-      return [{ id: u.id, fullName: u.fullName, category: u.category!, categoryTier: u.categoryTier, gender: u.gender!, avatarUrl: null, availability: slot }];
+      return [{ id: u.id, fullName: u.fullName, category: u.category!, categoryTier: u.categoryTier, gender: u.gender!, avatarUrl: null, emailVerified: u.emailVerified, availability: slot }];
     });
 }
 
@@ -509,6 +509,11 @@ export async function mockRequest<T>(method: Method, fullPath: string, body?: un
             startsAt: match.startsAt,
             courtNumber: match.courtNumber,
             branchName: branches.find((c) => c.id === match.branchId)!.name,
+            status: viewOf(match).status,
+            category: match.category,
+            categoryTier: match.categoryTier,
+            durationMinutes: match.durationMinutes,
+            type: match.type,
           },
         })),
     );

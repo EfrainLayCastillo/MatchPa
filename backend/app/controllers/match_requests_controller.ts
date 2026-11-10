@@ -2,6 +2,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import MatchRequest from '#models/match_request'
 import { notifyRequestAnswered } from '#services/notifications'
 import { respondToRequest } from '#services/match_service'
+import { effectiveStatus } from '#services/match_rules'
 import { matchChanged, requestChanged } from '#services/realtime'
 import { requestActionValidator } from '#validators/match'
 
@@ -21,6 +22,11 @@ export default class MatchRequestsController {
         startsAt: request.match.startsAt.toISO(),
         courtNumber: request.match.courtNumber,
         branchName: request.match.branch.name,
+        status: effectiveStatus(request.match),
+        category: request.match.category,
+        categoryTier: request.match.categoryTier,
+        durationMinutes: request.match.durationMinutes,
+        type: request.match.type,
       },
     }))
   }

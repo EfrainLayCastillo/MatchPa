@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { DateField } from "@/components/matchpa/date-field";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Select,
   SelectContent,
@@ -28,11 +29,12 @@ import {
   type FieldErrors,
 } from "@/lib/form-errors";
 import { FormAlert } from "@/components/matchpa/form-alert";
+import { WHITE_FIELDS } from "@/lib/field-styles";
+import { InviteNotice } from "@/components/matchpa/invite-notice";
 import { FieldError } from "@/components/ui/field";
 import { CategoryTierPicker } from "@/components/matchpa/category-tier-picker";
 import {
   CATEGORIES,
-  formatDuration,
   GENDER_LABELS,
   MATCH_DURATIONS,
   shortCategory,
@@ -60,6 +62,7 @@ import type {
 interface GuestDraft {
   name: string;
   category: Category;
+  categoryTier: CategoryTier | null;
   gender: Gender;
 }
 
@@ -76,7 +79,7 @@ function MatchFormBody({ match }: { match?: Match }) {
   const [date, setDate] = useState(() =>
     match
       ? dateKey(new Date(match.startsAt))
-      : validDate(presetDate) ?? todayKey(),
+      : (validDate(presetDate) ?? todayKey()),
   );
   const [time, setTime] = useState(() =>
     match ? formatClock(match.startsAt) : "18:00",
@@ -103,9 +106,10 @@ function MatchFormBody({ match }: { match?: Match }) {
   );
   const [guests, setGuests] = useState<GuestDraft[]>(() =>
     match
-      ? match.guests.map(({ name, category, gender }) => ({
+      ? match.guests.map(({ name, category, categoryTier, gender }) => ({
           name,
           category,
+          categoryTier,
           gender,
         }))
       : [],
@@ -118,6 +122,11 @@ function MatchFormBody({ match }: { match?: Match }) {
   const [publishReady, setPublishReady] = useState(false);
 
   const seatsForGuests = Number(maxPlayers) - 1;
+  const branchLocked =
+    inviteeId !== null && presetBranch !== null && branchId === presetBranch;
+  const dateLocked = inviteeId !== null && date === validDate(presetDate);
+  const whereComplete =
+    Object.keys(whereErrors(branchId, courtNumber)).length === 0;
 
   useEffect(() => {
     api
@@ -226,28 +235,40 @@ function MatchFormBody({ match }: { match?: Match }) {
   }
 
   return (
-    <form ref={formRef} onSubmit={submit} noValidate className="space-y-6">
+    <form
+      ref={formRef}
+      onSubmit={submit}
+      noValidate
+      className={`space-y-6 ${WHITE_FIELDS}`}
+    >
       {inviteeId ? (
-        <p className="rounded-xl bg-brand-lime/40 p-3 text-sm">
+        <InviteNotice>
           Al publicar le enviaremos la invitación a{" "}
           <strong>{inviteeName}</strong>.
-        </p>
+        </InviteNotice>
       ) : null}
-      <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-        Paso {step + 1} de 2
-      </p>
+      <Tabs
+        value={String(step)}
+        onValueChange={(value) => (value === "1" ? goNext() : setStep(0))}
+      >
+        <TabsList className="w-full">
+          <TabsTrigger value="0">Cuándo y dónde</TabsTrigger>
+          <TabsTrigger value="1" disabled={!whereComplete}>
+            El partido
+          </TabsTrigger>
+        </TabsList>
 
-      {step === 0 ? (
-        <Section title="Cuándo y dónde">
-          <div className="grid grid-cols-2 gap-3">
-            <Field label="Fecha" htmlFor="date">
-              <DateField
-                id="date"
-                value={date}
-                min={todayKey()}
-                onChange={setDate}
-              />
-            </Field>
+        <TabsContent value="0" className="mt-4 space-y-3">
+          <Field label="Fecha" htmlFor="date">
+            <DateField
+              id="date"
+              value={date}
+              min={todayKey()}
+              onChange={setDate}
+              disabled={dateLocked}
+            />
+          </Field>
+          <div className="grid grid-cols-3 gap-2">
             <Field label="Hora" htmlFor="time" error={errors.fields.startsAt}>
               <Select
                 value={time}
@@ -273,12 +294,12 @@ function MatchFormBody({ match }: { match?: Match }) {
                 </SelectContent>
               </Select>
             </Field>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
             <Field label="Duración">
               <Select
                 value={String(duration)}
-                onValueChange={(value) => setDuration(Number(value) as MatchDuration)}
+                onValueChange={(value) =>
+                  setDuration(Number(value) as MatchDuration)
+                }
               >
                 <SelectTrigger className="w-full">
                   <SelectValue />
@@ -286,7 +307,7 @@ function MatchFormBody({ match }: { match?: Match }) {
                 <SelectContent>
                   {MATCH_DURATIONS.map((minutes) => (
                     <SelectItem key={minutes} value={String(minutes)}>
-                      {formatDuration(minutes)}
+                      {minutes} min
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -327,13 +348,15 @@ function MatchFormBody({ match }: { match?: Match }) {
                 clearField("branchId");
               }}
               onSuggest={setSuggestQuery}
+              disabled={branchLocked}
               {...invalidProps("branch", errors.fields.branchId)}
             />
           </Field>
           {match ? null : (
             <p className="-mt-1 text-xs text-muted-foreground">
-              Los jugadores disponibles de ese día se mostrarán filtrados por la
-              sucursal de este partido.
+              {branchLocked || dateLocked
+                ? `Fecha y sucursal fijas: son las de la disponibilidad de ${inviteeName ?? "tu invitado"}.`
+                : "Los jugadores disponibles de ese día se mostrarán filtrados por la sucursal de este partido."}
             </p>
           )}
           <SuggestBranchDialog
@@ -341,12 +364,10 @@ function MatchFormBody({ match }: { match?: Match }) {
             onOpenChange={(open) => !open && setSuggestQuery(null)}
             initialName={suggestQuery ?? ""}
           />
-        </Section>
-      ) : null}
+        </TabsContent>
 
-      {step === 1 ? (
-        <>
-          <Section title="El partido">
+        <TabsContent value="1" className="mt-4 space-y-6">
+          <div className="space-y-3">
             <Field label="Categoría">
               <Select
                 value={category.toString()}
@@ -366,6 +387,15 @@ function MatchFormBody({ match }: { match?: Match }) {
                 </SelectContent>
               </Select>
             </Field>
+            <CategoryTierPicker
+              id="categoryTier"
+              value={categoryTier}
+              onChange={(value) => {
+                setCategoryTier(value);
+                clearField("categoryTier");
+              }}
+              error={errors.fields.categoryTier}
+            />
 
             <Field label="Tipo">
               <RadioGroup
@@ -384,15 +414,6 @@ function MatchFormBody({ match }: { match?: Match }) {
                 ))}
               </RadioGroup>
             </Field>
-            <CategoryTierPicker
-              id="categoryTier"
-              value={categoryTier}
-              onChange={(value) => {
-                setCategoryTier(value);
-                clearField("categoryTier");
-              }}
-              error={errors.fields.categoryTier}
-            />
             <Field label="Jugadores en el partido">
               <Select
                 value={maxPlayers}
@@ -411,7 +432,7 @@ function MatchFormBody({ match }: { match?: Match }) {
                 </SelectContent>
               </Select>
             </Field>
-          </Section>
+          </div>
 
           <Section title="¿Ya tienes jugadores?">
             <p className="text-sm text-muted-foreground">
@@ -452,7 +473,7 @@ function MatchFormBody({ match }: { match?: Match }) {
                       <FieldError id={`guest-${index}-error`} className="-mt-1">
                         {errors.fields[`guests.${index}.name`]}
                       </FieldError>
-                      <div className="grid grid-cols-2 gap-2">
+                      <div className="grid gap-3">
                         <Select
                           value={guest.category.toString()}
                           onValueChange={(value) =>
@@ -475,6 +496,13 @@ function MatchFormBody({ match }: { match?: Match }) {
                             ))}
                           </SelectContent>
                         </Select>
+                        <CategoryTierPicker
+                          id={`guest-${index}-tier`}
+                          value={guest.categoryTier}
+                          onChange={(value) =>
+                            updateGuest(index, { categoryTier: value })
+                          }
+                        />
                         <Select
                           value={guest.gender}
                           onValueChange={(value) =>
@@ -508,15 +536,15 @@ function MatchFormBody({ match }: { match?: Match }) {
               onClick={() =>
                 setGuests((current) => [
                   ...current,
-                  { name: "", category, gender: "male" },
+                  { name: "", category, categoryTier: null, gender: "male" },
                 ])
               }
             >
               Agregar jugador
             </Button>
           </Section>
-        </>
-      ) : null}
+        </TabsContent>
+      </Tabs>
 
       <FormAlert message={errors.form} />
 
@@ -553,7 +581,7 @@ function MatchFormBody({ match }: { match?: Match }) {
               ? "Guardando…"
               : match
                 ? "Guardar cambios"
-                : "Publicar partido"}
+                : "Crear nuevo partido"}
           </Button>
         )}
       </div>
@@ -610,7 +638,9 @@ function whereErrors(branchId: string, courtNumber: string): FieldErrors {
 }
 
 function validDate(value: string | null): string | null {
-  return value && /^\d{4}-\d{2}-\d{2}$/.test(value) && value >= todayKey() ? value : null;
+  return value && /^\d{4}-\d{2}-\d{2}$/.test(value) && value >= todayKey()
+    ? value
+    : null;
 }
 
 function guestErrors(guests: GuestDraft[]): FieldErrors {

@@ -1,9 +1,8 @@
-import { GlobeIcon, MapPinIcon, MessageCircleIcon, PhoneIcon } from "lucide-react";
-import { isPanamaMobile, whatsappUrl } from "@/lib/whatsapp";
-import { Button } from "@/components/ui/button";
+import { GlobeIcon, MapPinIcon, PhoneIcon, type LucideIcon } from "lucide-react";
+import { Card } from "@/components/ui/card";
 import type { Branch } from "@/lib/types";
 
-function directionsHref(branch: Branch): string | null {
+export function directionsHref(branch: Branch): string | null {
   if (branch.latitude !== null && branch.longitude !== null) {
     return `https://www.google.com/maps/dir/?api=1&destination=${branch.latitude},${branch.longitude}`;
   }
@@ -14,27 +13,39 @@ function websiteLabel(url: string): string {
   return url.includes("instagram.com") ? "Instagram" : "Sitio web";
 }
 
-export function BranchContact({ branch }: { branch: Branch }) {
-  const directions = directionsHref(branch);
-  const links = [
-    directions && { label: "Cómo llegar", href: directions, icon: MapPinIcon, external: true },
-    branch.phone && isPanamaMobile(branch.phone) && { label: "WhatsApp", href: whatsappUrl(branch.phone), icon: MessageCircleIcon, external: true },
-    branch.phone && { label: "Llamar", href: `tel:${branch.phone}`, icon: PhoneIcon, external: false },
-    branch.website && { label: websiteLabel(branch.website), href: branch.website, icon: GlobeIcon, external: true },
-  ].filter((link) => !!link);
-
-  if (links.length === 0) return null;
-
+export function BranchDetails({ branch }: { branch: Branch }) {
   return (
-    <div className="flex flex-wrap gap-2">
-      {links.map(({ label, href, icon: Icon, external }) => (
-        <Button key={label} asChild variant="outline" size="sm" className="h-11">
-          <a href={href} {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}>
-            <Icon className="size-4" />
-            {label}
+    <Card className="gap-2 px-4">
+      <p className="font-heading text-base font-bold leading-tight">{branch.name}</p>
+      <DetailRow icon={MapPinIcon}>{branch.locationLabel}</DetailRow>
+      {branch.phone ? (
+        <DetailRow icon={PhoneIcon}>
+          <a href={`tel:${branch.phone}`} className="underline-offset-4 hover:underline">
+            {branch.phone}
           </a>
-        </Button>
-      ))}
-    </div>
+        </DetailRow>
+      ) : null}
+      {branch.website ? (
+        <DetailRow icon={GlobeIcon}>
+          <a
+            href={branch.website}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-semibold text-brand-teal underline-offset-4 hover:underline dark:text-brand-lime"
+          >
+            {websiteLabel(branch.website)}
+          </a>
+        </DetailRow>
+      ) : null}
+    </Card>
+  );
+}
+
+function DetailRow({ icon: Icon, children }: { icon: LucideIcon; children: React.ReactNode }) {
+  return (
+    <p className="flex min-h-6 items-center gap-2 text-sm text-muted-foreground">
+      <Icon aria-hidden className="size-4 shrink-0 text-brand-teal dark:text-brand-lime" />
+      <span className="min-w-0 truncate">{children}</span>
+    </p>
   );
 }

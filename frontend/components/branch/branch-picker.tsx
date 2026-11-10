@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckIcon, ChevronsUpDownIcon, PlusIcon } from "lucide-react";
+import { CheckIcon, ChevronsUpDownIcon, LockIcon, PlusIcon } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -23,12 +23,13 @@ interface BranchPickerProps {
   extraOption?: { value: string; label: string };
   onSuggest?: (query: string) => void;
   id?: string;
+  disabled?: boolean;
   "aria-invalid"?: boolean;
   "aria-describedby"?: string;
   className?: string;
 }
 
-export function BranchPicker({ branches, value, onChange, emptyOption, extraOption, onSuggest, id, className, ...aria }: BranchPickerProps) {
+export function BranchPicker({ branches, value, onChange, emptyOption, extraOption, onSuggest, id, disabled, className, ...aria }: BranchPickerProps) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
 
@@ -62,11 +63,16 @@ export function BranchPicker({ branches, value, onChange, emptyOption, extraOpti
           variant="outline"
           role="combobox"
           aria-expanded={open}
+          disabled={disabled}
           {...aria}
           className={cn("h-11 w-full justify-between font-normal", !selected && !emptyOption && "text-muted-foreground", className)}
         >
           <span className="truncate">{triggerLabel}</span>
-          <ChevronsUpDownIcon className="size-4 shrink-0 opacity-50" />
+          {disabled ? (
+            <LockIcon aria-hidden className="size-4 shrink-0 opacity-50" />
+          ) : (
+            <ChevronsUpDownIcon className="size-4 shrink-0 opacity-50" />
+          )}
         </Button>
       </PopoverTrigger>
       <PopoverContent align="start" className="w-(--radix-popover-trigger-width) min-w-64 p-0">

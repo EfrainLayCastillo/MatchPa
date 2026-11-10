@@ -3,14 +3,25 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { ClockIcon, MapPinIcon } from "lucide-react";
+import { IconBadge } from "@/components/match/match-summary-card";
+import { FormAlert } from "@/components/matchpa/form-alert";
+import { InviteNotice } from "@/components/matchpa/invite-notice";
+import { PlayerSummary } from "@/components/matchpa/player-identity";
+import { Card } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { useVerifiedAction } from "@/components/auth/verify-email-dialog";
 import { api } from "@/lib/api";
-import { GENDER_LABELS, firstName, formatAvailabilityWindow, formatCategory } from "@/lib/format";
+import { formatDistance } from "@/lib/distance";
+import { firstName, formatAvailabilityWindow } from "@/lib/format";
 import { dateKey } from "@/lib/panamaFormatDate";
 import type { Match, Player } from "@/lib/types";
-import { DistanceTag } from "./distance-tag";
 
 interface PlayerCardProps {
   player: Player;
@@ -18,7 +29,11 @@ interface PlayerCardProps {
   distanceKm?: number | null;
 }
 
-export function PlayerCard({ player, branchName, distanceKm }: PlayerCardProps) {
+export function PlayerCard({
+  player,
+  branchName,
+  distanceKm,
+}: PlayerCardProps) {
   const router = useRouter();
   const { guard } = useVerifiedAction();
   const [matches, setMatches] = useState<Match[] | null>(null);
@@ -61,23 +76,59 @@ export function PlayerCard({ player, branchName, distanceKm }: PlayerCardProps) 
   }
 
   return (
-    <Card className="gap-3 py-4">
-      <CardContent className="flex items-center justify-between gap-3">
-        <div className="min-w-0 space-y-1">
-          <p className="truncate font-heading text-lg font-bold leading-tight">{player.fullName}</p>
-          <p className="text-sm text-muted-foreground">
-            {formatCategory(player.category, player.categoryTier)} categoría · {GENDER_LABELS[player.gender]}
+    <Card className="gap-3 px-4">
+      <PlayerSummary
+        name={player.fullName}
+        verified={player.emailVerified}
+        gender={player.gender}
+        category={player.category}
+        tier={player.categoryTier}
+        caption={
+          <p className="flex min-w-0 items-center gap-1 text-xs text-muted-foreground">
+            <MapPinIcon
+              aria-hidden
+              className="size-3.5 shrink-0 text-brand-teal dark:text-brand-lime"
+            />
+            <span className="truncate">
+              {branchName(availability.branchId)}
+            </span>
+            {distanceKm != null ? (
+              <span className="shrink-0 font-semibold text-brand-teal dark:text-brand-lime">
+                · {formatDistance(distanceKm)}
+              </span>
+            ) : null}
           </p>
-          <p className="text-xs text-muted-foreground">
-            {formatAvailabilityWindow(availability)} · {branchName(availability.branchId)}
-            {distanceKm != null ? <DistanceTag km={distanceKm} /> : null}
-          </p>
-        </div>
-        <Button size="sm" variant="outline" onClick={invite} disabled={busy} className="shrink-0">
-          Ey Pa, ¿juegas?
-        </Button>
-      </CardContent>
-      <InviteDialog player={player} matches={matches} onClose={() => setMatches(null)} />
+        }
+        extraBadges={
+          <IconBadge icon={ClockIcon}>
+            {formatAvailabilityWindow(availability)}
+          </IconBadge>
+        }
+        action={
+          <div className="flex flex-col items-center gap-1">
+            <span
+              aria-hidden
+              className="font-script text-lg leading-none text-brand-teal dark:text-brand-lime"
+            >
+              Ey Pa,
+            </span>
+            <Button
+              size="sm"
+              onClick={invite}
+              disabled={busy}
+              aria-label={`Ey Pa, ¿juegas? Invitar a ${player.fullName}`}
+              className="font-bold"
+            >
+              ¿Juegas?
+            </Button>
+          </div>
+        }
+      />
+      <InviteDialog
+        player={player}
+        matches={matches}
+        onClose={() => setMatches(null)}
+      />
     </Card>
   );
 }
@@ -91,21 +142,27 @@ function InviteDialog({
   matches: Match[] | null;
   onClose: () => void;
 }) {
-  const [message, setMessage] = useState<string | null>(null);
+  const [sent, setSent] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const playerName = firstName(player.fullName);
 
   async function invite(match: Match) {
     try {
+      setError(null);
       await api.invite(match.code, player.id);
-      setMessage(`Listo, le enviamos la invitación a ${playerName}.`);
-    } catch (error) {
-      setMessage(error instanceof Error ? error.message : "No se pudo enviar la invitación");
+      setSent(true);
+    } catch (err) {
+      setSent(false);
+      setError(
+        err instanceof Error ? err.message : "No se pudo enviar la invitación",
+      );
     }
   }
 
   function handleOpenChange(open: boolean) {
     if (!open) {
-      setMessage(null);
+      setSent(false);
+      setError(null);
       onClose();
     }
   }
@@ -115,21 +172,34 @@ function InviteDialog({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Invitar a {playerName}</DialogTitle>
-          <DialogDescription>Elige el partido al que lo quieres sumar.</DialogDescription>
+          <DialogDescription>
+            Elige el partido al que lo quieres sumar.
+          </DialogDescription>
         </DialogHeader>
         <ul className="space-y-2">
           {(matches ?? []).map((match) => (
             <li key={match.id}>
-              <Button variant="outline" className="w-full justify-between" onClick={() => invite(match)}>
+              <Button
+                variant="outline"
+                className="w-full justify-between"
+                onClick={() => invite(match)}
+              >
                 <span>
                   Cancha {match.courtNumber} · {match.branch.name}
                 </span>
-                <span className="text-muted-foreground">Faltan {match.spotsLeft}</span>
+                <span className="text-muted-foreground">
+                  Faltan {match.spotsLeft}
+                </span>
               </Button>
             </li>
           ))}
         </ul>
-        {message ? <p role="status" className="text-sm font-medium">{message}</p> : null}
+        {sent ? (
+          <InviteNotice sent>
+            Listo, le enviamos la invitación a <strong>{playerName}</strong>.
+          </InviteNotice>
+        ) : null}
+        <FormAlert message={error} />
       </DialogContent>
     </Dialog>
   );

@@ -34,7 +34,7 @@ Especificación de qué debe cumplir el backend y el frontend. Si el código se 
 
 - Fecha de hoy o futura.
 - Máximo de jugadores: 4 por defecto, hasta 6.
-- El organizador cuenta como jugador. Los que ya tiene son **invitados** (nombre, categoría, género), sin cuenta.
+- El organizador cuenta como jugador. Los que ya tiene son **invitados** (nombre, categoría, subnivel opcional, género), sin cuenta.
 - **Puestos disponibles** = máximo − organizador − invitados − aceptados.
 - Sin puestos → `full`. El organizador puede cerrar antes (`closed`), por ejemplo con 4 de 6.
 - Solo el organizador aprueba, invita, saca jugadores, edita y cierra. No puede invitarse a sí mismo.
@@ -90,6 +90,7 @@ Una sola entidad, `match_requests`, con `kind`:
 - **Sucursal obligatoria:** el jugador elige dónde puede jugar ese día. Sin sucursal no se guarda.
 - Si organizas partidos abiertos ese día, la pestaña Jugadores (y Partidos) viene filtrada por sus sucursales (todas, si son varias). Con la fecha en "Todos (próximos)", Partidos no se filtra porque abarca varios días. Se puede cambiar a mano; al cambiar de fecha vuelve a la automática. Al crear un partido se avisa: "Los jugadores disponibles de ese día se mostrarán filtrados por la sucursal de este partido."
 - "Invitar" en un jugador ofrece solo tus partidos abiertos de la misma fecha y sucursal que su disponibilidad. Si no hay ninguno, propone publicar uno con esa fecha, esa sucursal y la invitación precargadas.
+- Al publicar desde "Invitar", la fecha y la sucursal quedan **fijas** (no editables): son las de la disponibilidad del jugador. Si la fecha ya pasó o la sucursal ya no existe, se pueden editar. Hora y cancha siguen libres.
 - **Horarios cada 30 minutos** (`:00` o `:30`, la API también lo valida), mostrados en formato de 12 horas (`8:30 a. m.`). El fin del día se guarda como `24:00` y se muestra como `12:00 a. m.`.
 - Hoy, `Desde` no puede ser antes de la próxima media hora (redondeada hacia arriba). Si ya no quedan medias horas hoy, no se puede guardar, con o sin horario. La API valida lo mismo.
 - Un jugador comprometido ese día (organiza o tiene una solicitud aceptada en un partido abierto o completo) no aparece en la lista de disponibles de ese día.
@@ -99,7 +100,7 @@ Una sola entidad, `match_requests`, con `kind`:
 
 - 1ra (más alta) a 7ma, guardadas como entero `1`–`7`.
 - La elige el jugador y la actualiza en su perfil.
-- Subnivel opcional (`category_tier`) en el jugador y en el partido: `high` = "alta" ("5ta alta"), `entry` = "de entrada" ("5ta de entrada"), `null` = sin precisar.
+- Subnivel opcional (`category_tier`) en el jugador, en el partido y en sus invitados: `high` = "alta" ("5ta alta"), `entry` = "de entrada" ("5ta de entrada"), `null` = sin precisar.
 - Nivel efectivo: `category − ⅓` si es alta, `category + ⅓` si es de entrada. 5ta alta queda más cerca de 4ta que de 5ta de entrada.
 - No filtra, ordena: el lobby muestra primero lo más cercano a tu nivel efectivo (`abs(nivel − mío)`).
 
@@ -113,11 +114,12 @@ Una sola entidad, `match_requests`, con `kind`:
 
 ### Ficha en el detalle del partido
 
-| Botón | Se muestra si | Abre |
+Sección "Sucursal" con nombre, zona y los datos que el club publique. "Cómo llegar" va en la barra fija de abajo.
+
+| Dato | Se muestra si | Al tocarlo |
 |---|---|---|
 | Cómo llegar | Hay coordenadas o `maps_url` | Google Maps con ruta a las coordenadas; si no hay, `maps_url` |
-| WhatsApp | El teléfono es celular (8 dígitos que empiezan con 6) | `wa.me` |
-| Llamar | Hay teléfono | `tel:` |
+| Teléfono | Hay teléfono | `tel:` |
 | Website / Instagram | Hay website | La URL |
 
 ### Sugerir sucursal

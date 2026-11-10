@@ -22,6 +22,13 @@ export function nextDayKeys(count: number): string[] {
   return Array.from({ length: count }, (_, i) => dateKey(new Date(start.getTime() + i * DAY_MS)));
 }
 
+/** Full month name of a day key, e.g. "noviembre". */
+export function formatMonth(key: string): string {
+  return new Intl.DateTimeFormat("es-PA", { timeZone: PANAMA_TZ, month: "long" }).format(
+    new Date(`${key}T12:00:00${PANAMA_OFFSET}`),
+  );
+}
+
 /** "Hoy" for today, otherwise the short weekday and day, e.g. "mié 28". */
 export function formatDay(key: string): string {
   if (key === todayKey()) return "Hoy";

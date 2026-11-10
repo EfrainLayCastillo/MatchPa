@@ -1,11 +1,8 @@
-import Link from "next/link";
+import { ClockIcon, LandPlotIcon, UsersIcon, VenusAndMarsIcon } from "lucide-react";
+import { IconBadge, MatchSummaryCard } from "@/components/match/match-summary-card";
 import { Button } from "@/components/ui/button";
-import { StatusBadge } from "@/components/matchpa/status-badge";
-import { Card, CardContent } from "@/components/ui/card";
-import { formatCategory, formatDuration, TYPE_LABELS } from "@/lib/format";
-import { formatDateTime } from "@/lib/panamaFormatDate";
+import { TYPE_LABELS } from "@/lib/format";
 import type { Match } from "@/lib/types";
-import { DistanceTag } from "./distance-tag";
 
 interface MatchCardProps {
   match: Match;
@@ -15,47 +12,35 @@ interface MatchCardProps {
 }
 
 export function MatchCard({ match, onJoin, joining, distanceKm }: MatchCardProps) {
-  const canJoin = match.status === "open" && !match.isOrganizer && !match.myRequest;
-
   return (
-    <Card className="gap-3 py-4">
-      <CardContent className="space-y-3">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <p className="font-heading text-lg font-bold leading-tight">{formatDateTime(match.startsAt)}</p>
-            <p className="text-sm text-muted-foreground">
-              {match.branch.name} · Cancha {match.courtNumber} · {formatDuration(match.durationMinutes)}
-              {distanceKm != null ? <DistanceTag km={distanceKm} /> : null}
-            </p>
-          </div>
-          <StatusBadge status={match.status} />
-        </div>
+    <MatchSummaryCard
+      match={match}
+      distanceKm={distanceKm}
+      image="bg2"
+      badges={[
+        <IconBadge key="court" icon={LandPlotIcon}>Cancha {match.courtNumber}</IconBadge>,
+        <IconBadge key="duration" icon={ClockIcon}>{match.durationMinutes} min</IconBadge>,
+        <IconBadge key="type" icon={VenusAndMarsIcon}>{TYPE_LABELS[match.type]}</IconBadge>,
+        <IconBadge key="spots" icon={UsersIcon}>
+          Faltan {match.spotsLeft} de {match.maxPlayers - 1}
+        </IconBadge>,
+      ]}
+      footer={joinAction({ match, onJoin, joining })}
+    />
+  );
+}
 
-        <div className="flex flex-wrap gap-2 text-xs font-semibold">
-          <span className="rounded-md bg-brand-lime/60 px-2 py-1 text-brand-teal dark:bg-brand-lime dark:text-brand-teal">
-            {formatCategory(match.category, match.categoryTier)}
-          </span>
-          <span className="rounded-md bg-muted px-2 py-1">{TYPE_LABELS[match.type]}</span>
-          <span className="rounded-md bg-muted px-2 py-1">
-            Faltan {match.spotsLeft} de {match.maxPlayers - 1}
-          </span>
-        </div>
-
-        <div className="flex items-center justify-between gap-2">
-          <Link href={`/partidos/${match.code}`} className="text-sm font-semibold text-brand-teal underline-offset-4 hover:underline dark:text-brand-lime">
-            Ver partido
-          </Link>
-          {canJoin ? (
-            <Button size="sm" onClick={() => onJoin(match)} disabled={joining}>
-              Pedir unirme
-            </Button>
-          ) : match.myRequest ? (
-            <span className="text-sm text-muted-foreground">
-              {match.myRequest.status === "accepted" ? "Ya juegas" : "Solicitud enviada"}
-            </span>
-          ) : null}
-        </div>
-      </CardContent>
-    </Card>
+function joinAction({ match, onJoin, joining }: Omit<MatchCardProps, "distanceKm">): React.ReactNode {
+  if (match.myRequest)
+    return (
+      <span className="text-sm text-muted-foreground">
+        {match.myRequest.status === "accepted" ? "Ya juegas" : "Solicitud enviada"}
+      </span>
+    );
+  if (match.status !== "open" || match.isOrganizer) return null;
+  return (
+    <Button size="sm" onClick={() => onJoin(match)} disabled={joining}>
+      Pedir unirme
+    </Button>
   );
 }

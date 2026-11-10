@@ -15,6 +15,9 @@ export default class MatchGuest extends BaseModel {
   declare category: number
 
   @column()
+  declare categoryTier: 'high' | 'entry' | null
+
+  @column()
   declare gender: 'male' | 'female'
 
   @column.dateTime({ autoCreate: true })

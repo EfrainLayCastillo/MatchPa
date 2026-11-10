@@ -2,17 +2,24 @@
 
 import { CardListSkeleton } from "@/components/matchpa/skeletons";
 import { useQuery } from "@tanstack/react-query";
-import Link from "next/link";
+import {
+  ClockIcon,
+  CrownIcon,
+  LandPlotIcon,
+  MailOpenIcon,
+  SendIcon,
+  UserCheckIcon,
+  UsersIcon,
+  VenusAndMarsIcon,
+} from "lucide-react";
 import { useMemo, useState } from "react";
 import { PageTitle } from "@/components/matchpa/page-title";
-import { StatusBadge } from "@/components/matchpa/status-badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { SectionHeading } from "@/components/matchpa/section-heading";
+import { IconBadge, MatchSummaryCard } from "@/components/match/match-summary-card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { api } from "@/lib/api";
-import { formatCategory, formatDuration, TYPE_LABELS } from "@/lib/format";
+import { TYPE_LABELS } from "@/lib/format";
 import { lobbyKeys } from "@/lib/lobby-queries";
-import { formatDateTime } from "@/lib/panamaFormatDate";
 import type { Match, MyRequest } from "@/lib/types";
 
 type SortBy = "updated" | "match";
@@ -54,11 +61,11 @@ export function MyMatchesView() {
 
   return (
     <>
-      <PageTitle hint="Los partidos que organizas o en los que juegas.">Mis partidas</PageTitle>
+      <PageTitle className="text-2xl sm:text-3xl">Mis partidas</PageTitle>
 
-      <div className="flex flex-col gap-2 sm:flex-row">
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
         <Select value={branch} onValueChange={setBranch}>
-          <SelectTrigger className="w-full sm:w-56" aria-label="Sucursal">
+          <SelectTrigger className="h-11! w-full min-w-0 bg-card" aria-label="Sucursal">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -71,7 +78,7 @@ export function MyMatchesView() {
           </SelectContent>
         </Select>
         <Select value={sortBy} onValueChange={(value) => setSortBy(value as SortBy)}>
-          <SelectTrigger className="w-full sm:w-56" aria-label="Orden">
+          <SelectTrigger className="h-11! w-full min-w-0 bg-card" aria-label="Orden">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -83,8 +90,8 @@ export function MyMatchesView() {
 
       {pending.length > 0 ? (
         <section className="space-y-2">
-          <h2 className="font-heading text-lg font-bold">Pendientes</h2>
-          <ul className="space-y-2">
+          <SectionHeading>Pendientes</SectionHeading>
+          <ul className="grid grid-cols-1 gap-3 md:grid-cols-2">
             {pending.map((request) => (
               <li key={request.id}>
                 <PendingRow request={request} />
@@ -95,7 +102,7 @@ export function MyMatchesView() {
       ) : null}
 
       <section className="space-y-2">
-        <h2 className="font-heading text-lg font-bold">Partidos</h2>
+        <SectionHeading>Partidos</SectionHeading>
         {matchesQuery.isPending ? (
           <CardListSkeleton />
         ) : matches.length === 0 ? (
@@ -105,7 +112,7 @@ export function MyMatchesView() {
               : `No tienes partidos en ${branch}.`}
           </p>
         ) : (
-          <ul className="space-y-3">
+          <ul className="grid grid-cols-1 gap-3 md:grid-cols-2">
             {matches.map((match) => (
               <li key={match.id}>
                 <MatchRow match={match} />
@@ -127,59 +134,52 @@ function sorter(sortBy: SortBy) {
 }
 
 function MatchRow({ match }: { match: Match }) {
-  const seated = match.players.length + match.guests.length;
-
   return (
-    <Card className="gap-3 py-4">
-      <CardContent className="space-y-3">
-        <div className="flex items-start justify-between gap-3">
-          <div className="space-y-1">
-            <p className="font-heading text-lg font-bold leading-tight">{formatDateTime(match.startsAt)}</p>
-            <p className="text-sm text-muted-foreground">
-              {match.branch.name} · Cancha {match.courtNumber} · {formatDuration(match.durationMinutes)}
-            </p>
-          </div>
-          <StatusBadge status={match.status} />
-        </div>
-
-        <div className="flex flex-wrap gap-2 text-xs font-semibold">
-          <span className="rounded-md bg-brand-teal px-2 py-1 text-brand-ivory">
-            {match.isOrganizer ? "Organizas" : "Juegas"}
-          </span>
-          <span className="rounded-md bg-muted px-2 py-1">{formatCategory(match.category, match.categoryTier)} categoría</span>
-          <span className="rounded-md bg-muted px-2 py-1">{TYPE_LABELS[match.type]}</span>
-          <span className="rounded-md bg-muted px-2 py-1">
-            {seated}/{match.maxPlayers} jugadores
-          </span>
-        </div>
-
-        <div className="flex items-center justify-between gap-3">
-          {match.updatedAt ? (
-            <span className="text-xs text-muted-foreground">Actualizado {formatDateTime(match.updatedAt)}</span>
-          ) : (
-            <span />
-          )}
-          <Button asChild size="sm" variant="outline">
-            <Link href={`/partidos/${match.code}`}>Ver partido</Link>
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+    <MatchSummaryCard
+      match={match}
+      image={null}
+      badges={[
+        <IconBadge key="role" icon={match.isOrganizer ? CrownIcon : UserCheckIcon}>
+          {match.isOrganizer ? "Organizas" : "Juegas"}
+        </IconBadge>,
+        <IconBadge key="court" icon={LandPlotIcon}>
+          Cancha {match.courtNumber}
+        </IconBadge>,
+        <IconBadge key="duration" icon={ClockIcon}>
+          {match.durationMinutes} min
+        </IconBadge>,
+        <IconBadge key="type" icon={VenusAndMarsIcon}>
+          {TYPE_LABELS[match.type]}
+        </IconBadge>,
+        <IconBadge key="spots" icon={UsersIcon}>
+          {match.spotsLeft > 0 ? `Faltan ${match.spotsLeft}` : "Completo"}
+        </IconBadge>,
+      ]}
+    />
   );
 }
 
 function PendingRow({ request }: { request: MyRequest }) {
-  const label = request.kind === "invitation" ? "Te invitaron" : "Solicitud enviada";
-
+  const { match } = request;
+  const invited = request.kind === "invitation";
   return (
-    <Link
-      href={`/partidos/${request.match.code}`}
-      className="flex items-center justify-between gap-3 rounded-xl border border-border bg-card p-3 text-sm"
-    >
-      <span>
-        {formatDateTime(request.match.startsAt)} · Cancha {request.match.courtNumber} · {request.match.branchName}
-      </span>
-      <span className="shrink-0 font-semibold text-brand-teal dark:text-brand-lime">{label}</span>
-    </Link>
+    <MatchSummaryCard
+      match={{ ...match, branch: { name: match.branchName } }}
+      image={null}
+      badges={[
+        <IconBadge key="kind" icon={invited ? MailOpenIcon : SendIcon}>
+          {invited ? "Te invitaron" : "Solicitud enviada"}
+        </IconBadge>,
+        <IconBadge key="court" icon={LandPlotIcon}>
+          Cancha {match.courtNumber}
+        </IconBadge>,
+        <IconBadge key="duration" icon={ClockIcon}>
+          {match.durationMinutes} min
+        </IconBadge>,
+        <IconBadge key="type" icon={VenusAndMarsIcon}>
+          {TYPE_LABELS[match.type]}
+        </IconBadge>,
+      ]}
+    />
   );
 }

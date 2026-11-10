@@ -3,6 +3,10 @@ import vine from '@vinejs/vine'
 const guest = vine.object({
   name: vine.string().trim().minLength(2).maxLength(80),
   category: vine.number().in([1, 2, 3, 4, 5, 6, 7]),
+  categoryTier: vine
+    .enum(['high', 'entry'] as const)
+    .nullable()
+    .optional(),
   gender: vine.enum(['male', 'female'] as const),
 })
 

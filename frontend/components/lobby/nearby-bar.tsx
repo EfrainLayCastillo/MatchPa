@@ -3,18 +3,13 @@
 import { LocateFixedIcon, MapPinIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import type { Zone } from "@/lib/distance";
 import type { NearbyOrigin, NearbyStatus } from "@/lib/nearby";
-
-export type LobbySort = "distance" | "level";
 
 interface NearbyBarProps {
   origin: NearbyOrigin | null;
   status: NearbyStatus;
   zones: Zone[];
-  sort: LobbySort;
-  onSortChange: (sort: LobbySort) => void;
   onLocate: () => void;
   onChooseZone: (zone: Zone) => void;
   onClear: () => void;
@@ -55,31 +50,15 @@ function NearbyPrompt({ status, zones, onLocate, onChooseZone }: NearbyBarProps)
   );
 }
 
-function NearbyActive({ origin, sort, onSortChange, onClear }: NearbyBarProps & { origin: NearbyOrigin }) {
+function NearbyActive({ origin, onClear }: NearbyBarProps & { origin: NearbyOrigin }) {
   return (
-    <div className="flex flex-wrap items-center justify-between gap-2">
-      <p className="flex min-h-11 items-center gap-1.5 text-sm text-muted-foreground">
-        <MapPinIcon className="size-4 text-brand-teal dark:text-brand-lime" />
-        Cerca de {origin.zone ?? "tu ubicación"} ·
-        <button type="button" onClick={onClear} className="min-h-11 font-semibold text-brand-teal underline-offset-4 hover:underline dark:text-brand-lime">
-          Cambiar
-        </button>
-      </p>
-      <ToggleGroup
-        type="single"
-        variant="outline"
-        value={sort}
-        onValueChange={(value) => value && onSortChange(value as LobbySort)}
-        aria-label="Ordenar por"
-      >
-        <ToggleGroupItem value="distance" className="h-11 px-4 data-[state=on]:bg-brand-lime/40">
-          Cercanía
-        </ToggleGroupItem>
-        <ToggleGroupItem value="level" className="h-11 px-4 data-[state=on]:bg-brand-lime/40">
-          Nivel
-        </ToggleGroupItem>
-      </ToggleGroup>
-    </div>
+    <p className="flex min-h-11 items-center gap-1.5 text-sm text-muted-foreground">
+      <MapPinIcon className="size-4 text-brand-teal dark:text-brand-lime" />
+      Cerca de {origin.zone ?? "tu ubicación"} ·
+      <button type="button" onClick={onClear} className="min-h-11 font-semibold text-brand-teal underline-offset-4 hover:underline dark:text-brand-lime">
+        Cambiar
+      </button>
+    </p>
   );
 }
 

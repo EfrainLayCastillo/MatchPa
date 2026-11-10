@@ -16,6 +16,7 @@ export type RequestAction = 'accept' | 'reject' | 'leave' | 'remove'
 export interface GuestInput {
   name: string
   category: number
+  categoryTier?: 'high' | 'entry' | null
   gender: 'male' | 'female'
 }
 

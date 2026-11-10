@@ -1,6 +1,6 @@
 "use client";
 
-import { formatDay, nextDayKeys, todayKey } from "@/lib/panamaFormatDate";
+import { formatDay, formatMonth, nextDayKeys, todayKey } from "@/lib/panamaFormatDate";
 import { cn } from "@/lib/utils";
 
 interface DateStripProps {
@@ -8,8 +8,19 @@ interface DateStripProps {
   onChange: (dateKey: string | null) => void;
 }
 
+const STRIP_DAYS = 7;
+
+/** Month of the picked day; with no pick, the month (or months) the strip covers. */
+export function stripMonth(value: string | null): string {
+  if (value) return formatMonth(value);
+  const days = nextDayKeys(STRIP_DAYS);
+  const first = formatMonth(days[0]);
+  const last = formatMonth(days[days.length - 1]);
+  return first === last ? first : `${first} – ${last}`;
+}
+
 export function DateStrip({ value, onChange }: DateStripProps) {
-  const days = nextDayKeys(7);
+  const days = nextDayKeys(STRIP_DAYS);
 
   return (
     <div role="group" aria-label="Fecha" className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none]">

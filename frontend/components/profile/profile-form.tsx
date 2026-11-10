@@ -15,6 +15,7 @@ import { track } from "@/lib/analytics";
 import { api } from "@/lib/api";
 import { invalidProps, toFormErrors, useFormErrors } from "@/lib/form-errors";
 import { CATEGORIES, GENDER_LABELS, shortCategory } from "@/lib/format";
+import { WHITE_FIELDS } from "@/lib/field-styles";
 import { useSession } from "@/lib/session";
 import type { Category, CategoryTier, Gender } from "@/lib/types";
 
@@ -53,7 +54,7 @@ export function ProfileForm({ mode }: ProfileFormProps) {
   }
 
   return (
-    <form ref={formRef} onSubmit={save} noValidate className="space-y-6">
+    <form ref={formRef} onSubmit={save} noValidate className={`space-y-6 ${WHITE_FIELDS}`}>
       <div className="space-y-1.5">
         <Label>Categoría</Label>
         <Select value={category.toString()} onValueChange={(value) => setCategory(Number(value) as Category)}>

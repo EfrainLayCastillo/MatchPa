@@ -1,6 +1,6 @@
 "use client";
 
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, LockIcon } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -14,19 +14,21 @@ interface DateFieldProps {
   /** "YYYY-MM-DD"; earlier days can't be picked. */
   min: string;
   onChange: (value: string) => void;
+  disabled?: boolean;
 }
 
 /** Date picker that stores "YYYY-MM-DD" and never shifts the day across time zones. */
-export function DateField({ id, value, min, onChange }: DateFieldProps) {
+export function DateField({ id, value, min, onChange, disabled }: DateFieldProps) {
   const [open, setOpen] = useState(false);
   const selected = fromKey(value);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button id={id} type="button" variant="outline" className="w-full justify-start font-normal">
+        <Button id={id} type="button" variant="outline" disabled={disabled} className="w-full justify-start font-normal">
           <CalendarIcon className="mr-2 size-4 opacity-70" aria-hidden />
           {formatLongDate(value)}
+          {disabled ? <LockIcon className="ml-auto size-4 opacity-50" aria-hidden /> : null}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="start">

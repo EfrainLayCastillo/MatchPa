@@ -7,7 +7,7 @@ export default function NewMatchPage() {
   return (
     <SessionGate>
       <div className="mx-auto w-full max-w-xl space-y-8 px-4 pb-16 pt-6">
-        <PageTitle hint="Ya tienes cancha? Publica los puestos que te faltan.">Publicar partido</PageTitle>
+        <PageTitle>Crear nuevo partido</PageTitle>
         <Suspense>
           <MatchForm />
         </Suspense>
