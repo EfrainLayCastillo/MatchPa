@@ -210,7 +210,7 @@ export function MatchDetail({
           <BranchDetails branch={match.branch} />
         </section>
       </div>
-      <MatchBottomBar match={match} />
+      <MatchBottomBar match={match} image={image} />
       <PushPrompt
         open={pushOpen}
         onOpenChange={setPushOpen}

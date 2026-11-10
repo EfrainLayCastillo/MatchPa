@@ -5,13 +5,14 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { SITE_URL } from "@/lib/config";
+import type { MatchImage } from "@/lib/match-images";
 import type { Match } from "@/lib/types";
 import { directionsHref } from "./branch-contact";
 
-export function MatchBottomBar({ match }: { match: Match }) {
+export function MatchBottomBar({ match, image }: { match: Match; image: MatchImage }) {
   const directions = directionsHref(match.branch);
   const canShare = match.status === "open" || match.isOrganizer;
-  const storyImage = useStoryImage(canShare ? match.code : null);
+  const storyImage = useStoryImage(canShare ? match.code : null, image);
   if (!directions && !canShare) return null;
 
   return (
@@ -49,12 +50,12 @@ export function MatchBottomBar({ match }: { match: Match }) {
 }
 
 /** Fetched ahead of the tap: iOS blocks the share sheet if the file is downloaded after the user gesture. */
-function useStoryImage(code: string | null): File | null {
+function useStoryImage(code: string | null, image: MatchImage): File | null {
   const [file, setFile] = useState<File | null>(null);
   useEffect(() => {
     if (!code || typeof navigator.canShare !== "function") return;
     let active = true;
-    fetch(`/partidos/${code}/historia`)
+    fetch(`/partidos/${code}/historia?img=${image}`)
       .then((res) => (res.ok ? res.blob() : null))
       .then((blob) => {
         if (!active || !blob) return;
@@ -67,7 +68,7 @@ function useStoryImage(code: string | null): File | null {
     return () => {
       active = false;
     };
-  }, [code]);
+  }, [code, image]);
   return file;
 }
 

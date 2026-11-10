@@ -43,6 +43,9 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   /* config options here */
   cacheComponents: true,
+  outputFileTracingIncludes: {
+    "/partidos/[code]/historia": ["./assets/fonts/**", "./public/logo/logo.svg", "./public/static/**"],
+  },
   partialPrefetching: true,
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
