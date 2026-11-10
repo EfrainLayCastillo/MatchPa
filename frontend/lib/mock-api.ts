@@ -122,8 +122,9 @@ const users: (User & { password: string })[] = [
 const availabilities = new Map<number, Availability[]>();
 const today = dateKey(new Date());
 availabilities.set(2, [{ date: today, fromTime: "17:00", toTime: "21:00", branchId: 1 }]);
-availabilities.set(3, [{ date: today, fromTime: "18:00", toTime: "22:00", branchId: 2 }]);
-availabilities.set(4, [{ date: today, fromTime: "16:00", toTime: "20:00", branchId: 2 }]);
+availabilities.set(3, [{ date: today, fromTime: "18:00", toTime: "22:00", branchId: 1 }]);
+availabilities.set(4, [{ date: today, fromTime: "16:00", toTime: "20:00", branchId: 1 }]);
+availabilities.set(5, [{ date: today, fromTime: "19:00", toTime: "23:00", branchId: 1 }]);
 availabilities.set(6, [{ date: today, fromTime: null, toTime: null, branchId: 1 }]);
 
 const matches: StoredMatch[] = [
@@ -158,7 +159,7 @@ const matches: StoredMatch[] = [
     maxPlayers: 4,
     updatedAt: new Date().toISOString(),
     closed: false,
-    guests: [],
+    guests: [{ id: 1, name: "Diego Pinzón", category: 4, categoryTier: null, gender: "male" }],
     requests: [],
   },
 ];
