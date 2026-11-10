@@ -1,10 +1,11 @@
-import { Clock, LandPlot, MapPin, Trophy, Users, VenusAndMars, type IconNode } from "lucide";
+import { Clock, LandPlot, MapPin, Trophy, Users, VenusAndMars } from "lucide";
 import { ImageResponse } from "next/og";
 import { BRAND } from "@/lib/brand-colors";
 import { formatCategory, STATUS_LABELS, TYPE_LABELS } from "@/lib/format";
 import { toMatchImage } from "@/lib/match-images";
 import { ogFonts, ogLogo, ogPhoto } from "@/lib/og/assets";
 import { OgIcon } from "@/lib/og/icon";
+import { OgPill } from "@/lib/og/parts";
 import { formatDateTime } from "@/lib/panamaFormatDate";
 import { fetchPublicMatch } from "@/lib/public-match";
 import type { Match } from "@/lib/types";
@@ -78,8 +79,8 @@ function MatchSummary({ match }: { match: Match }) {
     <Column>
       <div style={{ display: "flex", flexDirection: "column", gap: 36 }}>
         <div style={{ display: "flex", gap: 16 }}>
-          <Pill background={BRAND.lime}>{STATUS_LABELS[match.status]}</Pill>
-          <Pill icon={Trophy}>{formatCategory(match.category, match.categoryTier)}</Pill>
+          <OgPill background={BRAND.lime}>{STATUS_LABELS[match.status]}</OgPill>
+          <OgPill icon={Trophy}>{formatCategory(match.category, match.categoryTier)}</OgPill>
         </div>
         <div style={{ display: "flex", flexDirection: "column" }}>
           <div style={{ display: "flex", fontSize: 64, fontWeight: 800, textTransform: "capitalize" }}>{day}</div>
@@ -90,10 +91,10 @@ function MatchSummary({ match }: { match: Match }) {
           {`${match.branch.name} · ${match.branch.locationLabel}`}
         </div>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 16 }}>
-          <Pill icon={LandPlot}>{`Cancha ${match.courtNumber}`}</Pill>
-          <Pill icon={Clock}>{`${match.durationMinutes} min`}</Pill>
-          <Pill icon={VenusAndMars}>{TYPE_LABELS[match.type]}</Pill>
-          <Pill icon={Users}>{match.spotsLeft > 0 ? `Faltan ${match.spotsLeft}` : "Completo"}</Pill>
+          <OgPill icon={LandPlot}>{`Cancha ${match.courtNumber}`}</OgPill>
+          <OgPill icon={Clock}>{`${match.durationMinutes} min`}</OgPill>
+          <OgPill icon={VenusAndMars}>{TYPE_LABELS[match.type]}</OgPill>
+          <OgPill icon={Users}>{match.spotsLeft > 0 ? `Faltan ${match.spotsLeft}` : "Completo"}</OgPill>
         </div>
       </div>
       <CallToAction />
@@ -148,26 +149,6 @@ function CallToAction() {
       >
         <OgIcon node={Users} size={56} color={BRAND.teal} />
       </div>
-    </div>
-  );
-}
-
-function Pill({ icon, background = BRAND.secondary, children }: { icon?: IconNode; background?: string; children: string }) {
-  return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: 12,
-        padding: "16px 28px",
-        borderRadius: 999,
-        background,
-        fontSize: 36,
-        fontWeight: 800,
-      }}
-    >
-      {icon ? <OgIcon node={icon} size={36} color={BRAND.teal} /> : null}
-      {children}
     </div>
   );
 }

@@ -1,3 +1,4 @@
+import { DateTime } from 'luxon'
 import type { HttpContext } from '@adonisjs/core/http'
 import MatchRequest from '#models/match_request'
 import { notifyRequestAnswered } from '#services/notifications'
@@ -11,6 +12,9 @@ export default class MatchRequestsController {
     const requests = await MatchRequest.query()
       .where('user_id', auth.getUserOrFail().id)
       .whereIn('status', ['pending'])
+      .whereHas('match', (query) => {
+        query.where('status', 'open').where('starts_at', '>', DateTime.now().toSQL()!)
+      })
       .preload('match', (query) => query.preload('branch'))
       .orderBy('created_at', 'desc')
     return requests.map((request) => ({

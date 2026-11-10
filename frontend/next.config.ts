@@ -40,11 +40,16 @@ const securityHeaders = [
   { key: "Content-Security-Policy-Report-Only", value: buildCsp() },
 ];
 
+/** Files the generated images read from disk; Vercel only ships what is listed for those routes. */
+const OG_ASSETS = ["./assets/fonts/**", "./public/logo/logo.svg", "./public/static/**"];
+
 const nextConfig: NextConfig = {
   /* config options here */
   cacheComponents: true,
   outputFileTracingIncludes: {
-    "/partidos/[code]/historia": ["./assets/fonts/**", "./public/logo/logo.svg", "./public/static/**"],
+    "/partidos/[code]/historia": OG_ASSETS,
+    "/partidos/[code]/opengraph-image*": OG_ASSETS,
+    "/opengraph-image*": OG_ASSETS,
   },
   partialPrefetching: true,
   async headers() {

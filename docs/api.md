@@ -44,7 +44,7 @@ Base `/api`. Las escrituras con sesión tienen límite por cuenta y responden 42
 | `POST` | `/matches/:code/invitations` | Invitar (`userId`) |
 | `PATCH` | `/match-requests/:id` | Ejecutar `action`. 403 `EMAIL_NOT_VERIFIED` si el invitado acepta sin correo verificado |
 | `GET` | `/me/matches` | Partidos que organizo o juego |
-| `GET` | `/me/match-requests` | Mis solicitudes e invitaciones pendientes, con el resumen del partido (fecha, cancha, sucursal, estado, categoría, duración y tipo) |
+| `GET` | `/me/match-requests` | Mis solicitudes e invitaciones pendientes de partidos abiertos y vigentes, con el resumen del partido (fecha, cancha, sucursal, estado, categoría, duración y tipo) |
 
 | `action` | Desde | Quién |
 |---|---|---|

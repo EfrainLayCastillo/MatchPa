@@ -21,7 +21,8 @@ Las URLs son visibles para el usuario, así que van en español.
 | `/onboarding` | Sí | Categoría (con subnivel opcional), género y teléfono. Obligatorio antes del lobby |
 | `/lobby` | Sí | Tarjeta de perfil, carrusel de tus próximos partidos (abiertos o completos, el más cercano primero), selector de fecha, filtro de sucursal (preseleccionado con las de tus partidos del día), menú "Filtros" y pestañas **Partidos** / **Jugadores**. Barra fija con "Estoy disponible" (bottom sheet) y "Crear una partida" |
 | `/partidos/nuevo` | Sí | Crear partido en dos pestañas: **Cuándo y dónde** y **El partido**. La segunda se habilita al completar sucursal y cancha |
-| `/partidos/[code]` | Para actuar | Detalle público. El organizador gestiona solicitudes, invita, saca y cierra; el jugador puede salirse |
+| `/partidos/[code]` | Para actuar | Detalle público: banner con la foto (`?img=`), encabezado, jugadores, panel del organizador y sección Sucursal. Barra fija con "Cómo llegar" y "Compartir". El organizador edita, gestiona solicitudes, invita, saca y cierra; el jugador puede salirse |
+| `/partidos/[code]/historia` | No | Imagen vertical 1080×1920 para historias y Reels. "Compartir" la envía como archivo |
 | `/perfil` | Sí | Editar categoría y subnivel, género y WhatsApp, activar/desactivar push |
 | `/mis-partidas` | Sí | Partidos que organizas o juegas, con estado y filtros por sucursal y orden (por defecto, última actualización) |
 

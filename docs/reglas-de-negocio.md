@@ -72,6 +72,8 @@ Una sola entidad, `match_requests`, con `kind`:
 | `left` | El jugador se salió |
 | `removed` | El organizador lo sacó |
 
+- Una `pending` de un partido expirado no se muestra en "Te invitaron" ni en Mis partidas, y no se puede responder. Sigue `pending` en la BD porque `expired` se calcula al consultar, sin cron.
+
 ## Link para compartir
 
 - URL: `matchpa.app/partidos/<code>`, con `code` aleatorio de 8 caracteres (no el `id`, para evitar enumeración).
@@ -80,7 +82,7 @@ Una sola entidad, `match_requests`, con `kind`:
 - El WhatsApp del organizador solo lo reciben el propio organizador y los jugadores aceptados, y solo mientras el partido está `open` o `full`. Si el partido expiró o se cerró, la API no lo devuelve y el botón no aparece.
 - Si el partido no está `open`, muestra su estado en vez del botón de unirse.
 - Botón Compartir con `navigator.share`; fallback a "Copiar link" y `wa.me/?text=`.
-- Vista previa Open Graph dinámica (`generateMetadata` + `opengraph-image`): sucursal, fecha, hora, categoría y puestos.
+- Vista previa Open Graph dinámica (`generateMetadata` + `opengraph-image`): estado, fecha, hora, sucursal, categoría, tipo y puestos. Mismos datos en la imagen vertical de historias.
 - SEO: JSON-LD `SportsEvent` en partidos `open` y `full`; `noindex` en `closed` y `expired`; código inexistente → 404.
 
 ## Disponibilidad

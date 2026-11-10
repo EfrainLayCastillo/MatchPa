@@ -4,6 +4,7 @@ import { DateTime } from 'luxon'
 import BusinessRuleError from '#exceptions/business_rule_error'
 import EmailNotVerifiedError from '#exceptions/email_not_verified_error'
 import Branch from '#models/branch'
+import Match from '#models/match'
 import MatchRequest from '#models/match_request'
 import User from '#models/user'
 import {
@@ -234,5 +235,22 @@ test.group('flujo de partidos', (group) => {
       () => respondToRequest(request.id, 'accept'),
       'Este jugador aún no verifica su correo'
     )
+  })
+
+  test('una invitación de un partido expirado ya no aparece en mis solicitudes', async ({
+    client,
+    assert,
+  }) => {
+    const { match, players } = await fixtures(0)
+    await inviteToMatch(match.code, players[0].id)
+
+    const before = await client.get('/api/me/match-requests').loginAs(players[0])
+    assert.lengthOf(before.body(), 1)
+
+    await Match.query()
+      .where('id', match.id)
+      .update({ starts_at: DateTime.now().minus({ hours: 1 }).toSQL() })
+    const after = await client.get('/api/me/match-requests').loginAs(players[0])
+    assert.lengthOf(after.body(), 0)
   })
 })
