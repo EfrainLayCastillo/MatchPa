@@ -1,7 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { CircleHelpIcon, LocateFixedIcon, MapPinIcon } from "lucide-react";
+import {
+  CircleHelpIcon,
+  LocateFixedIcon,
+  MapPinIcon,
+  PencilIcon,
+} from "lucide-react";
 import {
   InitialAvatar,
   LevelBadges,
@@ -44,8 +49,12 @@ export function ProfileCard({ user, ...location }: ProfileCardProps) {
   const name = displayName(user);
   return (
     <Card className="relative flex-row items-center gap-3 px-4 has-[a:focus-visible]:ring-3 has-[a:focus-visible]:ring-ring/50">
+      <PencilIcon
+        aria-hidden
+        className="absolute top-2.5 right-2.5 size-3.5 text-muted-foreground"
+      />
       <InitialAvatar name={name} verified={user.emailVerified} />
-      <div className="min-w-0 flex-1">
+      <div className="min-w-0 flex-1 pr-3">
         <LocationSelect {...location} />
         <div className="flex items-center gap-1.5">
           <Link
