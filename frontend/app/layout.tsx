@@ -56,7 +56,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
               <SiteHeader />
               <main className="flex flex-1 flex-col">{children}</main>
               <SiteFooter />
-              <TermsGate />
+              <Suspense fallback={null}>
+                <TermsGate />
+              </Suspense>
             </VerifiedActionProvider>
           </SessionProvider>
         </QueryProvider>
