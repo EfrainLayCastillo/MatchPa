@@ -14,6 +14,7 @@ import { api, API_BASE, ApiError, USING_MOCKS } from "@/lib/api";
 import { invalidProps, toFormErrors, useFormErrors, type FormErrors } from "@/lib/form-errors";
 import { GOOGLE_AUTH_ENABLED } from "@/lib/config";
 import { safeNextPath } from "@/lib/next-path";
+import { track } from "@/lib/analytics";
 import { stashRecoveryEmail } from "@/lib/recovery-email";
 import { isProfileComplete, useSession } from "@/lib/session";
 
@@ -64,8 +65,9 @@ export function AuthForm({ mode }: { mode: Mode }) {
           ? await api.login({ email, password })
           : await api.register({ fullName, email, password, acceptTerms: accepted });
       setUser(user);
+      track(mode === "login" ? "login" : "sign_up", { method: "email" });
       const destination = isProfileComplete(user) ? next : "/onboarding";
-      router.replace(mode === "register" ? `/verificar?next=${encodeURIComponent(destination)}` : destination);
+      router.replace(mode === "register" ? `/verificar?next=${encodeURIComponent(destination)}&origen=registro` : destination);
     } catch (err) {
       fail(authErrors(err));
     } finally {

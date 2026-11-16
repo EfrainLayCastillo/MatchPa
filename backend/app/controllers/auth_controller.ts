@@ -90,13 +90,20 @@ export default class AuthController {
       return response.redirect(`${env.get('FRONTEND_URL')}/login`)
     }
 
-    const profile = await google.user()
-    if (!profile.email) return response.redirect(`${env.get('FRONTEND_URL')}/login`)
+    const frontend = env.get('FRONTEND_URL')
+    let result: Awaited<ReturnType<typeof findOrLinkGoogleUser>>
+    try {
+      const profile = await google.user()
+      if (!profile.email) return response.redirect(`${frontend}/login`)
+      result = await findOrLinkGoogleUser({ ...profile, email: profile.email })
+    } catch (error) {
+      ctx.logger.error({ err: error }, 'google callback failed')
+      return response.redirect(`${frontend}/login`)
+    }
+    if (!result) return response.redirect(`${frontend}/login?error=email_registrado`)
 
-    const user = await findOrLinkGoogleUser({ ...profile, email: profile.email })
-    if (!user) return response.redirect(`${env.get('FRONTEND_URL')}/login?error=email_registrado`)
-
-    await startSession(ctx, user)
-    return response.redirect(`${env.get('FRONTEND_URL')}${next}`)
+    await startSession(ctx, result.user)
+    ctx.session.put('auth_event', result.created ? 'google_signup' : 'google_login')
+    return response.redirect(`${frontend}${next}`)
   }
 }

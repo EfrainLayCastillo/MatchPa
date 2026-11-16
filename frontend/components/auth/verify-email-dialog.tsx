@@ -85,7 +85,7 @@ export function VerifyEmailDialog({ open, onOpenChange, email }: VerifyEmailDial
       }
     }
     const current = `${window.location.pathname}${window.location.search}`;
-    router.push(`/verificar?next=${encodeURIComponent(current)}`);
+    router.push(`/verificar?next=${encodeURIComponent(current)}&origen=accion`);
     setBusy(false);
     onOpenChange(false);
   }

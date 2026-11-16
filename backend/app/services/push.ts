@@ -8,6 +8,8 @@ export interface PushPayload {
   url: string
 }
 
+const PUSH_TIMEOUT_MS = 5000
+
 let configured = false
 
 function configure(): boolean {
@@ -35,7 +37,8 @@ export async function notifyUsers(userIds: number[], payload: PushPayload): Prom
             endpoint: subscription.endpoint,
             keys: { p256dh: subscription.p256dh, auth: subscription.auth },
           },
-          JSON.stringify(payload)
+          JSON.stringify(payload),
+          { timeout: PUSH_TIMEOUT_MS }
         )
         .catch(async (error: { statusCode?: number }) => {
           if (error.statusCode === 404 || error.statusCode === 410) await subscription.delete()

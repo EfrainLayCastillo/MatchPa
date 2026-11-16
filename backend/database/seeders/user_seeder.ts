@@ -3,6 +3,8 @@ import User from '#models/user'
 
 /** Dummy accounts for local development. Password for both: secret123 */
 export default class UserSeeder extends BaseSeeder {
+  static environment = ['development', 'test']
+
   async run() {
     await User.updateOrCreateMany('email', [
       {

@@ -1,6 +1,8 @@
 import env from '#start/env'
 import app from '@adonisjs/core/services/app'
 import { defineConfig } from '@adonisjs/core/http'
+import { timingSafeEqual } from 'node:crypto'
+import { isIP } from 'node:net'
 
 /**
  * The app URL can be used in various places where you want to create absolute
@@ -8,6 +10,13 @@ import { defineConfig } from '@adonisjs/core/http'
  * use absolute URLs.
  */
 export const appUrl = env.get('APP_URL')
+
+function matchesSecret(received: string | undefined, expected: string | undefined): boolean {
+  if (!received || !expected) return false
+  const a = Buffer.from(received)
+  const b = Buffer.from(expected)
+  return a.length === b.length && timingSafeEqual(a, b)
+}
 
 /**
  * The configuration settings used by the HTTP server
@@ -31,6 +40,16 @@ export const http = defineConfig({
    * from anywhere inside your application.
    */
   useAsyncLocalStorage: false,
+
+  /**
+   * The client IP is only read from "x-client-ip" when the frontend proxy proves
+   * itself with "x-proxy-secret". X-Forwarded-For is never trusted.
+   */
+  getIp(request, original) {
+    const clientIp = request.header('x-client-ip')?.trim()
+    const trusted = matchesSecret(request.header('x-proxy-secret'), env.get('PROXY_SECRET'))
+    return trusted && clientIp && isIP(clientIp) ? clientIp : original()
+  },
 
   router: {
     matcher: 'tree',

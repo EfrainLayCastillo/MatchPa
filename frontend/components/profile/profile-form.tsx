@@ -43,7 +43,7 @@ export function ProfileForm({ mode }: ProfileFormProps) {
     try {
       setUser(await api.updateMe({ category, categoryTier, gender, phone: phone.trim() }));
       if (mode === "onboarding") {
-        track("sign_up", { category });
+        track("onboarding_complete", { category });
         router.replace("/lobby");
       }
       else toast.success("Perfil guardado");

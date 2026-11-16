@@ -4,8 +4,9 @@ import { MapPinIcon, Share2Icon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { SITE_URL } from "@/lib/config";
+import { matchRole, track } from "@/lib/analytics";
 import type { MatchImage } from "@/lib/match-images";
+import { shareUrl } from "@/lib/share-url";
 import type { Match } from "@/lib/types";
 import { directionsHref } from "./branch-contact";
 
@@ -38,7 +39,7 @@ export function MatchBottomBar({ match, image }: { match: Match; image: MatchIma
           <Button
             size="lg"
             className="h-12 text-base font-bold"
-            onClick={() => shareMatch(match, storyImage)}
+            onClick={() => shareMatch(match, storyImage, image)}
           >
             <Share2Icon data-icon="inline-start" />
             Compartir
@@ -72,16 +73,23 @@ function useStoryImage(code: string | null, image: MatchImage): File | null {
   return file;
 }
 
-async function shareMatch(match: Match, image: File | null) {
-  const url = `${SITE_URL}/partidos/${match.code}`;
+async function shareMatch(match: Match, file: File | null, image: MatchImage) {
   const text = `Partido de pádel en ${match.branch.name}, cancha ${match.courtNumber}. Faltan ${match.spotsLeft} puestos.`;
+  const common = {
+    content_type: "match",
+    sharer_role: matchRole(match),
+    match_status: match.status,
+  } as const;
   if (typeof navigator.share === "function") {
-    const data: ShareData = image
-      ? { files: [image], text: `${text}\n${url}` }
+    const url = shareUrl(match.code, file ? "story" : "link", image);
+    const data: ShareData = file
+      ? { files: [file], text: `${text}\n${url}` }
       : { title: "Partido de pádel en MatchPa", text, url };
-    await navigator.share(data).catch(() => {});
+    const shared = await navigator.share(data).then(() => true, () => false);
+    if (shared) track("share", { ...common, method: file ? "story_image" : "share_sheet" });
     return;
   }
-  await navigator.clipboard.writeText(url);
+  await navigator.clipboard.writeText(shareUrl(match.code, "copy", image));
+  track("share", { ...common, method: "copy_link" });
   toast.success("Link copiado");
 }

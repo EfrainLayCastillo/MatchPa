@@ -16,7 +16,7 @@ Las URLs son visibles para el usuario, así que van en español.
 | `/beta` | No | Qué es la beta: el problema, por qué nació, cómo se usa y lo que viene. Enlazada desde el badge "Beta" del header |
 | `/login` | No | Google o correo y contraseña |
 | `/registro` | No | Registro básico |
-| `/verificar` | Sí | Código de 6 dígitos para verificar el correo, con reenvío |
+| `/verificar` | Sí | Código de 6 dígitos para verificar el correo, con reenvío. `?origen=registro\|accion\|perfil` solo para la analítica |
 | `/recuperar` | No | Recuperar contraseña: correo, luego código y contraseña nueva |
 | `/privacidad` | No | Política de privacidad (Ley 81). Enlazada desde el footer, el perfil, el registro y el aviso del teléfono |
 | `/terminos` | No | Términos de servicio |

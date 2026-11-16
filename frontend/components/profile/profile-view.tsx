@@ -14,6 +14,7 @@ import type { User } from "@/lib/types";
 import { DeleteAccount } from "./delete-account";
 import { ProfileForm } from "./profile-form";
 import { FormAlert } from "@/components/matchpa/form-alert";
+import { forgetPushOnLogout } from "@/lib/push";
 
 type PushState = "loading" | "unsupported" | "on" | "off" | "denied";
 
@@ -22,6 +23,7 @@ export function ProfileView() {
   const router = useRouter();
 
   async function logout() {
+    await forgetPushOnLogout();
     await api.logout().catch(() => {});
     setUser(null);
     router.replace("/");
@@ -89,7 +91,7 @@ function VerifyEmailNotice() {
         return;
       }
     }
-    router.push("/verificar?next=/perfil");
+    router.push("/verificar?next=/perfil&origen=perfil");
   }
 
   return (

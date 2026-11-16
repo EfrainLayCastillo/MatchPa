@@ -7,6 +7,7 @@ import { PageTitle } from "@/components/matchpa/page-title";
 import { SessionGate } from "@/components/matchpa/session-gate";
 import { Button } from "@/components/ui/button";
 import { CODE_LENGTH, CodeField, apiErrorMessage, useCountdown } from "@/components/auth/code-input";
+import { track } from "@/lib/analytics";
 import { api } from "@/lib/api";
 import { safeNextPath } from "@/lib/next-path";
 import { useSession } from "@/lib/session";
@@ -24,7 +25,9 @@ export function VerifyEmail() {
 
 function VerifyEmailForm() {
   const router = useRouter();
-  const next = safeNextPath(useSearchParams().get("next"));
+  const searchParams = useSearchParams();
+  const next = safeNextPath(searchParams.get("next"));
+  const origin = searchParams.get("origen");
   const { user, setUser } = useSession();
   const [code, setCode] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -61,6 +64,7 @@ function VerifyEmailForm() {
     setNotice(null);
     try {
       setUser(await api.verifyEmail(value));
+      track("email_verified", { context: origin === "registro" ? "signup" : origin === "perfil" ? "profile" : "action" });
       router.replace(next);
     } catch (err) {
       setError(verifyErrorMessage(err));

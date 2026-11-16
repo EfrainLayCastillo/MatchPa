@@ -17,7 +17,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useVerifiedAction } from "@/components/auth/verify-email-dialog";
+import { track } from "@/lib/analytics";
 import { api } from "@/lib/api";
+import { stashInvitee } from "@/lib/invitee-handoff";
 import { formatDistance } from "@/lib/distance";
 import { firstName, formatAvailabilityWindow } from "@/lib/format";
 import { dateKey } from "@/lib/panamaFormatDate";
@@ -65,9 +67,8 @@ export function PlayerCard({
   }
 
   function publishWithInvite() {
+    stashInvitee({ id: player.id, name: player.fullName });
     const params = new URLSearchParams({
-      invitar: String(player.id),
-      nombre: player.fullName,
       fecha: availability.date,
       sucursal: String(availability.branchId),
       n: String(Date.now()),
@@ -150,6 +151,7 @@ function InviteDialog({
     try {
       setError(null);
       await api.invite(match.code, player.id);
+      track("invite_player", { branch: match.branch.slug, entry_point: "pool" });
       setSent(true);
     } catch (err) {
       setSent(false);

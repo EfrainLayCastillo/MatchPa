@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { FieldError } from "@/components/ui/field";
+import { dayBucket, track } from "@/lib/analytics";
 import { api } from "@/lib/api";
 import { notifyError } from "@/lib/notify";
 import { InfoIcon } from "lucide-react";
@@ -71,6 +72,8 @@ function AvailabilityForm({ dateKey, current, branches, onOpenChange, onSaved }:
         toTime: hasWindow ? toTime : null,
         branchId: Number(branchId),
       });
+      const branch = branches.find((b) => b.id === Number(branchId));
+      if (branch) track("set_availability", { branch: branch.slug, has_time_window: hasWindow, day: dayBucket(dateKey) });
       onSaved();
       onOpenChange(false);
     } catch (err) {

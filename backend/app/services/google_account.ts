@@ -46,13 +46,13 @@ function canLink(user: User, profile: GoogleProfile) {
 
 export async function findOrLinkGoogleUser(profile: GoogleProfile) {
   const byGoogle = await User.findBy('googleId', profile.id)
-  if (byGoogle) return byGoogle
+  if (byGoogle) return { user: byGoogle, created: false }
 
   const byEmail = await findByEmail(profile.email)
-  if (!byEmail) return createGoogleUser(profile)
+  if (!byEmail) return { user: await createGoogleUser(profile), created: true }
   if (!canLink(byEmail, profile)) return null
 
   byEmail.googleId = profile.id
   await byEmail.save()
-  return byEmail
+  return { user: byEmail, created: false }
 }

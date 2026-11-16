@@ -13,6 +13,8 @@ import { SessionProvider } from "@/lib/session";
 import { QueryProvider } from "@/components/matchpa/query-provider";
 import { TermsGate } from "@/components/legal/terms-gate";
 import { CookieNotice } from "@/components/legal/cookie-notice";
+import { PageView } from "@/components/analytics/page-view";
+import { Suspense } from "react";
 import { Toaster } from "@/components/ui/sonner";
 
 const inter = Inter({ variable: "--font-inter", subsets: ["latin"] });
@@ -59,6 +61,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           </SessionProvider>
         </QueryProvider>
         <Toaster />
+        <Suspense>
+          <PageView />
+        </Suspense>
         <SpeedInsights />
         {GTM_ID ? <CookieNotice /> : null}
       </body>

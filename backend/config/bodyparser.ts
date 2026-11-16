@@ -18,9 +18,9 @@ const bodyParserConfig = defineConfig({
     convertEmptyStringsToNull: true,
 
     /**
-     * Content types handled by the form parser.
+     * Disabled: the API is JSON only, so cross-site forms cannot post without CORS preflight.
      */
-    types: ['application/x-www-form-urlencoded'],
+    types: [],
   },
 
   /**
@@ -69,9 +69,9 @@ const bodyParserConfig = defineConfig({
     limit: '20mb',
 
     /**
-     * Content types handled by the multipart parser.
+     * Disabled: no endpoint accepts uploads.
      */
-    types: ['multipart/form-data'],
+    types: [],
   },
 })
 

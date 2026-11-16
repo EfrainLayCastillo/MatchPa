@@ -55,6 +55,26 @@ const nextConfig: NextConfig = {
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },
+  async redirects() {
+    const landing = (utm: string) => `/?${utm}`;
+    return [
+      {
+        source: "/ig",
+        destination: landing("utm_source=instagram&utm_medium=social&utm_campaign=bio&utm_content=lanzamiento"),
+        permanent: false,
+      },
+      {
+        source: "/c/:club([a-z0-9-]+)",
+        destination: landing("utm_source=:club&utm_medium=qr&utm_campaign=club_:club"),
+        permanent: false,
+      },
+      {
+        source: "/w/:club([a-z0-9-]+)",
+        destination: landing("utm_source=whatsapp&utm_medium=social&utm_campaign=club_:club"),
+        permanent: false,
+      },
+    ];
+  },
   async rewrites() {
     const backend = process.env.BACKEND_URL;
     if (!backend) return [];

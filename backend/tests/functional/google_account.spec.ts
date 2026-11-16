@@ -35,11 +35,13 @@ test.group('login con Google', (group) => {
 
     const user = await findOrLinkGoogleUser(profile)
 
-    assert.equal(user?.id, existing.id)
+    assert.equal(user?.user.id, existing.id)
+    assert.isFalse(user?.created)
     await existing.refresh()
     assert.equal(existing.googleId, profile.id)
     const again = await findOrLinkGoogleUser(profile)
-    assert.equal(again?.id, existing.id)
+    assert.equal(again?.user.id, existing.id)
+    assert.isFalse(again?.created)
   })
 
   test('no vincula si la cuenta no verificó su correo', async ({ assert }) => {
@@ -63,8 +65,8 @@ test.group('login con Google', (group) => {
     const existing = await passwordUser(`${local}@gmail.com`, true)
     const dotted = `${local.slice(0, 4)}.${local.slice(4)}@gmail.com`
 
-    const user = await findOrLinkGoogleUser(googleProfile(dotted))
-    assert.equal(user?.id, existing.id)
+    const result = await findOrLinkGoogleUser(googleProfile(dotted))
+    assert.equal(result?.user.id, existing.id)
   })
 
   test('no reemplaza otro Google ya vinculado a la cuenta', async ({ assert }) => {
@@ -86,8 +88,8 @@ test.group('login con Google', (group) => {
   })
 
   test('crea la cuenta verificada si el correo es nuevo', async ({ assert }) => {
-    const user = await findOrLinkGoogleUser(googleProfile(`nuevo${suffix()}@gmail.com`))
+    const result = await findOrLinkGoogleUser(googleProfile(`nuevo${suffix()}@gmail.com`))
 
-    assert.isNotNull(user?.emailVerifiedAt)
+    assert.isNotNull(result?.user.emailVerifiedAt)
   })
 })

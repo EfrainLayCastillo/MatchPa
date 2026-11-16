@@ -2,6 +2,7 @@ import { api } from "./api";
 
 const VAPID_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? "";
 const DISMISSED_KEY = "matchpa.push-dismissed";
+const RESUBSCRIBE_KEY = "matchpa.push-resubscribe";
 
 export type PushResult = "enabled" | "denied" | "unsupported";
 
@@ -15,20 +16,32 @@ export function isIosWithoutInstall(): boolean {
 }
 
 export function shouldAskForPush(): boolean {
-  if (!pushSupported() || Notification.permission !== "default") return false;
+  if (!pushSupported()) return false;
+  if (Notification.permission === "granted") return readFlag(RESUBSCRIBE_KEY);
+  if (Notification.permission !== "default") return false;
+  return !readFlag(DISMISSED_KEY);
+}
+
+function readFlag(key: string): boolean {
   try {
-    return localStorage.getItem(DISMISSED_KEY) === null;
+    return localStorage.getItem(key) !== null;
   } catch {
-    return true;
+    return false;
+  }
+}
+
+function writeFlag(key: string, on: boolean): void {
+  try {
+    if (on) localStorage.setItem(key, "1");
+    else localStorage.removeItem(key);
+  } catch {
+    // Storage can be blocked; the prompt will simply show again next time.
   }
 }
 
 export function dismissPushPrompt(): void {
-  try {
-    localStorage.setItem(DISMISSED_KEY, "1");
-  } catch {
-    // Storage can be blocked; the prompt will simply show again next time.
-  }
+  writeFlag(DISMISSED_KEY, true);
+  writeFlag(RESUBSCRIBE_KEY, false);
 }
 
 export async function enablePush(): Promise<PushResult> {
@@ -42,6 +55,7 @@ export async function enablePush(): Promise<PushResult> {
     applicationServerKey: urlBase64ToBytes(VAPID_PUBLIC_KEY),
   });
   await api.savePushSubscription(subscription.toJSON());
+  writeFlag(RESUBSCRIBE_KEY, false);
   return "enabled";
 }
 
@@ -49,8 +63,18 @@ export async function disablePush(): Promise<void> {
   const registration = await navigator.serviceWorker.getRegistration("/sw.js");
   const subscription = await registration?.pushManager.getSubscription();
   if (!subscription) return;
-  await api.removePushSubscription(subscription.endpoint);
-  await subscription.unsubscribe();
+  try {
+    await api.removePushSubscription(subscription.endpoint);
+  } finally {
+    await subscription.unsubscribe();
+  }
+}
+
+export async function forgetPushOnLogout(): Promise<void> {
+  if (!pushSupported()) return;
+  await disablePush().catch(() => {});
+  // The browser permission survives logout, so the opt-in modal re-offers it (no native prompt) at the next publish or join.
+  if (Notification.permission === "granted") writeFlag(RESUBSCRIBE_KEY, true);
 }
 
 export async function isPushEnabled(): Promise<boolean> {

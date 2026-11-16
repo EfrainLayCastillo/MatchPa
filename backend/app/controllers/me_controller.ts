@@ -8,8 +8,9 @@ import { acceptTerms } from '#services/terms'
 import { normalizeWhatsapp } from '#services/whatsapp'
 
 export default class MeController {
-  async show({ auth }: HttpContext) {
-    return serializeUser(auth.getUserOrFail())
+  async show({ auth, session }: HttpContext) {
+    const authEvent = session.pull('auth_event') as 'google_signup' | 'google_login' | undefined
+    return { ...serializeUser(auth.getUserOrFail()), ...(authEvent && { authEvent }) }
   }
 
   async update({ auth, request }: HttpContext) {

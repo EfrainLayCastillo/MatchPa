@@ -45,6 +45,9 @@ async function request<T>(
   if (res.status === 429) {
     throw new ApiError(429, [{ message: "Vas muy rápido. Espera un momento y vuelve a intentar." }]);
   }
+  if (res.status >= 500) {
+    throw new ApiError(res.status, [{ message: "Algo salió mal. Intenta de nuevo." }]);
+  }
   if (!res.ok) {
     throw new ApiError(
       res.status,
@@ -83,7 +86,7 @@ interface ProfileInput {
 }
 
 export const api = {
-  me: () => request<User>("GET", "/me"),
+  me: () => request<User & { authEvent?: "google_signup" | "google_login" }>("GET", "/me"),
   updateMe: (input: ProfileInput) => request<User>("PATCH", "/me", input),
   register: (input: { fullName: string; email: string; password: string; acceptTerms: boolean }) =>
     request<User>("POST", "/auth/register", input),

@@ -16,6 +16,7 @@ import { LegalLink } from "@/components/legal/legal-link";
 import { api, ApiError } from "@/lib/api";
 import { PRIVACY_EMAIL } from "@/lib/legal";
 import { useSession } from "@/lib/session";
+import { forgetPushOnLogout } from "@/lib/push";
 
 export function TermsDialog() {
   const { setUser } = useSession();
@@ -40,6 +41,7 @@ export function TermsDialog() {
 
   async function logout() {
     setBusy(true);
+    await forgetPushOnLogout();
     await api.logout().catch(() => {});
     setUser(null);
     router.replace("/");

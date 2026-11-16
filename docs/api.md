@@ -1,13 +1,13 @@
 # API (MVP)
 
-Base `/api`. Las escrituras con sesión tienen límite por cuenta y responden 429 al superarlo (ver `seguridad.md`). Todo requiere sesión salvo auth, `GET /branches` y `GET /matches/:code`. Los partidos se identifican por `code`.
+Base `/api`. Solo acepta JSON (`application/json`); formularios y multipart se rechazan. Las escrituras con sesión tienen límite por cuenta y responden 429 al superarlo (ver `seguridad.md`). Todo requiere sesión salvo auth, `GET /branches` y `GET /matches/:code`. Los partidos se identifican por `code`.
 
 ## Auth y perfil
 
 | Método | Endpoint | Descripción |
 |---|---|---|
 | `GET` | `/auth/google/redirect` | Login con Google. Solo existe con `GOOGLE_AUTH_ENABLED=true` |
-| `GET` | `/auth/google/callback` | Callback de Google. Solo existe con `GOOGLE_AUTH_ENABLED=true` |
+| `GET` | `/auth/google/callback` | Callback de Google. Solo existe con `GOOGLE_AUTH_ENABLED=true`. Si sale bien, redirige a `next` y guarda en la sesión si fue cuenta nueva o login, para la analítica |
 | `POST` | `/auth/register` | Registro con `{ fullName, email, password, acceptTerms }`. `acceptTerms` debe ser `true`; si no, 422 y no se crea la cuenta. Guarda fecha y versión aceptada |
 | `POST` | `/auth/login` | Login con correo |
 | `POST` | `/auth/email/verify` | Verifica el correo con `{ code }` (6 dígitos). Requiere sesión. 422: `Código incorrecto` o `El código venció o se agotaron los intentos. Pide uno nuevo` |
@@ -16,7 +16,7 @@ Base `/api`. Las escrituras con sesión tienen límite por cuenta y responden 42
 | `POST` | `/auth/email/resend` | Envía un código nuevo e invalida el anterior. 204 (también si ya está verificado, sin enviar). 429 si pidió otro hace menos de 60 s o más de 5 en una hora |
 | `POST` | `/auth/logout` | Logout |
 | `GET` | `/health` | `{ ok: true }` sin tocar la base. Lo usa el workflow que mantiene despierto el backend |
-| `GET` | `/me` | Usuario actual, con `emailVerified` y `termsAccepted` (aceptó la versión vigente). Todas las respuestas con el usuario incluyen `termsAccepted` |
+| `GET` | `/me` | Usuario actual, con `emailVerified` y `termsAccepted` (aceptó la versión vigente). Justo después de un login con Google trae una sola vez `authEvent`: `google_signup` o `google_login`. Todas las respuestas con el usuario incluyen `termsAccepted` |
 | `POST` | `/me/terms` | Acepta la versión vigente de términos y privacidad. Devuelve el usuario |
 | `PATCH` | `/me` | Actualizar perfil (`category`, `categoryTier`, `gender`, `phone`) |
 | `DELETE` | `/me` | Eliminar la cuenta con `{ confirm: "ELIMINAR" }`. Anonimiza, cierra o libera sus partidos futuros y cierra la sesión. 204 |
@@ -36,7 +36,7 @@ Base `/api`. Las escrituras con sesión tienen límite por cuenta y responden 42
 
 | Método | Endpoint | Descripción |
 |---|---|---|
-| `POST` | `/matches` | Publicar (con invitados y `categoryTier` opcional). 403 `EMAIL_NOT_VERIFIED` si el correo no está verificado |
+| `POST` | `/matches` | Publicar (con invitados y `categoryTier` opcional). 422 si `branchId` no existe. 403 `EMAIL_NOT_VERIFIED` si el correo no está verificado |
 | `GET` | `/matches` | Partidos `open` (`date`, `branchId`, `type`) |
 | `GET` | `/matches/:code` | Detalle público; incluye solicitudes si eres organizador |
 | `PATCH` | `/matches/:code` | Editar mientras está `open` |

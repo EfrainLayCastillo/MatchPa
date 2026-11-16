@@ -11,7 +11,7 @@ const guest = vine.object({
 })
 
 export const matchValidator = vine.create({
-  branchId: vine.number().positive(),
+  branchId: vine.number().positive().exists({ table: 'branches', column: 'id' }),
   courtNumber: vine.number().min(1).max(50),
   startsAt: vine.string().trim(),
   durationMinutes: vine.number().in([60, 90, 120]),

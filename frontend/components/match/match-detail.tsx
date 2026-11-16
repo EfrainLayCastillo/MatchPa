@@ -6,7 +6,7 @@ import { SITE_URL } from "@/lib/config";
 import { formatDateTime } from "@/lib/panamaFormatDate";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { PushPrompt } from "@/components/matchpa/push-prompt";
@@ -17,7 +17,7 @@ import {
 } from "@/components/matchpa/invite-surface";
 import { PlayerSummary } from "@/components/matchpa/player-identity";
 import { SectionHeading } from "@/components/matchpa/section-heading";
-import { track } from "@/lib/analytics";
+import { levelGap, matchRole, track } from "@/lib/analytics";
 import { useVerifiedAction } from "@/components/auth/verify-email-dialog";
 import { api, ApiError } from "@/lib/api";
 import { notifyError } from "@/lib/notify";
@@ -42,7 +42,7 @@ export function MatchDetail({
   code: string;
   serverMatch?: Match;
 }) {
-  const { user } = useSession();
+  const { user, loading: sessionLoading } = useSession();
   const { guard, handleError } = useVerifiedAction();
   const query = useMatch(code, serverMatch);
   const personalized = !query.isPlaceholderData;
@@ -57,6 +57,18 @@ export function MatchDetail({
   const [busy, setBusy] = useState(false);
   const [pushOpen, setPushOpen] = useState(false);
   const image = toMatchImage(useSearchParams().get("img"));
+  const viewTracked = useRef(false);
+
+  useEffect(() => {
+    if (!match || !personalized || sessionLoading || viewTracked.current) return;
+    viewTracked.current = true;
+    track("view_match", {
+      match_status: match.status,
+      viewer_role: user ? matchRole(match) : "anonymous",
+      spots_left: match.spotsLeft,
+      branch: match.branch.slug,
+    });
+  }, [match, personalized, sessionLoading, user]);
 
   if (loadError && !match)
     return (
@@ -81,11 +93,16 @@ export function MatchDetail({
   }
 
   async function respond(
+    current: Match,
     requestId: number,
     action: "accept" | "reject" | "remove",
   ) {
     await api.respondToRequest(requestId, action);
-    if (action === "accept") track("join_approved", {});
+    if (action === "accept")
+      track("join_approved", {
+        branch: current.branch.slug,
+        fills_match: current.spotsLeft === 1,
+      });
   }
 
   const whatsappHref = match.organizer.phone
@@ -161,7 +178,11 @@ export function MatchDetail({
                       api
                         .requestToJoin(match.code)
                         .then(() =>
-                          track("join_request", { source: "match_page" }),
+                          track("join_request", {
+                            entry_point: "match_page",
+                            branch: match.branch.slug,
+                            level_gap: levelGap(user ?? { category: null }, match),
+                          }),
                         ),
                     true,
                   ),
@@ -182,7 +203,7 @@ export function MatchDetail({
                 match={match}
                 busy={busy}
                 onRespond={(request, action) =>
-                  run(() => respond(request.id, action))
+                  run(() => respond(match, request.id, action))
                 }
                 onClose={() => run(() => api.closeMatch(match.code))}
               />
@@ -239,7 +260,10 @@ function ActionPanel({
   if (!signedIn) {
     return (
       <Button asChild size="lg" className="h-12 w-full text-base font-bold">
-        <Link href={`/login?next=/partidos/${match.code}`}>
+        <Link
+          href={`/login?next=/partidos/${match.code}`}
+          onClick={() => track("join_intent", { branch: match.branch.slug })}
+        >
           Inicia sesión para unirte
         </Link>
       </Button>

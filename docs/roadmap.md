@@ -35,7 +35,9 @@
   - [x] Rate limit por cuenta en endpoints de escritura
   - [x] Dependencias sin vulnerabilidades altas (`npm audit`)
   - [x] Auditoría de seguridad, primera ronda (auth, API, cliente)
-  - [ ] **Prioridad alta, antes del lanzamiento de la beta:** límite por IP real detrás del proxy. Sin `trustProxy`, `request.ip()` puede ser la IP del proxy de Render y todos los usuarios compartirían el límite de 10 por minuto en login, registro y reset: un atacante bloquearía el acceso de todos. Medir los headers de IP en Render y configurar `trustProxy` con los saltos exactos
+  - [x] Límite por IP real detrás del proxy (`x-client-ip` firmado con `PROXY_SECRET`; ver `seguridad.md`)
+  - [x] Auditoría prelanzamiento: CSRF por formulario (solo JSON), 5xx genéricos, IP real
+  - [ ] Después del lanzamiento: límite de login por cuenta, límite de conexiones y `subscribe` en Transmit, `report-to` en la CSP antes de aplicarla, enumeración de cuentas por `userId` al invitar
   - [ ] Auditoría, segunda ronda: templates de correo, migraciones, Transmit y headers de Vercel
 - [x] Catálogo completo de sucursales de Panamá con coordenadas, y "Sugerir sucursal" (aprobación manual en el seed)
 - [ ] Lanzamiento de la beta

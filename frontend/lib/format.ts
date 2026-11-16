@@ -43,7 +43,7 @@ export function formatCategory(category: Category, tier?: CategoryTier | null): 
 
 const TIER_OFFSET: Record<CategoryTier, number> = { high: -1 / 3, entry: 1 / 3 };
 
-function effectiveLevel(category: Category, tier?: CategoryTier | null): number {
+export function effectiveLevel(category: Category, tier?: CategoryTier | null): number {
   return category + (tier ? TIER_OFFSET[tier] : 0);
 }
 

@@ -7,5 +7,5 @@ export type MatchImage = keyof typeof MATCH_IMAGES;
 
 /** Only known keys are accepted, so the `?img=` query param can't point anywhere else. */
 export function toMatchImage(value: string | null): MatchImage {
-  return value !== null && value in MATCH_IMAGES ? (value as MatchImage) : "bg1";
+  return value !== null && Object.hasOwn(MATCH_IMAGES, value) ? (value as MatchImage) : "bg1";
 }

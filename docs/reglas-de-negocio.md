@@ -89,7 +89,7 @@ Una sola entidad, `match_requests`, con `kind`:
 - Ver no requiere cuenta. Unirse sí: login → onboarding → vuelve al partido y envía la solicitud.
 - El WhatsApp del organizador solo lo reciben el propio organizador y los jugadores aceptados, y solo mientras el partido está `open` o `full`. Si el partido expiró o se cerró, la API no lo devuelve y el botón no aparece.
 - Si el partido no está `open`, muestra su estado en vez del botón de unirse.
-- Botón Compartir con `navigator.share`; fallback a "Copiar link" y `wa.me/?text=`.
+- Botón Compartir con `navigator.share`; si el navegador no lo tiene, copia el link. El link lleva UTM de `share` (ver `analitica.md`).
 - Vista previa Open Graph dinámica (`generateMetadata` + `opengraph-image`): estado, fecha, hora, sucursal, categoría, tipo y puestos. Mismos datos en la imagen vertical de historias.
 - SEO: JSON-LD `SportsEvent` en partidos `open` y `full`; `noindex` en `closed` y `expired`; código inexistente → 404.
 

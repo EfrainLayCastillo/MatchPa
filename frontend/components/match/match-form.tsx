@@ -19,7 +19,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { PushPrompt } from "@/components/matchpa/push-prompt";
-import { track } from "@/lib/analytics";
+import { leadTime, track } from "@/lib/analytics";
+import { clearInvitee, readInvitee, type Invitee } from "@/lib/invitee-handoff";
 import { useVerifiedAction } from "@/components/auth/verify-email-dialog";
 import { api } from "@/lib/api";
 import {
@@ -71,10 +72,18 @@ function MatchFormBody({ match }: { match?: Match }) {
   const { handleError } = useVerifiedAction();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const inviteeId = match ? null : Number(searchParams.get("invitar")) || null;
-  const inviteeName = searchParams.get("nombre");
+  const [invitee, setInvitee] = useState<Invitee | null>(null);
+  const inviteeId = invitee?.id ?? null;
+  const inviteeName = invitee?.name ?? null;
   const presetDate = match ? null : searchParams.get("fecha");
   const presetBranch = match ? null : searchParams.get("sucursal");
+  const fromInviteFlow = presetDate !== null && presetBranch !== null;
+  useEffect(() => {
+    if (match || !fromInviteFlow) return;
+    const stored = readInvitee();
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- sessionStorage only exists on the client
+    if (stored) setInvitee(stored);
+  }, [match, fromInviteFlow]);
   const [branches, setBranches] = useState<Branch[]>([]);
   const [date, setDate] = useState(() =>
     match
@@ -191,13 +200,26 @@ function MatchFormBody({ match }: { match?: Match }) {
         return;
       }
       const published = await api.createMatch(buildInput());
+      clearInvitee();
       track("publish_match", {
         match_type: published.type,
         category: published.category,
         max_players: published.maxPlayers,
+        branch: published.branch.slug,
+        guests: published.guests.length,
+        from_invite: inviteeId !== null,
+        lead_time: leadTime(published.startsAt),
       });
       if (inviteeId)
-        await api.invite(published.code, inviteeId).catch(() => null);
+        await api
+          .invite(published.code, inviteeId)
+          .then(() =>
+            track("invite_player", {
+              branch: published.branch.slug,
+              entry_point: "new_match",
+            }),
+          )
+          .catch(() => null);
       if (shouldAskForPush()) {
         setCreated(published);
         return;

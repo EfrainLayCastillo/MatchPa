@@ -12,7 +12,7 @@ import { PageTitle } from "@/components/matchpa/page-title";
 import { SectionHeading } from "@/components/matchpa/section-heading";
 import { PushPrompt } from "@/components/matchpa/push-prompt";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { track } from "@/lib/analytics";
+import { levelGap, track } from "@/lib/analytics";
 import { useVerifiedAction } from "@/components/auth/verify-email-dialog";
 import { api } from "@/lib/api";
 import { notifyError } from "@/lib/notify";
@@ -130,7 +130,11 @@ export function LobbyView() {
     setJoiningCode(match.code);
     try {
       await api.requestToJoin(match.code);
-      track("join_request", { source: "lobby" });
+      track("join_request", {
+        entry_point: "lobby",
+        branch: match.branch.slug,
+        level_gap: levelGap(user ?? { category: null }, match),
+      });
       if (shouldAskForPush()) setPushOpen(true);
       refresh();
     } catch (err) {

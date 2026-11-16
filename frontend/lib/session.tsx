@@ -1,6 +1,8 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { ONE_SHOT_PARAMS, setInternalTraffic, track } from "./analytics";
 import { api, ApiError } from "./api";
 import type { User } from "./types";
 
@@ -15,7 +17,28 @@ interface SessionValue {
 
 const SessionContext = createContext<SessionValue | null>(null);
 
+const GOOGLE_AUTH_EVENTS = { google_signup: "sign_up", google_login: "login" } as const;
+
+/** Team traffic flag: `?internal=1|0` is stored and stripped from the URL. */
+function useUrlFlags() {
+  const router = useRouter();
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    const internal = url.searchParams.get("internal");
+    if (internal !== "1" && internal !== "0") return;
+    setInternalTraffic(internal === "1");
+    ONE_SHOT_PARAMS.forEach((name) => url.searchParams.delete(name));
+    router.replace(`${url.pathname}${url.search}${url.hash}`);
+  }, [router]);
+}
+
+function trackGoogleAuth(authEvent: string | undefined) {
+  if (authEvent && Object.hasOwn(GOOGLE_AUTH_EVENTS, authEvent))
+    track(GOOGLE_AUTH_EVENTS[authEvent as keyof typeof GOOGLE_AUTH_EVENTS], { method: "google" });
+}
+
 export function SessionProvider({ children }: { children: React.ReactNode }) {
+  useUrlFlags();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [failed, setFailed] = useState(false);
@@ -23,7 +46,8 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
   const refresh = useCallback(() => {
     return api
       .me()
-      .then((me) => {
+      .then(({ authEvent, ...me }) => {
+        trackGoogleAuth(authEvent);
         setUser(me);
         setFailed(false);
       })
