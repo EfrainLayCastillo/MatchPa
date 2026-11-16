@@ -45,8 +45,10 @@ export function ProfileForm({ mode }: ProfileFormProps) {
       if (mode === "onboarding") {
         track("onboarding_complete", { category });
         router.replace("/lobby");
+        return;
       }
-      else toast.success("Perfil guardado");
+      toast.success("Perfil guardado");
+      router.push("/lobby");
     } catch (err) {
       fail(toFormErrors(err, "No se pudo guardar tu perfil"));
     } finally {

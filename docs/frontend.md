@@ -25,7 +25,7 @@ Las URLs son visibles para el usuario, así que van en español.
 | `/partidos/nuevo` | Sí | Crear partido en dos pestañas: **Cuándo y dónde** y **El partido**. La segunda se habilita al completar sucursal y cancha |
 | `/partidos/[code]` | Para actuar | Detalle público: banner con la foto (`?img=`), encabezado, jugadores, panel del organizador y sección Sucursal. Barra fija con "Cómo llegar" y "Compartir". El organizador edita, gestiona solicitudes, invita, saca y cierra; el jugador puede salirse |
 | `/partidos/[code]/historia` | No | Imagen vertical 1080×1920 para historias y Reels. "Compartir" la envía como archivo |
-| `/perfil` | Sí | Editar categoría y subnivel, género y WhatsApp, activar/desactivar push |
+| `/perfil` | Sí | Editar categoría y subnivel, género y WhatsApp (al guardar: toast "Perfil guardado" y vuelve al lobby), activar/desactivar push |
 | `/mis-partidas` | Sí | Partidos que organizas o juegas, con estado y filtros por sucursal y orden (por defecto, última actualización) |
 
 ### Lobby
