@@ -8,7 +8,7 @@ Base `/api`. Las escrituras con sesión tienen límite por cuenta y responden 42
 |---|---|---|
 | `GET` | `/auth/google/redirect` | Login con Google. Solo existe con `GOOGLE_AUTH_ENABLED=true` |
 | `GET` | `/auth/google/callback` | Callback de Google. Solo existe con `GOOGLE_AUTH_ENABLED=true` |
-| `POST` | `/auth/register` | Registro |
+| `POST` | `/auth/register` | Registro con `{ fullName, email, password, acceptTerms }`. `acceptTerms` debe ser `true`; si no, 422 y no se crea la cuenta. Guarda fecha y versión aceptada |
 | `POST` | `/auth/login` | Login con correo |
 | `POST` | `/auth/email/verify` | Verifica el correo con `{ code }` (6 dígitos). Requiere sesión. 422: `Código incorrecto` o `El código venció o se agotaron los intentos. Pide uno nuevo` |
 | `POST` | `/auth/password/forgot` | `{ email }`. Siempre 204, exista o no la cuenta y aunque se pase el límite de 5 códigos por hora por cuenta (simplemente no envía). 429 solo por el límite por IP |
@@ -16,7 +16,8 @@ Base `/api`. Las escrituras con sesión tienen límite por cuenta y responden 42
 | `POST` | `/auth/email/resend` | Envía un código nuevo e invalida el anterior. 204 (también si ya está verificado, sin enviar). 429 si pidió otro hace menos de 60 s o más de 5 en una hora |
 | `POST` | `/auth/logout` | Logout |
 | `GET` | `/health` | `{ ok: true }` sin tocar la base. Lo usa el workflow que mantiene despierto el backend |
-| `GET` | `/me` | Usuario actual, con `emailVerified` |
+| `GET` | `/me` | Usuario actual, con `emailVerified` y `termsAccepted` (aceptó la versión vigente). Todas las respuestas con el usuario incluyen `termsAccepted` |
+| `POST` | `/me/terms` | Acepta la versión vigente de términos y privacidad. Devuelve el usuario |
 | `PATCH` | `/me` | Actualizar perfil (`category`, `categoryTier`, `gender`, `phone`) |
 | `DELETE` | `/me` | Eliminar la cuenta con `{ confirm: "ELIMINAR" }`. Anonimiza, cierra o libera sus partidos futuros y cierra la sesión. 204 |
 

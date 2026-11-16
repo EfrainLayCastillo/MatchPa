@@ -11,6 +11,8 @@ import { SiteHeader } from "@/components/matchpa/site-header";
 import { VerifiedActionProvider } from "@/components/auth/verify-email-dialog";
 import { SessionProvider } from "@/lib/session";
 import { QueryProvider } from "@/components/matchpa/query-provider";
+import { TermsGate } from "@/components/legal/terms-gate";
+import { CookieNotice } from "@/components/legal/cookie-notice";
 import { Toaster } from "@/components/ui/sonner";
 
 const inter = Inter({ variable: "--font-inter", subsets: ["latin"] });
@@ -52,11 +54,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
               <SiteHeader />
               <main className="flex flex-1 flex-col">{children}</main>
               <SiteFooter />
+              <TermsGate />
             </VerifiedActionProvider>
           </SessionProvider>
         </QueryProvider>
         <Toaster />
         <SpeedInsights />
+        {GTM_ID ? <CookieNotice /> : null}
       </body>
       {GTM_ID ? <GoogleTagManager gtmId={GTM_ID} /> : null}
     </html>

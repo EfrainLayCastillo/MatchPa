@@ -42,6 +42,7 @@ export interface User {
   category: Category | null;
   categoryTier: CategoryTier | null;
   gender: Gender | null;
+  termsAccepted: boolean;
 }
 
 export interface Availability {

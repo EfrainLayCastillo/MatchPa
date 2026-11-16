@@ -3,6 +3,7 @@ import type Match from '#models/match'
 import type MatchRequest from '#models/match_request'
 import type User from '#models/user'
 import { effectiveStatus, spotsLeft } from '#services/match_rules'
+import { hasAcceptedCurrentTerms } from '#services/terms'
 
 export function serializeBranch(branch: Branch) {
   return {
@@ -29,6 +30,7 @@ export function serializeUser(user: User) {
     category: user.category,
     categoryTier: user.categoryTier,
     gender: user.gender,
+    termsAccepted: hasAcceptedCurrentTerms(user),
   }
 }
 

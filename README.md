@@ -77,6 +77,20 @@ npm run dev
 
 Abre [http://localhost:3000](http://localhost:3000). Variables, datos de prueba y tests en [desarrollo local](docs/desarrollo-local.md).
 
+### Voz para los videos de marketing (opcional)
+
+La voz en off de los videos de `marketing/` se genera en local con [Voicebox](https://github.com/jamiepine/voicebox), una voz clonada que corre en Docker. Va en el perfil `marketing`, así que `docker compose up -d` no lo levanta:
+
+```bash
+docker compose --profile marketing up -d --build voicebox
+```
+
+- El contenedor usa hasta 10 GB (el modelo Qwen3-TTS 1.7B no cabe en 8): en Docker Desktop → Settings → Resources, sube la memoria a 12 GB.
+- La primera vez construye la imagen desde GitHub y descarga los modelos; luego quedan en los volúmenes `voicebox-data` y `voicebox-models`.
+- Abre [http://localhost:17600](http://localhost:17600) y crea el perfil de voz con 10–30 s de audio limpio. Usa un motor con español: Qwen3-TTS o Chatterbox Multilingual.
+- El nombre del perfil va en la línea **Voz:** del guion (`**Voz:** Voicebox, perfil `efrain``). Después, `node scripts/vo.mjs <slug>` desde `marketing/` genera cada línea y sus tiempos por palabra.
+- Para apagarlo: `docker compose --profile marketing stop voicebox`.
+
 ## Documentación
 
 | Documento | Contenido |

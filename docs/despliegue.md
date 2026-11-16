@@ -23,6 +23,7 @@ Plataformas en plan gratuito: frontend en Vercel, backend en Render y base de da
 
 - **Entrante:** Cloudflare Email Routing reenvía `hola@matchpa.app` a un Gmail personal (MX y SPF `include:_spf.mx.cloudflare.net` en la raíz). Es el `CONTACT_EMAIL` del frontend y el `VAPID_SUBJECT` del backend. Solo recibe: para responder desde `hola@` hay que usar otro servicio.
 - **Saliente:** Resend con el dominio `matchpa.app`. Sus registros no chocan con Email Routing: el DKIM va en `resend._domainkey` y el MX y SPF de rebotes en `send.`, no en la raíz. Registros en Cloudflare (DNS only): los que da Resend, y `TXT _dmarc.matchpa.app` = `v=DMARC1; p=none; rua=mailto:hola@matchpa.app`. El backend usa el transporte de Resend de `@adonisjs/mail`; en local, Mailpit.
+- `privacidad@matchpa.app` (derechos ARCO+P, publicado en `/privacidad`) necesita su propia regla **Send to an email**; sin ella rebota por el Catch-all.
 - La regla de `hola@` debe tener la acción **Send to an email** y el Gmail de destino verificado. El Catch-all viene en **Drop**: un correo que no coincide con ninguna regla rebota con "dirección no encontrada".
 
 ## Limitaciones del plan gratuito
@@ -32,7 +33,7 @@ Plataformas en plan gratuito: frontend en Vercel, backend en Render y base de da
 - **Despierto en horas pico (hora de Panamá):** lunes a viernes de 17:00 a 23:00, y sábado y domingo de 07:00 a 23:00. El workflow `.github/workflows/keep-awake.yml` llama `GET /api/health` cada 10 minutos para que Render no se duerma, y `start/db_warmer.ts` hace `select 1` cada 4 minutos mientras el backend está despierto en esas horas. Fuera de esas horas, el primer usuario despierta todo. Las horas viven en `app/services/peak_hours.ts` y en el cron del workflow (en UTC): hay que cambiar los dos.
 - GitHub puede atrasar los cron varios minutos y desactiva los workflows programados tras 60 días sin actividad en el repo.
 - Transmit usa transporte en memoria: mientras haya una sola instancia del backend, el tiempo real funciona; con varias instancias haría falta Redis.
-- Vercel Hobby es para uso no comercial.
+- Vercel Hobby es para uso no comercial: pasar a Pro antes de cualquier función de pago, y revisar la lista de proveedores de `/privacidad` si cambia alguno.
 
 ## Seed en producción
 

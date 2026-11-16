@@ -17,7 +17,9 @@ Las visitas de página las registra la medición mejorada de GA4 ("Cambios de p�
 
 ## Reglas
 
-- Ningún evento lleva datos personales: ni id de usuario, nombre, correo, teléfono ni `code` del partido.
+- Ningún evento lleva datos personales: ni id de usuario, nombre, correo ni teléfono. Los eventos propios tampoco llevan el `code` del partido.
+- Las visitas de página sí envían la URL, que puede incluir el `code` (`/partidos/<code>`). Ninguna URL lleva datos personales: el correo de "¿Olvidaste tu contraseña?" pasa a `/recuperar` por `sessionStorage`, no por query.
+- Aviso de cookies informativo (`cookie-notice`), solo con GTM activo: GTM carga igual, sin esperar al aviso. Lo explica `/privacidad#cookies`.
 - Los bloqueadores de anuncios ocultan una parte del tráfico: GA4 sirve para proporciones del embudo; los totales salen de la BD.
 
 ## Configuración en GTM

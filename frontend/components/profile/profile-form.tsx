@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -103,7 +104,10 @@ export function ProfileForm({ mode }: ProfileFormProps) {
         <Label htmlFor="phone">Teléfono (WhatsApp)</Label>
         <Input id="phone" type="tel" inputMode="tel" autoComplete="tel" placeholder="+507 6000-0000" value={phone} onChange={(e) => { setPhone(e.target.value.replace(/[^\d+\s()-]/g, "")); clearField("phone"); }} maxLength={25} required {...invalidProps("phone", errors.fields.phone)} />
         <FieldError id="phone-error">{errors.fields.phone}</FieldError>
-        <p className="text-xs text-muted-foreground">Se guarda cifrado. Solo lo usamos para que el organizador de un partido en el que juegas pueda escribirte por WhatsApp.</p>
+        <p className="text-xs text-muted-foreground">
+          Se guarda cifrado. Si organizas un partido, los jugadores de tu partido (aceptados o que aceptaron tu invitación) podrán escribirte por WhatsApp mientras esté abierto o completo.{" "}
+          <Link href="/privacidad#whatsapp" target="_blank" className="font-semibold underline underline-offset-4">Privacidad</Link>
+        </p>
       </div>
 
       <FormAlert message={errors.form} />

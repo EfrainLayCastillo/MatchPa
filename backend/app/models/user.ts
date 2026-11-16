@@ -53,6 +53,12 @@ export default class User extends compose(BaseModel, withAuthFinder(hash)) {
   declare emailVerifiedAt: DateTime | null
 
   @column.dateTime()
+  declare termsAcceptedAt: DateTime | null
+
+  @column()
+  declare termsVersion: string | null
+
+  @column.dateTime()
   declare deletedAt: DateTime | null
 
   @column.dateTime({ autoCreate: true })

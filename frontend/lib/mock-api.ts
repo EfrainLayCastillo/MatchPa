@@ -42,11 +42,11 @@ interface StoredMatch {
 const branches: Branch[] = [
   {
     id: 1,
-    name: "WePadel",
-    slug: "wepadel",
+    name: "Pádel del Barrio",
+    slug: "padel-del-barrio",
     phone: null,
     locationLabel: "Centennial",
-    mapsUrl: "https://www.google.com/maps/place/WePadel/@9.0280882,-79.5353089,17z/data=!4m6!3m5!1s0x8faca9c6402a50f5:0xd64aab20f44eb01e!8m2!3d9.0280882!4d-79.5353089!16s%2Fg%2F11xvxdkcjw",
+    mapsUrl: "https://www.google.com/maps/@9.028088,-79.535309,17z",
     website: null,
     latitude: 9.028088,
     longitude: -79.535309,
@@ -111,6 +111,7 @@ const users: (User & { password: string })[] = [
     category: 4,
     categoryTier: "high",
     gender: "male",
+    termsAccepted: true,
   },
   seedPlayer(2, "Sacha Ortega", 4, "male"),
   seedPlayer(3, "Esteban Mora", 5, "male", "entry"),
@@ -121,10 +122,10 @@ const users: (User & { password: string })[] = [
 
 const availabilities = new Map<number, Availability[]>();
 const today = dateKey(new Date());
-availabilities.set(2, [{ date: today, fromTime: "17:00", toTime: "21:00", branchId: 1 }]);
-availabilities.set(3, [{ date: today, fromTime: "18:00", toTime: "22:00", branchId: 1 }]);
-availabilities.set(4, [{ date: today, fromTime: "16:00", toTime: "20:00", branchId: 1 }]);
-availabilities.set(5, [{ date: today, fromTime: "19:00", toTime: "23:00", branchId: 1 }]);
+availabilities.set(2, [{ date: today, fromTime: "18:00", toTime: "22:00", branchId: 1 }]);
+availabilities.set(3, [{ date: today, fromTime: "17:00", toTime: "21:00", branchId: 1 }]);
+availabilities.set(4, [{ date: today, fromTime: "19:00", toTime: "23:00", branchId: 1 }]);
+availabilities.set(5, [{ date: today, fromTime: "16:00", toTime: "20:00", branchId: 1 }]);
 availabilities.set(6, [{ date: today, fromTime: null, toTime: null, branchId: 1 }]);
 
 const matches: StoredMatch[] = [
@@ -151,7 +152,7 @@ const matches: StoredMatch[] = [
     organizerId: 1,
     branchId: 1,
     courtNumber: 2,
-    startsAt: laterToday(3),
+    startsAt: eveningOrLater(today, "20:00"),
     durationMinutes: 90,
     category: 4,
     categoryTier: null,
@@ -179,7 +180,13 @@ function seedPlayer(id: number, fullName: string, category: Category, gender: Ge
     category,
     categoryTier,
     gender,
+    termsAccepted: true,
   };
+}
+
+function eveningOrLater(date: string, time: string): string {
+  const evening = at(date, time);
+  return Date.parse(evening) > Date.now() + 3_600_000 ? evening : laterToday(3);
 }
 
 function laterToday(hours: number): string {
@@ -217,6 +224,7 @@ function publicUser(user: User & { password?: string }): User {
     category: user.category,
     categoryTier: user.categoryTier,
     gender: user.gender,
+    termsAccepted: user.termsAccepted,
   };
 }
 
@@ -334,6 +342,12 @@ export async function mockRequest<T>(method: Method, fullPath: string, body?: un
     Object.assign(user, { email: String(input.email), password: String(input.password), category: null, categoryTier: null, gender: null, emailVerified: false });
     users.push(user);
     me = user.id;
+    return publicUser(user);
+  });
+  on(/^POST \/me\/terms$/, () => {
+    const user = users.find((u) => u.id === me);
+    if (!user) fail(401, "Inicia sesión para continuar");
+    user.termsAccepted = true;
     return publicUser(user);
   });
   on(/^POST \/auth\/email\/verify$/, () => {

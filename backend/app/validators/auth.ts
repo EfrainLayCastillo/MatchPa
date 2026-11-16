@@ -4,6 +4,7 @@ export const registerValidator = vine.create({
   fullName: vine.string().trim().minLength(2).maxLength(120),
   email: vine.string().trim().email().normalizeEmail().unique({ table: 'users', column: 'email' }),
   password: vine.string().minLength(8).maxLength(72),
+  acceptTerms: vine.accepted(),
 })
 
 export const verifyEmailValidator = vine.create({

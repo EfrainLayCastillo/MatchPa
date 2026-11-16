@@ -10,6 +10,7 @@ import {
   verifyEmailValidator,
 } from '#validators/auth'
 import { serializeUser } from '#serializers/match_serializer'
+import { acceptTerms } from '#services/terms'
 import { safeNextPath } from '#services/next_path'
 import { issueCode, verifyCode } from '#services/email_verification'
 import { requestReset, resetPassword } from '#services/password_reset'
@@ -21,11 +22,13 @@ export default class AuthController {
   async register(ctx: HttpContext) {
     const { request } = ctx
     const data = await request.validateUsing(registerValidator)
-    const user = await User.create({
+    const user = new User().merge({
       fullName: data.fullName,
       email: data.email,
       password: data.password,
     })
+    acceptTerms(user)
+    await user.save()
     await issueCode(user)
     await startSession(ctx, user)
     return serializeUser(user)

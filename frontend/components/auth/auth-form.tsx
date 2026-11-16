@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
+import { LegalLink } from "@/components/legal/legal-link";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { FormAlert } from "@/components/matchpa/form-alert";
 import { FieldError } from "@/components/ui/field";
@@ -12,6 +14,7 @@ import { api, API_BASE, ApiError, USING_MOCKS } from "@/lib/api";
 import { invalidProps, toFormErrors, useFormErrors, type FormErrors } from "@/lib/form-errors";
 import { GOOGLE_AUTH_ENABLED } from "@/lib/config";
 import { safeNextPath } from "@/lib/next-path";
+import { stashRecoveryEmail } from "@/lib/recovery-email";
 import { isProfileComplete, useSession } from "@/lib/session";
 
 type Mode = "login" | "register";
@@ -42,18 +45,24 @@ export function AuthForm({ mode }: { mode: Mode }) {
   const [password, setPassword] = useState("");
   const { errors, formRef, fail, reset, clearField } = useFormErrors(accountErrorMessage(params.get("error")));
   const [busy, setBusy] = useState(false);
+  const [accepted, setAccepted] = useState(false);
+  const [termsMissing, setTermsMissing] = useState(false);
   const copy = COPY[mode];
   const next = safeNextPath(params.get("next"));
 
   async function submit(event: React.FormEvent) {
     event.preventDefault();
-    setBusy(true);
     reset();
+    if (mode === "register" && !accepted) {
+      setTermsMissing(true);
+      return;
+    }
+    setBusy(true);
     try {
       const user =
         mode === "login"
           ? await api.login({ email, password })
-          : await api.register({ fullName, email, password });
+          : await api.register({ fullName, email, password, acceptTerms: accepted });
       setUser(user);
       const destination = isProfileComplete(user) ? next : "/onboarding";
       router.replace(mode === "register" ? `/verificar?next=${encodeURIComponent(destination)}` : destination);
@@ -73,6 +82,10 @@ export function AuthForm({ mode }: { mode: Mode }) {
           <Button asChild variant="outline" size="lg" className="h-12 w-full">
             <a href={`${API_BASE}/auth/google/redirect?next=${encodeURIComponent(next)}`}>Continuar con Google</a>
           </Button>
+          <p className="-mt-3 text-center text-xs text-muted-foreground">
+            Si creas tu cuenta con Google, te pediremos aceptar los <LegalLink href="/terminos">Términos</LegalLink> y la{" "}
+            <LegalLink href="/privacidad">Política de privacidad</LegalLink>.
+          </p>
           <div className="flex items-center gap-3 text-xs uppercase tracking-wide text-muted-foreground">
             <span className="h-px flex-1 bg-border" />o<span className="h-px flex-1 bg-border" />
           </div>
@@ -110,13 +123,37 @@ export function AuthForm({ mode }: { mode: Mode }) {
           <FieldError id="password-error">{errors.fields.password}</FieldError>
           {mode === "login" ? (
             <Link
-              href={`/recuperar${email ? `?email=${encodeURIComponent(email)}` : ""}`}
+              href="/recuperar"
+              onClick={() => stashRecoveryEmail(email)}
               className="inline-block py-2 text-sm font-semibold text-brand-teal underline-offset-4 hover:underline dark:text-brand-lime"
             >
               ¿Olvidaste tu contraseña?
             </Link>
           ) : null}
         </div>
+
+        {mode === "register" ? (
+          <div className="space-y-1.5">
+            <div className="flex items-start gap-3">
+              <Checkbox
+                id="acceptTerms"
+                checked={accepted}
+                onCheckedChange={(value) => {
+                  setAccepted(value === true);
+                  setTermsMissing(false);
+                }}
+                aria-invalid={termsMissing || undefined}
+                aria-describedby={termsMissing ? "acceptTerms-error" : undefined}
+                className="mt-0.5 size-5"
+              />
+              <Label htmlFor="acceptTerms" className="block text-sm font-normal leading-snug">
+                Tengo 18 años o más y acepto los <LegalLink href="/terminos">Términos</LegalLink> y la{" "}
+                <LegalLink href="/privacidad">Política de privacidad</LegalLink>
+              </Label>
+            </div>
+            <FieldError id="acceptTerms-error">{termsMissing ? "Acepta los términos para crear tu cuenta." : undefined}</FieldError>
+          </div>
+        ) : null}
 
         <FormAlert message={errors.form} />
 

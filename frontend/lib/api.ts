@@ -85,8 +85,9 @@ interface ProfileInput {
 export const api = {
   me: () => request<User>("GET", "/me"),
   updateMe: (input: ProfileInput) => request<User>("PATCH", "/me", input),
-  register: (input: { fullName: string; email: string; password: string }) =>
+  register: (input: { fullName: string; email: string; password: string; acceptTerms: boolean }) =>
     request<User>("POST", "/auth/register", input),
+  acceptTerms: () => request<User>("POST", "/me/terms"),
   login: (input: { email: string; password: string }) =>
     request<User>("POST", "/auth/login", input),
   verifyEmail: (code: string) => request<User>("POST", "/auth/email/verify", { code }),

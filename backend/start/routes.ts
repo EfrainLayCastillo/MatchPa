@@ -50,6 +50,7 @@ router
         router.get('me', [MeController, 'show'])
         router.patch('me', [MeController, 'update']).use(writeThrottle)
         router.delete('me', [MeController, 'destroy']).use(writeThrottle)
+        router.post('me/terms', [MeController, 'acceptTerms']).use(writeThrottle)
         router.get('me/availabilities', [AvailabilitiesController, 'index'])
         router
           .put('me/availabilities/:date', [AvailabilitiesController, 'upsert'])

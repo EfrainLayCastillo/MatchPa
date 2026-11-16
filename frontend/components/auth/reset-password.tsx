@@ -1,14 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { CODE_LENGTH, CodeField, apiErrorMessage, useCountdown } from "@/components/auth/code-input";
 import { PageTitle } from "@/components/matchpa/page-title";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { api } from "@/lib/api";
+import { takeRecoveryEmail } from "@/lib/recovery-email";
 import { isProfileComplete, useSession } from "@/lib/session";
 import { FormAlert } from "@/components/matchpa/form-alert";
 
@@ -17,7 +18,13 @@ const RATE_LIMITED = "Ya pediste varios códigos. Intenta más tarde.";
 const linkClass = "font-semibold text-brand-teal underline-offset-4 hover:underline disabled:no-underline disabled:opacity-60 dark:text-brand-lime";
 
 export function ResetPassword() {
-  const [email, setEmail] = useState(useSearchParams().get("email") ?? "");
+  const [email, setEmail] = useState("");
+
+  useEffect(() => {
+    const stored = takeRecoveryEmail();
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- sessionStorage only exists on the client
+    if (stored) setEmail(stored);
+  }, []);
   const [codeSent, setCodeSent] = useState(false);
 
   return (

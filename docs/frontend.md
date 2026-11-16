@@ -18,6 +18,8 @@ Las URLs son visibles para el usuario, así que van en español.
 | `/registro` | No | Registro básico |
 | `/verificar` | Sí | Código de 6 dígitos para verificar el correo, con reenvío |
 | `/recuperar` | No | Recuperar contraseña: correo, luego código y contraseña nueva |
+| `/privacidad` | No | Política de privacidad (Ley 81). Enlazada desde el footer, el perfil, el registro y el aviso del teléfono |
+| `/terminos` | No | Términos de servicio |
 | `/onboarding` | Sí | Categoría (con subnivel opcional), género y teléfono. Obligatorio antes del lobby |
 | `/lobby` | Sí | Tarjeta de perfil, carrusel de tus próximos partidos (abiertos o completos, el más cercano primero), selector de fecha, filtro de sucursal (preseleccionado con las de tus partidos del día), menú "Filtros" y pestañas **Partidos** / **Jugadores**. Barra fija con "Estoy disponible" (bottom sheet) y "Crear una partida" |
 | `/partidos/nuevo` | Sí | Crear partido en dos pestañas: **Cuándo y dónde** y **El partido**. La segunda se habilita al completar sucursal y cancha |
@@ -34,3 +36,10 @@ Las URLs son visibles para el usuario, así que van en español.
 | Menú "Filtros" | "Ordenar por: Cercanía · Nivel" para ambas pestañas (reglas en [Categorías](reglas-de-negocio.md#categorías) y [Sucursales](reglas-de-negocio.md#sucursales)). Cercanía se desactiva sin ubicación ni zona |
 | Tarjeta de partido | Toda la tarjeta abre el detalle. Estado, categoría, fecha, sucursal con distancia y etiquetas (cancha, duración, tipo, puestos). En la pestaña Partidos, "Pedir unirme". Tus próximos partidos se cancelan desde el detalle, no desde el lobby |
 | Tarjeta de jugador | Inicial con check de verificado, sucursal con distancia, nombre, género, categoría, subnivel, horario y "¿Juegas?" |
+
+## Términos y privacidad
+
+- `TermsGate` (en `app/layout.tsx`, dentro de `SessionProvider`) muestra `TermsDialog` bloqueante si el usuario tiene `termsAccepted: false`, en cualquier ruta salvo `/privacidad` y `/terminos`.
+- `LEGAL_UPDATED_AT` (`lib/legal.ts`) es la fecha legible de `TERMS_VERSION` (`backend/app/services/terms.ts`): se cambian juntas.
+- `CookieNotice` solo se monta con `NEXT_PUBLIC_GTM_ID`; recuerda el cierre en `localStorage` y sube sobre las barras fijas (`data-fixed-bottom-bar`).
+

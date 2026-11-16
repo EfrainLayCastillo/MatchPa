@@ -5,6 +5,8 @@ const LINKS = [
   { href: "/", label: "Inicio" },
   { href: "/lobby", label: "Lobby" },
   { href: "/beta", label: "Beta" },
+  { href: "/terminos", label: "Términos" },
+  { href: "/privacidad", label: "Privacidad" },
 ];
 
 /** Hidden while a fixed bottom bar is on screen; it would cover the footer. */

@@ -26,5 +26,26 @@ services:
       - "1025:1025"
       - "8025:8025"
 
+  voicebox:
+    profiles: ["marketing"]
+    build: https://github.com/jamiepine/voicebox.git#main
+    container_name: matchpa-voicebox
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:17600:17493"
+    environment:
+      LOG_LEVEL: info
+      NUMBA_CACHE_DIR: /tmp/numba_cache
+    volumes:
+      - voicebox-data:/app/data
+      - voicebox-models:/home/voicebox/.cache/huggingface
+    deploy:
+      resources:
+        limits:
+          cpus: "4"
+          memory: 10G
+
 volumes:
   postgres-data:
+  voicebox-data:
+  voicebox-models:

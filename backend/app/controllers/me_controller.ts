@@ -4,6 +4,7 @@ import { updateProfileValidator } from '#validators/profile'
 import BusinessRuleError from '#exceptions/business_rule_error'
 import { serializeUser } from '#serializers/match_serializer'
 import { announceAccountDeletion, deleteAccount } from '#services/account_deletion'
+import { acceptTerms } from '#services/terms'
 import { normalizeWhatsapp } from '#services/whatsapp'
 
 export default class MeController {
@@ -20,6 +21,13 @@ export default class MeController {
       user.whatsapp = whatsapp
     }
     user.merge(data)
+    await user.save()
+    return serializeUser(user)
+  }
+
+  async acceptTerms({ auth }: HttpContext) {
+    const user = auth.getUserOrFail()
+    acceptTerms(user)
     await user.save()
     return serializeUser(user)
   }

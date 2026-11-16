@@ -19,10 +19,18 @@ Especificación de qué debe cumplir el backend y el frontend. Si el código se 
 - Cambiar la contraseña con el código verifica el correo, cierra las sesiones de los demás dispositivos e inicia sesión. Sirve también para que una cuenta de Google cree contraseña.
 - Los códigos de verificación y de recuperación son independientes: uno no sirve para el otro.
 
+## Consentimiento
+
+- Términos (`/terminos`) y privacidad (`/privacidad`) tienen una sola versión vigente, `TERMS_VERSION` en el backend (fecha `AAAA-MM-DD`). Cada usuario guarda la fecha y la versión que aceptó.
+- Registro con correo: casilla obligatoria, sin marcar: "Tengo 18 años o más y acepto…". Sin ella no se crea la cuenta.
+- Quien no tiene la versión vigente (cuenta de Google, cuentas de antes de esta regla o cambio de versión) ve un diálogo bloqueante en cualquier página con sesión, salvo `/privacidad` y `/terminos`. Opciones: aceptar o cerrar sesión; para eliminar la cuenta sin aceptar, escribe a `privacidad@matchpa.app`.
+- Edad mínima: 18 años.
+- Cambiar el texto de cualquiera de las dos páginas en algo sustancial sube la versión.
+
 ## Eliminar cuenta
 
 - Desde el final del perfil, escribiendo `ELIMINAR` para confirmar. No se puede deshacer.
-- Se anonimiza, no se borra la fila: nombre "Jugador eliminado", correo `deleted-<id>@matchpa.invalid`, y contraseña, Google, foto, WhatsApp, categoría, subnivel, género y verificación en `null`. Se borran su disponibilidad, suscripciones push, códigos y sugerencias de sucursal.
+- Se anonimiza, no se borra la fila: nombre "Jugador eliminado", correo `deleted-<id>@matchpa.invalid`, y contraseña, Google, foto, WhatsApp, categoría, subnivel, género y verificación en `null`. Se borran su disponibilidad, suscripciones push, códigos y sugerencias de sucursal. Se conservan la fecha y la versión de términos aceptadas, como prueba del consentimiento.
 - Sus partidos futuros `open` o `full` se cierran y sus solicitudes pendientes se cancelan.
 - Sus solicitudes pendientes en partidos de otros se cancelan, y sus puestos aceptados en partidos futuros se liberan como si saliera (el partido vuelve a `open` si corresponde).
 - Los partidos pasados no cambian y lo muestran como "Jugador eliminado".
