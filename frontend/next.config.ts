@@ -46,6 +46,9 @@ const OG_ASSETS = ["./assets/fonts/**", "./public/logo/logo.svg", "./public/stat
 const nextConfig: NextConfig = {
   /* config options here */
   cacheComponents: true,
+  experimental: {
+    agentUpgrade: "security",
+  },
   outputFileTracingIncludes: {
     "/partidos/[code]/historia": OG_ASSETS,
     "/partidos/[code]/opengraph-image*": OG_ASSETS,
