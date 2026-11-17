@@ -1,4 +1,5 @@
 import { api } from "./api";
+import { suggestAndroidHeadsUp } from "./notify";
 
 const VAPID_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? "";
 const DISMISSED_KEY = "matchpa.push-dismissed";
@@ -10,6 +11,10 @@ export type PushResult = "enabled" | "denied" | "unsupported";
 
 export function pushSupported(): boolean {
   return "serviceWorker" in navigator && "PushManager" in window && "Notification" in window;
+}
+
+function isAndroid(): boolean {
+  return /Android/i.test(navigator.userAgent);
 }
 
 export function isIosWithoutInstall(): boolean {
@@ -58,6 +63,7 @@ export async function enablePush(): Promise<PushResult> {
   });
   await api.savePushSubscription(subscription.toJSON());
   writeFlag(RESUBSCRIBE_KEY, false);
+  if (isAndroid()) suggestAndroidHeadsUp();
   return "enabled";
 }
 
