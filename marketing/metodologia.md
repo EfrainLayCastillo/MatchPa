@@ -16,7 +16,7 @@ Reparto sugerido: 40 % producto, 30 % pádel, 20 % comunidad y 10 % problema. Lo
 - **Talking head:** tú hablando a cámara, con subtítulos y motion graphics encima. Skill: `talking-head-recut`.
 - **Demo de producto:** capturas de la app dentro de un mockup de teléfono, con zoom a cada acción. Skills: `motion-graphics` y `product-launch-video`.
 - **Explainer sin cara:** texto cinético con gráficos de la marca. Skill: `faceless-explainer`.
-- **Carrusel:** de 5 a 7 slides en 1080×1350. Skill: `slideshow`.
+- **Carrusel:** 4 slides o menos en 1080×1350, solo PNG, en `carruseles/<slug>/`: el problema y un cierre corto con matchpa.app. Ver "Carruseles" en `CLAUDE.md`. La skill `slideshow` no sirve: hace decks para presentar en vivo.
 
 ## Flujo por pieza
 

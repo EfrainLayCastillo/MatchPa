@@ -1,5 +1,5 @@
 // Uso: node scripts/grabar.mjs <slug> [--solo 01-disponibles,02-invitar] [--port 3123] [--sync]
-// Graba las tomas de videos/<slug>/tomas.mjs contra el frontend en modo mock (NEXT_PUBLIC_MOCK_API=true) y las sincroniza
+// Graba las tomas de videos/<slug>/tomas.mjs (o carruseles/<slug>/tomas.mjs) contra el frontend en modo mock (NEXT_PUBLIC_MOCK_API=true) y las sincroniza
 // con la composición. --sync no graba: solo vuelve a escribir la composición desde assets/tomas.json (tras cambiar un corte).
 // Deja grabaciones/<slug>/<toma>.mp4 (30 fps), su copia en videos/<slug>/assets/rec/ y assets/tomas.json; en index.html reemplaza
 // `const TOMAS = …;` y los bloques <!-- tomas-video:start/end --> (un <video> por toma) y <!-- tomas-audio:start/end --> (un clic por toque).
@@ -20,10 +20,11 @@ if (!slug) throw new Error("Uso: node scripts/grabar.mjs <slug>");
 const port = Number(arg("--port") ?? 3123);
 const only = arg("--solo")?.split(",");
 const base = `http://localhost:${port}`;
-const { default: tomas } = await import(pathToFileURL(join(ROOT, "videos", slug, "tomas.mjs")).href);
+const PIECE = join(ROOT, existsSync(join(ROOT, "carruseles", slug)) ? "carruseles" : "videos", slug);
+const { default: tomas } = await import(pathToFileURL(join(PIECE, "tomas.mjs")).href);
 const outDir = join(ROOT, "grabaciones", slug);
 const rawDir = join(outDir, ".raw");
-const jsonPath = join(ROOT, "videos", slug, "assets", "tomas.json");
+const jsonPath = join(PIECE, "assets", "tomas.json");
 
 const ffmpegDir = readdirSync(join(process.env.HOME, "Library/Application Support/HyperFrames/runtimes")).find((d) => d.startsWith("ffmpeg-"));
 const ffmpeg = join(process.env.HOME, "Library/Application Support/HyperFrames/runtimes", ffmpegDir, "ffmpeg");
@@ -139,8 +140,8 @@ async function record(browser, toma) {
   const out = join(outDir, `${toma.id}.mp4`);
   encodeFrames(frames, start, end, join(rawDir, toma.id), out);
   console.log(`${toma.id}: ${frames.length} cuadros`);
-  mkdirSync(join(ROOT, "videos", slug, "assets/rec"), { recursive: true });
-  copyFileSync(out, join(ROOT, "videos", slug, "assets/rec", `${toma.id}.mp4`));
+  mkdirSync(join(PIECE, "assets/rec"), { recursive: true });
+  copyFileSync(out, join(PIECE, "assets/rec", `${toma.id}.mp4`));
   return { file: `assets/rec/${toma.id}.mp4`, duration: +(end - start).toFixed(2), taps };
 }
 
@@ -154,7 +155,7 @@ function syncComposition(recorded) {
     `<video id="toma-${id}" class="rec" src="${file}" data-start="${video.start}" data-duration="${+((video.to - video.from) / video.rate).toFixed(2)}" data-media-start="${video.from}" data-playback-rate="${video.rate}" data-track-index="${8 + i}" muted playsinline></video>`);
   const clicks = placed.flatMap(([id, { taps, video }]) => taps.filter((tap) => tap.t >= video.from && tap.t <= video.to)
     .map((tap, i) => `<audio id="click-${id}-${i}" src="assets/audio/click.mp3" data-start="${clipTime(video, tap.t)}" data-duration="0.36" data-media-start="0" data-volume="0.8" data-track-index="13"></audio>`));
-  const page = join(ROOT, "videos", slug, "index.html");
+  const page = join(PIECE, "index.html");
   const block = (name, lines, indent) => `<!-- ${name}:start -->\n${lines.map((l) => indent + l).join("\n")}\n${indent}<!-- ${name}:end -->`;
   let html = readFileSync(page, "utf8").replace(/const TOMAS = .*;/, `const TOMAS = ${JSON.stringify(data)};`);
   html = html.replace(/<!-- tomas-video:start -->[\s\S]*?<!-- tomas-video:end -->/, block("tomas-video", videos, "            "));

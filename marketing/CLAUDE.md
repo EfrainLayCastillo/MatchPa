@@ -9,7 +9,8 @@ Contenido para Instagram (Reels, Stories y carruseles) hecho con [HyperFrames](h
 - `guiones/`: un guion con storyboard por pieza (`AAAA-MM-DD-slug.md`), creado a partir de `guiones/_plantilla.md`.
 - `videos/`: un proyecto HyperFrames por pieza, con el mismo slug del guion. Para crear uno, copia `videos/_plantilla-reel`.
 - `assets/`: marca y música que se comparten entre piezas. Lo que usa una sola pieza va en el `assets/` de su proyecto.
-- `grabaciones/` y `renders/`: material crudo y MP4 finales. Están en `.gitignore`.
+- `carruseles/`: un proyecto HyperFrames por carrusel de Instagram, con el mismo slug del guion. Referencia: `carruseles/2026-11-17-nadie-responde`.
+- `grabaciones/` y `renders/`: material crudo y MP4 finales. Están en `.gitignore`, igual que `videos/` y `carruseles/`.
 
 ## Reglas
 
@@ -36,6 +37,7 @@ Contenido para Instagram (Reels, Stories y carruseles) hecho con [HyperFrames](h
 - `node scripts/vo.mjs <slug> [--solo 2,5]`: genera la voz en off de la tabla del guion e imprime las palabras con sus tiempos. Con `**Voz:** Voicebox, perfil `efrain`` usa Voicebox local: el servicio `voicebox` del `docker-compose.yml` de la raíz, que se levanta con `docker compose --profile marketing up -d voicebox` y queda en `http://localhost:17600` y saca los tiempos con Whisper. Con un id de HeyGen usa HeyGen, que requiere plan.
 - `node scripts/sfx.mjs buscar|bajar|catalogo`: busca y descarga sonidos de la librería de HeyGen en `assets/sfx/` y actualiza `assets/sfx/CATALOGO.md`.
 - `node scripts/grabar.mjs <slug> [--solo <id>] [--sync]`: graba las tomas de la app y las sincroniza con la composición (ver "Grabaciones de la app").
+- `node scripts/carrusel.mjs <slug>`: saca un PNG por slide del carrusel en `renders/<slug>/slide-N.png`, listos para subir en orden, y `publicacion.md` con el caption, los hashtags (3 a 5) y el alt text de cada slide, que toma del guion (sección `## Alt text`, una línea corta por slide).
 - `node scripts/logo.mjs`: genera el logo con el texto en trazos (SVG y PNG) en `assets/marca/logo/`, desde las fuentes de `assets/fonts/`.
 - Mapa de Panamá con palas como pines (`map.mjs`), pala y pelota de pádel (`racket.mjs`, `racket-preview.mjs` genera `assets/racket*.svg`): `videos/2026-11-05-birria-pa-hoy/anatomy/`. `node anatomy/map.mjs` inyecta el mapa entre `<!-- map:start -->` y los puntos en `const MAP`.
 - Cancha y personajes isométricos: la versión al día está en `videos/2026-11-10-quien-pa-birrear/anatomy/`: `court.mjs` (cancha con grada y jugadores sentados) y `figures.mjs` (personajes chibi, `seated` con `id` y `drop`, pala ovalada y `badgePoint`). Cópialos de ahí y no de piezas anteriores. `node anatomy/court.mjs [--wait]` inyecta el SVG y los puntos de cámara (`const ISO`) en `index.html` entre los marcadores `<!-- court:start -->`.
@@ -48,6 +50,15 @@ Contenido para Instagram (Reels, Stories y carruseles) hecho con [HyperFrames](h
 - No leas videos ni grabaciones completos: usa `hyperframes snapshot`, o la transcripción si existe.
 - Revisa con `snapshot` en pocos segundos clave y lee el `contact-sheet`, no cada PNG.
 - No renderices: al terminar, `npx hyperframes open .` deja el proyecto en la app y el usuario exporta desde ahí.
+
+## Carruseles
+
+- Solo imágenes: un PNG por slide, sin video ni GIF. 1080×1350 (4:5), 4 slides o menos.
+- Estructura de historia: gancho (portada) → el problema que reconoce el jugador → giro → cierre corto con el logo, **matchpa.app** en pastilla lima y "Link en la bio". El cierre no lleva fondo lima ni "Guárdalo".
+- Todo en un solo `index.html`: cada slide es una `<section class="clip slide">` de 1 s y el root declara `data-slides="1,1,1,1"`. Sin animaciones: `node scripts/carrusel.mjs <slug>` toma un snapshot de cada slide.
+- Las ilustraciones salen de anatomy o de un cuadro de un reel (`npx hyperframes snapshot --at <s> --zoom 'x,y,w,h'`), no de fotos de stock. Referencia: `carruseles/2026-11-17-nadie-responde` (la grada sale del reel "Qué es MatchPa").
+- Si sale la app, se graba en modo mock (`grabar.mjs` encuentra la pieza en `carruseles/<slug>/`). No uses las capturas de `docs/capturas/` ni de `assets/marca/`: muestran clubes reales.
+- El chat del problema se dibuja con burbujas en colores de la marca, sin la interfaz ni el logo de WhatsApp.
 
 ## Grabaciones de la app
 

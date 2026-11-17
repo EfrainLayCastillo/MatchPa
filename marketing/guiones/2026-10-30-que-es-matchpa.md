@@ -72,8 +72,8 @@ Una sola figura isométrica en **SVG** (sin WebGL ni 3D), de 1080×1920 y en tem
 ## Publicación
 
 - **Fecha:**
-- **Caption:** ¿Listo pa' jugar y nadie responde? 🎾 MatchPa te muestra los partidos de hoy, de tu categoría, pa' que hagas Match en minutos. Link en la bio 👉 matchpa.app
-- **Hashtags:** #padel #padelpanama #panama #matchpa
+- **Caption:** Pala lista, zapatos amarrados… y nadie con quién jugar 🎾 En MatchPa ves los partidos de hoy en tu sucursal, con tu categoría primero. Pides unirte, el organizador te acepta y ¡Match! Ya están los 4. Hecho por jugadores, pa' jugadores. Link en la bio 👉 matchpa.app
+- **Hashtags:** #padel #padelpanama #padelpty #jugadoresdepadel #matchpa
 
 ## Métricas (7 días)
 

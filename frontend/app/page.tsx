@@ -6,7 +6,7 @@ import { UpcomingFeatures } from "@/components/matchpa/upcoming-features";
 import { Button } from "@/components/ui/button";
 import { jsonLdHtml, SITE_JSON_LD, SITE_OPEN_GRAPH } from "@/lib/seo";
 
-const TITLE = "MatchPa — ¿Te falta una pala? Encuéntrala aquí";
+const TITLE = "Partidos de pádel en Panamá — ¿Te falta una pala? | MatchPa";
 const DESCRIPTION =
   "Jugadores disponibles y partidos de pádel buscando pala en Panamá, por categoría, sucursal y horario. Publica tu partido y compártelo por WhatsApp.";
 
@@ -49,13 +49,16 @@ export default function HomePage() {
           ey Pa, ¿juegas?
         </p>
         <h1 className="font-heading text-5xl font-extrabold leading-[0.95] sm:text-7xl">
-          ¿Te falta una pala?
+          ¿Te falta una pala?{" "}
           <span className="block text-brand-teal dark:text-brand-lime">
             Encuéntrala aquí.
+          </span>{" "}
+          <span className="mt-4 block font-sans text-xl font-semibold leading-tight text-muted-foreground sm:text-2xl">
+            Partidos de pádel en Panamá
           </span>
         </h1>
         <p className="max-w-xl text-lg text-muted-foreground">
-          Jugadores disponibles y partidos buscando pala, por categoría,
+          Jugadores disponibles y partidos de pádel buscando pala, por categoría,
           sucursal y horario. Sin scrollear el chat del grupo.
         </p>
         <div className="flex flex-col gap-3 sm:flex-row">

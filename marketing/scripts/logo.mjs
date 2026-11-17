@@ -49,17 +49,14 @@ function wordmark(match, pa) {
   return svg(w, h, `${x} ${y} ${w} ${h}`, body, "MatchPa");
 }
 
-function star(cx, cy, r) {
-  return `M${cx} ${cy - r}Q${cx} ${cy} ${cx + r} ${cy}Q${cx} ${cy} ${cx} ${cy + r}Q${cx} ${cy} ${cx - r} ${cy}Q${cx} ${cy} ${cx} ${cy - r}Z`;
-}
-
 function isotipo() {
   const side = 1024;
-  const probe = outline(yellowtail, "Pa", 600, 0, 0).bbox;
+  const probe = outline(bricolage, "MP", 520, 0, 0).bbox;
   const dx = side / 2 - (probe.minX + probe.maxX) / 2;
   const dy = side / 2 - (probe.minY + probe.maxY) / 2;
-  const pa = outline(yellowtail, "Pa", 600, dx, dy);
-  const body = `<rect width="${side}" height="${side}" rx="224" fill="${C.verde}"/><path fill="${C.lima}" d="${pa.d}"/><path fill="${C.turquesa}" d="${star(790, 250, 92)}"/>`;
+  const m = outline(bricolage, "M", 520, dx, dy);
+  const p = outline(bricolage, "P", 520, m.end, dy);
+  const body = `<rect width="${side}" height="${side}" rx="224" fill="${C.verde}"/><path fill="${C.marfil}" d="${m.d}"/><path fill="${C.lima}" d="${p.d}"/>`;
   return svg(side, side, `0 0 ${side} ${side}`, body, "MatchPa");
 }
 
