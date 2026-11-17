@@ -50,6 +50,14 @@ Especificación de qué debe cumplir el backend y el frontend. Si el código se 
 - No puedes unirte a tu propio partido ni tener dos solicitudes activas en el mismo.
 - Al salir de `open`, las solicitudes pendientes pasan a `cancelled`.
 - Duración: 60, 90 o 120 minutos.
+
+### Reserva de cancha
+
+- Al publicar, el organizador elige **Ya reservé la cancha** (por defecto, con número) o **La reservo cuando se complete** (sin número). Con reserva, `court_booked_at` y `court_number` tienen valor; sin reserva, los dos son `null`.
+- Todos ven "Cancha N" o "Cancha por reservar" (detalle, lobby, invitaciones, Mis partidas, compartir e imágenes). Un partido sin reserva aparece igual en el lobby.
+- Solo el organizador confirma con "Ya reservé" y el número, en `open`, `full` o `closed`, mientras el partido no haya empezado. Mientras está `open` también puede hacerlo desde Editar, y ahí mismo quitar la reserva.
+- Solo el organizador ve el aviso con el contacto de la sucursal para reservar. Al llenarse sin reserva, el aviso pasa a destacado.
+- Confirmar, cambiar el número o quitar la reserva avisa a los jugadores aceptados.
 - **Sin solapamientos:** un jugador no puede tener dos partidos abiertos o completos que se crucen en horario. Cuenta tanto los que organiza como los que tiene aceptados. Aplica al pedir unirse, al recibir una invitación y al aceptar.
 - **Máximo 7 por día:** un jugador no puede tener más de 7 partidos el mismo día (hora de Panamá), contando los que organiza y los que tiene aceptados.
 - Un organizador con partido abierto o completo no puede sumarse a otro que se cruce en horario.

@@ -15,6 +15,7 @@ interface AnalyticsEvents {
   login: { method: AuthMethod };
   email_verified: { context: "signup" | "action" | "profile" };
   onboarding_complete: { category: Category | null };
+  confirm_booking: { branch: string; match_status: MatchStatus };
   publish_match: {
     match_type: MatchType;
     category: Category;
@@ -22,6 +23,7 @@ interface AnalyticsEvents {
     branch: string;
     guests: number;
     from_invite: boolean;
+    court_booked: boolean;
     lead_time: "same_day" | "next_day" | "later";
   };
   share: {

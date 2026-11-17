@@ -1,9 +1,9 @@
 "use client";
 
-import { LandPlotIcon, UsersIcon } from "lucide-react";
+import { UsersIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { SectionHeading } from "@/components/matchpa/section-heading";
-import { IconBadge, MatchSummaryCard } from "@/components/match/match-summary-card";
+import { CourtBadge, IconBadge, MatchSummaryCard } from "@/components/match/match-summary-card";
 import {
   Carousel,
   type CarouselApi,
@@ -73,7 +73,7 @@ function UpcomingMatchCard({ match }: { match: Match }) {
     <MatchSummaryCard
       match={match}
       badges={[
-        <IconBadge key="court" icon={LandPlotIcon}>Cancha {match.courtNumber}</IconBadge>,
+        <CourtBadge key="court" match={match} />,
         <IconBadge key="spots" icon={UsersIcon}>{match.spotsLeft > 0 ? `Faltan ${match.spotsLeft}` : "Completo"}</IconBadge>,
       ]}
     />

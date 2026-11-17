@@ -17,5 +17,5 @@ Al implementar:
 - Toda transición de estado va en el service correspondiente, dentro de una transacción.
 
 Antes de terminar:
-- Corre `node ace test` y reporta el resultado real.
-- Devuelve: archivos cambiados, endpoints o tablas tocados, y cualquier diferencia con `docs/` que haya que llevar con `sync-docs`.
+- Mientras trabajas, corre solo el spec tocado (`node ace test --files=<spec>`); la suite completa, typecheck y lint, una vez al final.
+- Reporte final de 15 líneas como máximo: resultado real de los checks (pasa/falla y solo los errores relevantes), archivos tocados en una lista, y desvíos del plan o de `docs/`. No repitas el plan ni expliques lo que ya está en el código.

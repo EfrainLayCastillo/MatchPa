@@ -5,6 +5,7 @@ import { DetailSkeleton } from "@/components/matchpa/skeletons";
 import { Suspense } from "react";
 import { MatchDetail } from "@/components/match/match-detail";
 import { SITE_URL } from "@/lib/config";
+import { courtLabel } from "@/lib/format";
 import { formatDateTime } from "@/lib/panamaFormatDate";
 import { fetchPublicMatch, isIndexable } from "@/lib/public-match";
 
@@ -19,7 +20,7 @@ export async function generateMetadata({ params }: MatchPageProps): Promise<Meta
   if (!match) return { title: "Partido" };
 
   const title = `${match.branch.name} · ${formatDateTime(match.startsAt)}`;
-  const description = `Cancha ${match.courtNumber}, ${match.branch.name}. Faltan ${match.spotsLeft} puestos.`;
+  const description = `${courtLabel(match)}, ${match.branch.name}. Faltan ${match.spotsLeft} puestos.`;
   return {
     title,
     description,

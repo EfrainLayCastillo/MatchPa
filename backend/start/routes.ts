@@ -66,6 +66,7 @@ router
         router.get('matches', [MatchesController, 'index'])
         router.post('matches', [MatchesController, 'store']).use(publishThrottle)
         router.patch('matches/:code', [MatchesController, 'update']).use(writeThrottle)
+        router.post('matches/:code/booking', [MatchesController, 'booking']).use(writeThrottle)
         router.post('matches/:code/close', [MatchesController, 'close']).use(publishThrottle)
         router
           .post('matches/:code/join-requests', [JoinRequestsController, 'store'])

@@ -92,7 +92,8 @@ export interface MyRequest {
   match: {
     code: string;
     startsAt: string;
-    courtNumber: number;
+    courtBooked: boolean;
+    courtNumber: number | null;
     branchName: string;
     status: MatchStatus;
     category: Category;
@@ -107,7 +108,8 @@ export interface Match {
   code: string;
   organizer: { id: number; fullName: string; phone: string | null };
   branch: Branch;
-  courtNumber: number;
+  courtBooked: boolean;
+  courtNumber: number | null;
   startsAt: string;
   updatedAt: string | null;
   durationMinutes: MatchDuration;
@@ -126,7 +128,8 @@ export interface Match {
 
 export interface NewMatchInput {
   branchId: number;
-  courtNumber: number;
+  courtBooked: boolean;
+  courtNumber: number | null;
   startsAt: string;
   durationMinutes: MatchDuration;
   category: Category;

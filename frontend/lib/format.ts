@@ -31,6 +31,20 @@ export const GENDER_LABELS: Record<Gender, string> = {
 
 export const CATEGORIES = [1, 2, 3, 4, 5, 6, 7] as const satisfies Category[];
 
+type Bookable = { status: MatchStatus; startsAt: string };
+
+export function acceptsBooking(match: Bookable): boolean {
+  return match.status !== "expired" && new Date(match.startsAt) > new Date();
+}
+
+export function canConfirmBooking(match: Bookable & { courtBooked: boolean }): boolean {
+  return !match.courtBooked && acceptsBooking(match);
+}
+
+export function courtLabel(match: { courtNumber: number | null }): string {
+  return match.courtNumber === null ? "Cancha por reservar" : `Cancha ${match.courtNumber}`;
+}
+
 export function shortCategory(category: Category): string {
   return CATEGORY_LABELS[category];
 }

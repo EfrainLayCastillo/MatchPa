@@ -100,8 +100,9 @@ function MatchFormBody({ match }: { match?: Match }) {
     match ? String(match.branch.id) : (presetBranch ?? ""),
   );
   const [suggestQuery, setSuggestQuery] = useState<string | null>(null);
+  const [courtBooked, setCourtBooked] = useState(match?.courtBooked ?? true);
   const [courtNumber, setCourtNumber] = useState(
-    match ? String(match.courtNumber) : "",
+    match?.courtNumber != null ? String(match.courtNumber) : "",
   );
   const [category, setCategory] = useState<Category>(
     match?.category ?? user?.category ?? 4,
@@ -135,7 +136,7 @@ function MatchFormBody({ match }: { match?: Match }) {
     inviteeId !== null && presetBranch !== null && branchId === presetBranch;
   const dateLocked = inviteeId !== null && date === validDate(presetDate);
   const whereComplete =
-    Object.keys(whereErrors(branchId, courtNumber)).length === 0;
+    Object.keys(whereErrors(branchId, courtBooked, courtNumber)).length === 0;
 
   useEffect(() => {
     api
@@ -158,7 +159,8 @@ function MatchFormBody({ match }: { match?: Match }) {
   function buildInput(): NewMatchInput {
     return {
       branchId: Number(branchId),
-      courtNumber: Number(courtNumber),
+      courtBooked,
+      courtNumber: courtBooked ? Number(courtNumber) : null,
       startsAt: new Date(`${date}T${time}:00-05:00`).toISOString(),
       durationMinutes: duration,
       category,
@@ -170,7 +172,7 @@ function MatchFormBody({ match }: { match?: Match }) {
   }
 
   function goNext() {
-    const fields = whereErrors(branchId, courtNumber);
+    const fields = whereErrors(branchId, courtBooked, courtNumber);
     if (Object.keys(fields).length > 0) return fail({ fields, form: null });
     reset();
     setStep(1);
@@ -185,7 +187,7 @@ function MatchFormBody({ match }: { match?: Match }) {
     const submitter = (event.nativeEvent as SubmitEvent).submitter;
     if (!submitter?.hasAttribute("data-publish")) return;
     const fields = {
-      ...whereErrors(branchId, courtNumber),
+      ...whereErrors(branchId, courtBooked, courtNumber),
       ...guestErrors(guests),
     };
     if (Object.keys(fields).length > 0)
@@ -208,6 +210,7 @@ function MatchFormBody({ match }: { match?: Match }) {
         branch: published.branch.slug,
         guests: published.guests.length,
         from_invite: inviteeId !== null,
+        court_booked: published.courtBooked,
         lead_time: leadTime(published.startsAt),
       });
       if (inviteeId)
@@ -290,7 +293,7 @@ function MatchFormBody({ match }: { match?: Match }) {
               disabled={dateLocked}
             />
           </Field>
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-2 gap-2">
             <Field label="Hora" htmlFor="time" error={errors.fields.startsAt}>
               <Select
                 value={time}
@@ -335,6 +338,28 @@ function MatchFormBody({ match }: { match?: Match }) {
                 </SelectContent>
               </Select>
             </Field>
+          </div>
+          <Field label="Reserva de la cancha">
+            <RadioGroup
+              value={courtBooked ? "booked" : "pending"}
+              onValueChange={(value) => {
+                setCourtBooked(value === "booked");
+                clearField("courtNumber");
+              }}
+              className="grid gap-2"
+            >
+              {COURT_OPTIONS.map(({ value, label }) => (
+                <Label
+                  key={value}
+                  className="flex cursor-pointer items-center gap-2 rounded-lg border border-border bg-card px-3 py-2.5 text-sm font-medium has-[[data-state=checked]]:border-brand-teal has-[[data-state=checked]]:bg-brand-lime/40 dark:has-[[data-state=checked]]:border-brand-lime"
+                >
+                  <RadioGroupItem value={value} />
+                  {label}
+                </Label>
+              ))}
+            </RadioGroup>
+          </Field>
+          {courtBooked ? (
             <Field
               label="Cancha"
               htmlFor="court"
@@ -345,6 +370,7 @@ function MatchFormBody({ match }: { match?: Match }) {
                 type="number"
                 inputMode="numeric"
                 min={1}
+                max={50}
                 placeholder="Ej. 3"
                 value={courtNumber}
                 onChange={(e) => {
@@ -355,7 +381,11 @@ function MatchFormBody({ match }: { match?: Match }) {
                 {...invalidProps("court", errors.fields.courtNumber)}
               />
             </Field>
-          </div>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              Te avisamos cuando se complete para que la reserves.
+            </p>
+          )}
           <Field
             label="Sucursal"
             htmlFor="branch"
@@ -645,6 +675,11 @@ function Field({ label, htmlFor, error, children }: FieldProps) {
   );
 }
 
+const COURT_OPTIONS = [
+  { value: "booked", label: "Ya reservé la cancha" },
+  { value: "pending", label: "La reservo cuando se complete" },
+];
+
 const STEP_ONE_FIELDS = new Set([
   "branchId",
   "courtNumber",
@@ -652,10 +687,14 @@ const STEP_ONE_FIELDS = new Set([
   "durationMinutes",
 ]);
 
-function whereErrors(branchId: string, courtNumber: string): FieldErrors {
+function whereErrors(
+  branchId: string,
+  courtBooked: boolean,
+  courtNumber: string,
+): FieldErrors {
   return {
     ...(branchId ? {} : { branchId: "Elige la sucursal de la cancha" }),
-    ...(courtNumber ? {} : { courtNumber: "Indica el número de cancha" }),
+    ...(!courtBooked || courtNumber ? {} : { courtNumber: "Indica el número de cancha" }),
   };
 }
 

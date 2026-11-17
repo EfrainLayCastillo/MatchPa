@@ -56,6 +56,7 @@ test.group('subnivel de categoría', (group) => {
       .post('/api/matches')
       .json({
         branchId: branch.id,
+        courtBooked: true,
         courtNumber: 3,
         startsAt: DateTime.now().plus({ days: 1 }).toISO(),
         durationMinutes: 90,

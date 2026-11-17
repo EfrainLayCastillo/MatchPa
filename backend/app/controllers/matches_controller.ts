@@ -3,17 +3,18 @@ import { DateTime } from 'luxon'
 import BusinessRuleError from '#exceptions/business_rule_error'
 import Match from '#models/match'
 import { serializeMatch } from '#serializers/match_serializer'
-import { notifyMatchClosed } from '#services/notifications'
+import { notifyBookingChanged, notifyMatchClosed, notifyMatchFilled } from '#services/notifications'
 import {
   matchQuery,
   findMatchByCode,
   closeMatch,
+  confirmBooking,
   publishMatch,
   updateMatch,
 } from '#services/match_service'
 import { matchChanged } from '#services/realtime'
 import { panamaDayBounds } from '#services/panama_time'
-import { matchFiltersValidator, matchValidator } from '#validators/match'
+import { bookingValidator, matchFiltersValidator, matchValidator } from '#validators/match'
 
 export default class MatchesController {
   async index({ auth, request }: HttpContext) {
@@ -41,6 +42,7 @@ export default class MatchesController {
 
     const match = await publishMatch(organizer, {
       ...data,
+      courtNumber: data.courtBooked ? (data.courtNumber ?? null) : null,
       startsAt,
       durationMinutes: data.durationMinutes as 60 | 90 | 120,
       guests,
@@ -65,12 +67,28 @@ export default class MatchesController {
 
     const updated = await updateMatch(params.code, {
       ...data,
+      courtNumber: data.courtBooked ? (data.courtNumber ?? null) : null,
       startsAt,
       durationMinutes: data.durationMinutes as 60 | 90 | 120,
       guests,
     })
-    matchChanged(updated.code)
-    return serializeMatch(await findMatchByCode(updated.code), auth.getUserOrFail())
+    await Promise.all([
+      notifyBookingChanged(updated.match, updated.bookingChange),
+      updated.filled ? notifyMatchFilled(updated.match) : undefined,
+    ])
+    matchChanged(params.code)
+    return serializeMatch(await findMatchByCode(params.code), auth.getUserOrFail())
+  }
+
+  async booking({ auth, bouncer, params, request }: HttpContext) {
+    const match = await Match.query().where('code', params.code).firstOrFail()
+    await bouncer.authorize('manageMatch', match)
+
+    const { courtNumber } = await request.validateUsing(bookingValidator)
+    const { match: booked, bookingChange } = await confirmBooking(params.code, courtNumber)
+    await notifyBookingChanged(booked, bookingChange)
+    matchChanged(params.code)
+    return serializeMatch(await findMatchByCode(params.code), auth.getUserOrFail())
   }
 
   async close({ auth, bouncer, params }: HttpContext) {

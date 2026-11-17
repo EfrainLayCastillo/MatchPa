@@ -25,7 +25,7 @@
   |---|---|---|
   | `publish` | `POST /matches`, `POST /matches/:code/close` | 10 por hora |
   | `social` | `POST /matches/:code/join-requests`, `POST /matches/:code/invitations` | 30 por hora |
-  | `write` | `PATCH/DELETE /me`, `POST /me/terms`, `PATCH /matches/:code`, `PATCH /match-requests/:id`, `PUT/DELETE /me/availabilities/:date`, `POST/DELETE /push-subscriptions` | 120 por hora |
+  | `write` | `PATCH/DELETE /me`, `POST /me/terms`, `POST /matches/:code/booking`, `PATCH /matches/:code`, `PATCH /match-requests/:id`, `PUT/DELETE /me/availabilities/:date`, `POST/DELETE /push-subscriptions` | 120 por hora |
 
   Son holgados: frenan scripts y ráfagas, no el uso normal. El frontend muestra "Vas muy rápido. Espera un momento y vuelve a intentar." en cualquier 429 sin mensaje propio.
 - **Dependencias:** `npm run audit` en cada paquete falla con vulnerabilidades altas de producción. `backend/package.json` fuerza `nodemailer ^10.3.1` con `overrides`, porque `@adonisjs/mail` 10.4 trae la 9.x con vulnerabilidades altas de DoS en `addressparser`; se quita el override cuando `@adonisjs/mail` actualice. Quedan moderate en herramientas de build (`minimatch`, `deepmerge`) sin parche publicado.

@@ -17,7 +17,8 @@ Transmit (SSE) para eventos con la app abierta; Web Push para avisos con la app 
 | Nueva solicitud | Organizador |
 | Nueva invitación | Invitado |
 | Solicitud o invitación aceptada | La otra parte |
-| Partido completo | Organizador y jugadores |
+| Partido completo (al aceptar o al editar) | Organizador: "Reserva la cancha en <sucursal>" si está por reservar, o "Ya están los N". Jugadores aceptados: "Ya están los N". Reemplaza al aviso de aceptación cuando la aceptación llena el partido |
+| Cancha confirmada, cambio de cancha o cancha por reservar | Jugadores aceptados |
 | Partido cerrado | Jugadores aceptados |
 | Jugador se salió | Organizador |
 | Jugador sacado | El jugador |

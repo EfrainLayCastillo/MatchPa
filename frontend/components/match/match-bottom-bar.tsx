@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { matchRole, track } from "@/lib/analytics";
+import { courtLabel } from "@/lib/format";
 import type { MatchImage } from "@/lib/match-images";
 import { shareUrl } from "@/lib/share-url";
 import type { Match } from "@/lib/types";
@@ -74,7 +75,7 @@ function useStoryImage(code: string | null, image: MatchImage): File | null {
 }
 
 async function shareMatch(match: Match, file: File | null, image: MatchImage) {
-  const text = `Partido de pádel en ${match.branch.name}, cancha ${match.courtNumber}. Faltan ${match.spotsLeft} puestos.`;
+  const text = `Partido de pádel en ${match.branch.name}, ${courtLabel(match).toLowerCase()}. Faltan ${match.spotsLeft} puestos.`;
   const common = {
     content_type: "match",
     sharer_role: matchRole(match),

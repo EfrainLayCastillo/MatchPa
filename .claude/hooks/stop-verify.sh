@@ -16,12 +16,18 @@ verify() {
   [ -f "$dir/package.json" ] && [ -d "$dir/node_modules" ] || return 0
   [ -n "$(git -C "$root" status --porcelain -- "$pkg")" ] || return 0
 
-  local cmd out
+  local stamp="$root/.git/stop-verify-$pkg" fingerprint
+  fingerprint="$(cd "$root" && { git diff HEAD -- "$pkg"; git ls-files --others --exclude-standard -z -- "$pkg" | xargs -0 cat 2>/dev/null; } | shasum | cut -d' ' -f1)"
+  [ "$(cat "$stamp" 2>/dev/null)" = "$fingerprint" ] && return 0
+
+  local cmd out pkg_failed=""
   for cmd in "$@"; do
     if ! out="$(cd "$dir" && eval "$cmd" 2>&1)"; then
-      failures+=$'\n'"[$pkg] $cmd falló:"$'\n'"$(tail -n 40 <<<"$out")"$'\n'
+      failures+=$'\n'"[$pkg] $cmd falló:"$'\n'"$(grep -E 'error|Error|✖|❯|FAILED|failed' <<<"$out" | head -n 15)"$'\n'
+      pkg_failed=1
     fi
   done
+  [ -z "$pkg_failed" ] && echo "$fingerprint" > "$stamp"
 }
 
 verify backend "npm run --if-present typecheck" "npm run --if-present lint" "node ace test"

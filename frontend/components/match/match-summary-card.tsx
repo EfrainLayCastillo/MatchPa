@@ -1,10 +1,10 @@
-import { MapPinIcon, TrophyIcon, type LucideIcon } from "lucide-react";
+import { LandPlotIcon, MapPinIcon, TrophyIcon, type LucideIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { StatusBadge } from "@/components/matchpa/status-badge";
 import { Badge } from "@/components/ui/badge";
 import { formatDistance } from "@/lib/distance";
-import { formatCategory } from "@/lib/format";
+import { courtLabel, formatCategory } from "@/lib/format";
 import { MATCH_IMAGES, type MatchImage } from "@/lib/match-images";
 import { formatDateTime } from "@/lib/panamaFormatDate";
 import type { Match } from "@/lib/types";
@@ -60,15 +60,28 @@ export function MatchSummaryCard({
   );
 }
 
+export function CourtBadge({ match }: { match: { courtNumber: number | null } }) {
+  return (
+    <IconBadge
+      icon={LandPlotIcon}
+      className={match.courtNumber === null ? "bg-brand-lime text-brand-teal" : undefined}
+    >
+      {courtLabel(match)}
+    </IconBadge>
+  );
+}
+
 export function IconBadge({
   icon: Icon,
   children,
+  className,
 }: {
   icon: LucideIcon;
   children: React.ReactNode;
+  className?: string;
 }) {
   return (
-    <Badge variant="secondary">
+    <Badge variant="secondary" className={className}>
       <Icon data-icon="inline-start" />
       {children}
     </Badge>

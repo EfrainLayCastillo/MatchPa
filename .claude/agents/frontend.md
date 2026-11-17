@@ -17,6 +17,5 @@ Al implementar:
 - Textos en español con el tono del brandbook.
 
 Antes de terminar:
-- Verifica la pantalla en el dev server (`next-dev-loop` o `webapp-testing`) a 375px y reporta qué comprobaste.
-- Corre lint y typecheck y reporta el resultado real.
-- Devuelve: archivos cambiados, rutas tocadas y cualquier diferencia con `docs/`.
+- No abras navegador ni dev server: el usuario prueba a 375px. Corre `npx tsc --noEmit` y `npx eslint` de los archivos tocados; `next build` solo si cambiaste layout, rutas o prerender.
+- Reporte final de 15 líneas como máximo: resultado real de los checks (pasa/falla y solo los errores relevantes), archivos tocados en una lista, y desvíos del plan o de `docs/`. No repitas el plan ni expliques lo que ya está en el código.

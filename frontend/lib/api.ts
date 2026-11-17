@@ -124,6 +124,8 @@ export const api = {
   updateMatch: (code: string, input: NewMatchInput) =>
     request<Match>("PATCH", `/matches/${code}`, input),
   closeMatch: (code: string) => request<Match>("POST", `/matches/${code}/close`),
+  confirmBooking: (code: string, courtNumber: number) =>
+    request<Match>("POST", `/matches/${code}/booking`, { courtNumber }),
   requestToJoin: (code: string) =>
     request<MatchRequest>("POST", `/matches/${code}/join-requests`),
   invite: (code: string, userId: number) =>

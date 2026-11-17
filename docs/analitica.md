@@ -12,13 +12,14 @@ El frontend los empuja al `dataLayer` con `track()` (`frontend/lib/analytics.ts`
 | `login` | Login con correo o con Google existente (`authEvent: google_login`) | `method` |
 | `email_verified` | Tras verificar el código | `context`: `signup` \| `action` \| `profile` (de `?origen=` en `/verificar`) |
 | `onboarding_complete` | Al guardar el onboarding | `category` |
-| `publish_match` | Tras publicar | `match_type`, `category`, `max_players`, `branch`, `guests`, `from_invite`, `lead_time`: `same_day` \| `next_day` \| `later` |
+| `publish_match` | Tras publicar | `match_type`, `category`, `max_players`, `branch`, `guests`, `from_invite`, `court_booked`, `lead_time`: `same_day` \| `next_day` \| `later` |
 | `share` | Cuando `navigator.share` resuelve (cancelar no cuenta) o al copiar el link | `method`: `share_sheet` \| `story_image` \| `copy_link`, `content_type`: `match`, `sharer_role`, `match_status` |
 | `view_match` | Una vez por apertura del detalle, con la sesión cargada | `match_status`, `viewer_role`: `organizer` \| `player` \| `visitor` \| `anonymous`, `spots_left`, `branch` |
 | `join_intent` | "Inicia sesión para unirte" (sin sesión) | `branch` |
 | `join_request` | Tras pedir unirse | `entry_point`: `lobby` \| `match_page`, `branch`, `level_gap`: `0` \| `1` \| `2_plus` |
 | `join_approved` | Cuando el organizador acepta | `branch`, `fills_match` |
 | `set_availability` | Tras marcar disponibilidad | `branch`, `has_time_window`, `day`: `today` \| `tomorrow` \| `later` |
+| `confirm_booking` | El organizador confirma la cancha ("Ya reservé") | `branch`, `match_status` |
 | `invite_player` | Tras invitar desde el pool o al publicar | `branch`, `entry_point`: `pool` \| `new_match` |
 
 `branch` es el `slug` de la sucursal. El contrato tipado vive en `frontend/lib/analytics.ts`.

@@ -22,7 +22,7 @@ export interface GuestInput {
 
 export interface MatchInput {
   branchId: number
-  courtNumber: number
+  courtNumber: number | null
   startsAt: DateTime
   durationMinutes: 60 | 90 | 120
   category: number
@@ -31,6 +31,8 @@ export interface MatchInput {
   maxPlayers: number
   guests: GuestInput[]
 }
+
+export type BookingChange = 'booked' | 'court_changed' | 'unbooked' | null
 
 const ACTIVE: RequestStatus[] = ['pending', 'accepted']
 
@@ -60,12 +62,16 @@ export async function publishMatch(organizer: User, input: MatchInput): Promise<
   })
 }
 
-export async function updateMatch(code: string, input: MatchInput): Promise<Match> {
+export async function updateMatch(
+  code: string,
+  input: MatchInput
+): Promise<{ match: Match; bookingChange: BookingChange; filled: boolean }> {
   return db.transaction(async (trx) => {
     const locked = await lockMatchByCode(code, trx)
     assertOpen(locked)
+    const previousCourt = locked.courtNumber
 
-    locked.merge(matchFields(input)).useTransaction(trx)
+    locked.merge(matchFields(input, locked)).useTransaction(trx)
     await locked.save()
     await MatchGuest.query({ client: trx }).where('match_id', locked.id).delete()
     await MatchGuest.createMany(
@@ -76,8 +82,39 @@ export async function updateMatch(code: string, input: MatchInput): Promise<Matc
     const fresh = await loadMatch(locked.id, trx)
     if (spotsLeft(fresh) < 0) throw new BusinessRuleError('No hay puestos para tantos jugadores')
     await syncStatus(locked.id, trx)
-    return loadMatch(locked.id, trx)
+    const match = await loadMatch(locked.id, trx)
+    return {
+      match,
+      bookingChange: bookingChange(previousCourt, match.courtNumber),
+      filled: match.status === 'full',
+    }
   })
+}
+
+export async function confirmBooking(
+  code: string,
+  courtNumber: number
+): Promise<{ match: Match; bookingChange: BookingChange }> {
+  return db.transaction(async (trx) => {
+    const locked = await lockMatchByCode(code, trx)
+    if (locked.startsAt <= DateTime.now())
+      throw new BusinessRuleError('Este partido ya no está disponible')
+
+    const previousCourt = locked.courtNumber
+    locked.courtNumber = courtNumber
+    locked.courtBookedAt = locked.courtBookedAt ?? DateTime.now()
+    await locked.useTransaction(trx).save()
+    return {
+      match: await loadMatch(locked.id, trx),
+      bookingChange: bookingChange(previousCourt, courtNumber),
+    }
+  })
+}
+
+function bookingChange(before: number | null, after: number | null): BookingChange {
+  if (before === after) return null
+  if (before === null) return 'booked'
+  return after === null ? 'unbooked' : 'court_changed'
 }
 
 export async function closeMatch(code: string): Promise<Match> {
@@ -148,7 +185,7 @@ export async function inviteToMatch(code: string, userId: number): Promise<Match
 export async function respondToRequest(
   requestId: number,
   action: RequestAction
-): Promise<MatchRequest> {
+): Promise<{ request: MatchRequest; match: Match; filled: boolean }> {
   return db.transaction(async (trx) => {
     const request = await MatchRequest.query({ client: trx })
       .where('id', requestId)
@@ -171,13 +208,15 @@ export async function respondToRequest(
 
     if (action === 'leave') {
       await releaseSeat(request, trx)
-      return request
+      return { request, match, filled: false }
     }
 
     request.status = transition.to
     await request.useTransaction(trx).save()
     await syncStatus(match.id, trx)
-    return request
+    const after = await loadMatch(match.id, trx)
+    const filled = action === 'accept' && after.status === 'full'
+    return { request, match: after, filled }
   })
 }
 
@@ -205,10 +244,12 @@ export function loadMatch(id: number, trx: TransactionClientContract): Promise<M
     .firstOrFail()
 }
 
-function matchFields(input: MatchInput) {
+function matchFields(input: MatchInput, current?: Match) {
+  const booked = input.courtNumber !== null
   return {
     branchId: input.branchId,
     courtNumber: input.courtNumber,
+    courtBookedAt: booked ? (current?.courtBookedAt ?? DateTime.now()) : null,
     startsAt: input.startsAt,
     durationMinutes: input.durationMinutes,
     category: input.category,

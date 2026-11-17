@@ -23,7 +23,10 @@ export default class Match extends BaseModel {
   declare branchId: number
 
   @column()
-  declare courtNumber: number
+  declare courtNumber: number | null
+
+  @column.dateTime()
+  declare courtBookedAt: DateTime | null
 
   @column.dateTime()
   declare startsAt: DateTime

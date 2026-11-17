@@ -1,7 +1,7 @@
 import { DateTime } from 'luxon'
 import type { HttpContext } from '@adonisjs/core/http'
 import MatchRequest from '#models/match_request'
-import { notifyRequestAnswered } from '#services/notifications'
+import { notifyMatchFilled, notifyRequestAnswered } from '#services/notifications'
 import { respondToRequest } from '#services/match_service'
 import { effectiveStatus } from '#services/match_rules'
 import { matchChanged, requestChanged } from '#services/realtime'
@@ -24,6 +24,7 @@ export default class MatchRequestsController {
       match: {
         code: request.match.code,
         startsAt: request.match.startsAt.toISO(),
+        courtBooked: request.match.courtBookedAt !== null,
         courtNumber: request.match.courtNumber,
         branchName: request.match.branch.name,
         status: effectiveStatus(request.match),
@@ -43,8 +44,15 @@ export default class MatchRequestsController {
       .firstOrFail()
     await bouncer.authorize('respondToRequest', existing, action)
 
-    const updated = await respondToRequest(existing.id, action)
-    await notifyRequestAnswered(existing.match, existing, action)
+    const { request: updated, match, filled } = await respondToRequest(existing.id, action)
+    await Promise.all([
+      filled && existing.kind === 'invitation'
+        ? undefined
+        : notifyRequestAnswered(existing.match, existing, action),
+      filled
+        ? notifyMatchFilled(match, existing.kind === 'join_request' ? [existing.userId] : [])
+        : undefined,
+    ])
     requestChanged(existing.userId)
     matchChanged(existing.match.code)
     return { id: updated.id, kind: updated.kind, status: updated.status }

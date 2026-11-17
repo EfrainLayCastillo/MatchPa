@@ -81,6 +81,7 @@ export function serializeMatch(match: Match, viewer: User | null) {
       phone: canSeeWhatsapp ? match.organizer.whatsapp : null,
     },
     branch: serializeBranch(match.branch),
+    courtBooked: match.courtBookedAt !== null,
     courtNumber: match.courtNumber,
     startsAt: match.startsAt.toISO(),
     updatedAt: match.updatedAt?.toISO() ?? null,

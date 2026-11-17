@@ -1,7 +1,7 @@
 import { Clock, LandPlot, MapPin, Trophy, Users, VenusAndMars } from "lucide";
 import { ImageResponse } from "next/og";
 import { BRAND } from "@/lib/brand-colors";
-import { formatCategory, STATUS_LABELS, TYPE_LABELS } from "@/lib/format";
+import { courtLabel, formatCategory, STATUS_LABELS, TYPE_LABELS } from "@/lib/format";
 import { ogFonts, ogLogo, ogPhoto } from "@/lib/og/assets";
 import { OgIcon } from "@/lib/og/icon";
 import { OgPhoto, OgPill } from "@/lib/og/parts";
@@ -58,7 +58,7 @@ function Details({ match }: { match: Match }) {
         </div>
       </div>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
-        <OgPill icon={LandPlot} scale={0.8}>{`Cancha ${match.courtNumber}`}</OgPill>
+        <OgPill icon={LandPlot} scale={0.8}>{courtLabel(match)}</OgPill>
         <OgPill icon={Clock} scale={0.8}>{`${match.durationMinutes} min`}</OgPill>
         <OgPill icon={VenusAndMars} scale={0.8}>{TYPE_LABELS[match.type]}</OgPill>
         <OgPill icon={Users} scale={0.8}>{match.spotsLeft > 0 ? `Faltan ${match.spotsLeft}` : "Completo"}</OgPill>

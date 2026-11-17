@@ -21,7 +21,7 @@ import { track } from "@/lib/analytics";
 import { api } from "@/lib/api";
 import { stashInvitee } from "@/lib/invitee-handoff";
 import { formatDistance } from "@/lib/distance";
-import { firstName, formatAvailabilityWindow } from "@/lib/format";
+import { courtLabel, firstName, formatAvailabilityWindow } from "@/lib/format";
 import { dateKey } from "@/lib/panamaFormatDate";
 import type { Match, Player } from "@/lib/types";
 
@@ -187,7 +187,7 @@ function InviteDialog({
                 onClick={() => invite(match)}
               >
                 <span>
-                  Cancha {match.courtNumber} · {match.branch.name}
+                  {courtLabel(match)} · {match.branch.name}
                 </span>
                 <span className="text-muted-foreground">
                   Faltan {match.spotsLeft}

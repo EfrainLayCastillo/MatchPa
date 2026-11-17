@@ -25,4 +25,5 @@ VineDate.transform((value) => DateTime.fromJSDate(value))
 vine.messagesProvider = new SimpleMessagesProvider({
   'database.unique': 'Ya existe una cuenta con este correo',
   'database.exists': 'La sucursal no existe',
+  'courtNumber.requiredWhen': 'Indica el número de cancha',
 })

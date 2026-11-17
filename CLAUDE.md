@@ -19,10 +19,16 @@ Partir el ítem del Roadmap con `/slice`. Su `slices.md` va al scratchpad de la 
 
 - **Historia chica** (un solo paquete, ~5 archivos o menos, sin reglas de negocio nuevas): implementar en la sesión principal → `/code-review` → commit. Sin `/rpi` ni agentes.
 - **Historia grande** (backend y frontend, o reglas/modelo/endpoints nuevos):
-  1. Planear con `/rpi`.
-  2. Implementar con los agentes `backend` y/o `frontend`.
-  3. Revisar con el agente `rules-reviewer` y `/code-review`.
+  1. Planear con `/rpi`: investigación y plan en un solo `plan.md`.
+  2. Implementar con los agentes `backend` y/o `frontend` en paralelo. El prompt apunta al `plan.md` y fija solo el contrato entre los dos; no copia el plan.
+  3. Revisar con **una** pasada: `/code-review`, más `rules-reviewer` solo si cambian reglas, modelo o endpoints. Las correcciones van al mismo agente que implementó; no se vuelve a revisar salvo que cambie el contrato.
   4. `sync-docs` y commit.
+
+### Economía de tokens con agentes
+
+- Modelos: `backend`, `frontend` y `rules-reviewer` en `sonnet`; búsquedas amplias con `Explore` en `haiku`. `opus` solo si el usuario lo pide.
+- Mientras un agente trabaja en segundo plano, la sesión principal no edita sus archivos ni repite sus checks.
+- En el chat, el resumen final va en una sola tabla o lista, sin repetir lo que dijeron los agentes.
 
 ## Convenciones
 

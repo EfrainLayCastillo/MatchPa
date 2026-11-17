@@ -1,6 +1,6 @@
 import type Match from '#models/match'
 import type MatchRequest from '#models/match_request'
-import type { RequestAction } from '#services/match_service'
+import type { BookingChange, RequestAction } from '#services/match_service'
 import { notifyUsers } from '#services/push'
 
 const linkTo = (match: Match) => `/partidos/${match.code}`
@@ -71,4 +71,33 @@ export function notifyPlayerDeleted(match: Match): Promise<void> {
     body: 'Un jugador eliminó su cuenta',
     url: linkTo(match),
   })
+}
+
+/** Tells the organizer and the accepted players the match is complete; `skipUserIds` already got a push for this action. */
+export function notifyMatchFilled(match: Match, skipUserIds: number[] = []): Promise<void> {
+  const url = linkTo(match)
+  const body = `Ya están los ${match.maxPlayers}`
+  const organizerBody =
+    match.courtBookedAt === null ? `Reserva la cancha en ${match.branch.name}` : body
+  const playerIds = match.requests
+    .filter((request) => request.status === 'accepted' && !skipUserIds.includes(request.userId))
+    .map((request) => request.userId)
+  return Promise.all([
+    notifyUsers([match.organizerId], { title: '¡Match!', body: organizerBody, url }),
+    notifyUsers(playerIds, { title: '¡Match!', body, url }),
+  ]).then(() => undefined)
+}
+
+export function notifyBookingChanged(match: Match, change: BookingChange): Promise<void> {
+  if (change === null) return Promise.resolve()
+  const court = `${match.branch.name}, cancha ${match.courtNumber}`
+  const bodies = {
+    booked: { title: 'Cancha confirmada', body: court },
+    court_changed: { title: 'Cambio de cancha', body: court },
+    unbooked: { title: 'Cancha por reservar', body: 'La cancha quedó por reservar' },
+  }
+  const playerIds = match.requests
+    .filter((request) => request.status === 'accepted')
+    .map((request) => request.userId)
+  return notifyUsers(playerIds, { ...bodies[change], url: linkTo(match) })
 }

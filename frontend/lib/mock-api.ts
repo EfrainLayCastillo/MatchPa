@@ -1,6 +1,7 @@
 // In-memory stand-in for the AdonisJS API, enabled with NEXT_PUBLIC_MOCK_API=true.
 // It mirrors the README contract so screens can be built before the backend exists.
 import { ApiError } from "./errors";
+import { acceptsBooking } from "./format";
 import { dateKey } from "./panamaFormatDate";
 
 import type {
@@ -27,7 +28,7 @@ interface StoredMatch {
   code: string;
   organizerId: number;
   branchId: number;
-  courtNumber: number;
+  courtNumber: number | null;
   startsAt: string;
   durationMinutes: MatchDuration;
   category: Match["category"];
@@ -37,6 +38,14 @@ interface StoredMatch {
   closed: boolean;
   guests: Match["guests"];
   requests: { id: number; userId: number; kind: MatchRequest["kind"]; status: RequestStatus }[];
+}
+
+function courtNumberOf(input: Record<string, unknown>): number | null {
+  if (input.courtBooked === false) return null;
+  const number = Number(input.courtNumber);
+  if (!input.courtNumber || !Number.isInteger(number) || number < 1 || number > 50)
+    throw new ApiError(422, [{ field: "courtNumber", message: "Indica el número de cancha" }]);
+  return number;
 }
 
 const branches: Branch[] = [
@@ -264,6 +273,7 @@ function viewOf(match: StoredMatch): Match {
     code: match.code,
     organizer: { id: organizer.id, fullName: organizer.fullName, phone: isOrganizer || me ? organizer.phone : null },
     branch: branches.find((c) => c.id === match.branchId)!,
+    courtBooked: match.courtNumber !== null,
     courtNumber: match.courtNumber,
     startsAt: match.startsAt,
     updatedAt: match.updatedAt,
@@ -421,7 +431,7 @@ export async function mockRequest<T>(method: Method, fullPath: string, body?: un
       code: Math.random().toString(36).slice(2, 10).padEnd(8, "x"),
       organizerId: user.id,
       branchId: Number(input.branchId),
-      courtNumber: Number(input.courtNumber),
+      courtNumber: courtNumberOf(input),
       startsAt: String(input.startsAt),
       durationMinutes: input.durationMinutes as MatchDuration,
       category: input.category as Match["category"],
@@ -443,7 +453,7 @@ export async function mockRequest<T>(method: Method, fullPath: string, body?: un
     if (statusOf(match) !== "open") fail(422, "Solo puedes editar un partido abierto");
     Object.assign(match, {
       branchId: Number(input.branchId),
-      courtNumber: Number(input.courtNumber),
+      courtNumber: courtNumberOf(input),
       startsAt: String(input.startsAt),
       updatedAt: new Date().toISOString(),
       durationMinutes: input.durationMinutes,
@@ -453,6 +463,14 @@ export async function mockRequest<T>(method: Method, fullPath: string, body?: un
       maxPlayers: Number(input.maxPlayers),
       guests: (input.guests as Omit<Match["guests"][number], "id">[]).map((g, i) => ({ id: i + 1, ...g })),
     });
+    return viewOf(match);
+  });
+  on(/^POST \/matches\/([^/]+)\/booking$/, (m) => {
+    const match = findMatch(m[1]);
+    requireOrganizer(match);
+    if (!acceptsBooking(viewOf(match))) fail(422, "Este partido ya no está disponible");
+    match.courtNumber = courtNumberOf({ courtBooked: true, courtNumber: input.courtNumber });
+    match.updatedAt = new Date().toISOString();
     return viewOf(match);
   });
   on(/^POST \/matches\/([^/]+)\/close$/, (m) => {
@@ -519,6 +537,7 @@ export async function mockRequest<T>(method: Method, fullPath: string, body?: un
           match: {
             code: match.code,
             startsAt: match.startsAt,
+            courtBooked: match.courtNumber !== null,
             courtNumber: match.courtNumber,
             branchName: branches.find((c) => c.id === match.branchId)!.name,
             status: viewOf(match).status,

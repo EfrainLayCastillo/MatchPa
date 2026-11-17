@@ -61,6 +61,7 @@ test.group('endurecimiento', (group) => {
       .post('/api/matches')
       .json({
         branchId: 999999,
+        courtBooked: true,
         courtNumber: 1,
         startsAt: DateTime.now().plus({ days: 1 }).toISO(),
         durationMinutes: 90,

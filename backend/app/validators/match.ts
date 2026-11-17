@@ -12,7 +12,14 @@ const guest = vine.object({
 
 export const matchValidator = vine.create({
   branchId: vine.number().positive().exists({ table: 'branches', column: 'id' }),
-  courtNumber: vine.number().min(1).max(50),
+  courtBooked: vine.boolean(),
+  courtNumber: vine
+    .number()
+    .min(1)
+    .max(50)
+    .nullable()
+    .optional()
+    .requiredWhen('courtBooked', '=', true),
   startsAt: vine.string().trim(),
   durationMinutes: vine.number().in([60, 90, 120]),
   category: vine.number().in([1, 2, 3, 4, 5, 6, 7]),
@@ -23,6 +30,10 @@ export const matchValidator = vine.create({
   type: vine.enum(['male', 'female', 'mixed'] as const),
   maxPlayers: vine.number().in([4, 5, 6]),
   guests: vine.array(guest).maxLength(5).optional(),
+})
+
+export const bookingValidator = vine.create({
+  courtNumber: vine.number().min(1).max(50),
 })
 
 export const inviteValidator = vine.create({

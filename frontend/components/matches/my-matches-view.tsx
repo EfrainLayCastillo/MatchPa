@@ -5,7 +5,6 @@ import { useQuery } from "@tanstack/react-query";
 import {
   ClockIcon,
   CrownIcon,
-  LandPlotIcon,
   MailOpenIcon,
   SendIcon,
   UserCheckIcon,
@@ -15,7 +14,7 @@ import {
 import { useMemo, useState } from "react";
 import { PageTitle } from "@/components/matchpa/page-title";
 import { SectionHeading } from "@/components/matchpa/section-heading";
-import { IconBadge, MatchSummaryCard } from "@/components/match/match-summary-card";
+import { CourtBadge, IconBadge, MatchSummaryCard } from "@/components/match/match-summary-card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { api } from "@/lib/api";
 import { TYPE_LABELS } from "@/lib/format";
@@ -142,9 +141,7 @@ function MatchRow({ match }: { match: Match }) {
         <IconBadge key="role" icon={match.isOrganizer ? CrownIcon : UserCheckIcon}>
           {match.isOrganizer ? "Organizas" : "Juegas"}
         </IconBadge>,
-        <IconBadge key="court" icon={LandPlotIcon}>
-          Cancha {match.courtNumber}
-        </IconBadge>,
+        <CourtBadge key="court" match={match} />,
         <IconBadge key="duration" icon={ClockIcon}>
           {match.durationMinutes} min
         </IconBadge>,
@@ -170,9 +167,7 @@ function PendingRow({ request }: { request: MyRequest }) {
         <IconBadge key="kind" icon={invited ? MailOpenIcon : SendIcon}>
           {invited ? "Te invitaron" : "Solicitud enviada"}
         </IconBadge>,
-        <IconBadge key="court" icon={LandPlotIcon}>
-          Cancha {match.courtNumber}
-        </IconBadge>,
+        <CourtBadge key="court" match={match} />,
         <IconBadge key="duration" icon={ClockIcon}>
           {match.durationMinutes} min
         </IconBadge>,

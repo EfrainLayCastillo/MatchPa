@@ -1,7 +1,7 @@
 import { Clock, LandPlot, MapPin, Trophy, Users, VenusAndMars } from "lucide";
 import { ImageResponse } from "next/og";
 import { BRAND } from "@/lib/brand-colors";
-import { formatCategory, STATUS_LABELS, TYPE_LABELS } from "@/lib/format";
+import { courtLabel, formatCategory, STATUS_LABELS, TYPE_LABELS } from "@/lib/format";
 import { toMatchImage } from "@/lib/match-images";
 import { ogFonts, ogLogo, ogPhoto } from "@/lib/og/assets";
 import { OgIcon } from "@/lib/og/icon";
@@ -91,7 +91,7 @@ function MatchSummary({ match }: { match: Match }) {
           {`${match.branch.name} · ${match.branch.locationLabel}`}
         </div>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 16 }}>
-          <OgPill icon={LandPlot}>{`Cancha ${match.courtNumber}`}</OgPill>
+          <OgPill icon={LandPlot}>{courtLabel(match)}</OgPill>
           <OgPill icon={Clock}>{`${match.durationMinutes} min`}</OgPill>
           <OgPill icon={VenusAndMars}>{TYPE_LABELS[match.type]}</OgPill>
           <OgPill icon={Users}>{match.spotsLeft > 0 ? `Faltan ${match.spotsLeft}` : "Completo"}</OgPill>

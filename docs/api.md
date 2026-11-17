@@ -36,16 +36,17 @@ Base `/api`. Solo acepta JSON (`application/json`); formularios y multipart se r
 
 | Método | Endpoint | Descripción |
 |---|---|---|
-| `POST` | `/matches` | Publicar (con invitados y `categoryTier` opcional). 422 si `branchId` no existe. 403 `EMAIL_NOT_VERIFIED` si el correo no está verificado |
+| `POST` | `/matches` | Publicar (con invitados y `categoryTier` opcional). `courtBooked` (bool) y `courtNumber` (1–50, obligatorio si `courtBooked`, si no se ignora). 422 si `branchId` no existe. 403 `EMAIL_NOT_VERIFIED` si el correo no está verificado |
 | `GET` | `/matches` | Partidos `open` (`date`, `branchId`, `type`) |
 | `GET` | `/matches/:code` | Detalle público; incluye solicitudes si eres organizador |
-| `PATCH` | `/matches/:code` | Editar mientras está `open` |
+| `PATCH` | `/matches/:code` | Editar mientras está `open` (mismo body que publicar; puede reservar o quitar la reserva) |
+| `POST` | `/matches/:code/booking` | Organizador: `{ courtNumber }` confirma o cambia la cancha reservada. `open`, `full` o `closed` antes de la hora; si no, 422 |
 | `POST` | `/matches/:code/close` | Cerrar |
 | `POST` | `/matches/:code/join-requests` | Pedir unirse. 403 `EMAIL_NOT_VERIFIED` si el correo no está verificado |
 | `POST` | `/matches/:code/invitations` | Invitar (`userId`) |
 | `PATCH` | `/match-requests/:id` | Ejecutar `action`. 403 `EMAIL_NOT_VERIFIED` si el invitado acepta sin correo verificado |
 | `GET` | `/me/matches` | Partidos que organizo o juego |
-| `GET` | `/me/match-requests` | Mis solicitudes e invitaciones pendientes de partidos abiertos y vigentes, con el resumen del partido (fecha, cancha, sucursal, estado, categoría, duración y tipo) |
+| `GET` | `/me/match-requests` | Mis solicitudes e invitaciones pendientes de partidos abiertos y vigentes, con el resumen del partido (fecha, cancha y `courtBooked`, sucursal, estado, categoría, duración y tipo) |
 
 | `action` | Desde | Quién |
 |---|---|---|

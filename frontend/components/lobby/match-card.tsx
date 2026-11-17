@@ -1,5 +1,5 @@
-import { ClockIcon, LandPlotIcon, UsersIcon, VenusAndMarsIcon } from "lucide-react";
-import { IconBadge, MatchSummaryCard } from "@/components/match/match-summary-card";
+import { ClockIcon, UsersIcon, VenusAndMarsIcon } from "lucide-react";
+import { CourtBadge, IconBadge, MatchSummaryCard } from "@/components/match/match-summary-card";
 import { Button } from "@/components/ui/button";
 import { TYPE_LABELS } from "@/lib/format";
 import type { Match } from "@/lib/types";
@@ -18,7 +18,7 @@ export function MatchCard({ match, onJoin, joining, distanceKm }: MatchCardProps
       distanceKm={distanceKm}
       image="bg2"
       badges={[
-        <IconBadge key="court" icon={LandPlotIcon}>Cancha {match.courtNumber}</IconBadge>,
+        <CourtBadge key="court" match={match} />,
         <IconBadge key="duration" icon={ClockIcon}>{match.durationMinutes} min</IconBadge>,
         <IconBadge key="type" icon={VenusAndMarsIcon}>{TYPE_LABELS[match.type]}</IconBadge>,
         <IconBadge key="spots" icon={UsersIcon}>

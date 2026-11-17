@@ -20,6 +20,7 @@ import { SectionHeading } from "@/components/matchpa/section-heading";
 import { levelGap, matchRole, track } from "@/lib/analytics";
 import { useVerifiedAction } from "@/components/auth/verify-email-dialog";
 import { api, ApiError } from "@/lib/api";
+import { canConfirmBooking, courtLabel } from "@/lib/format";
 import { notifyError } from "@/lib/notify";
 import { LoadFailed } from "@/components/matchpa/load-failed";
 import { toMatchImage } from "@/lib/match-images";
@@ -31,6 +32,7 @@ import {
 } from "@/lib/match-queries";
 import { useSession } from "@/lib/session";
 import type { Match, MatchRequest } from "@/lib/types";
+import { BookingBanner } from "./booking-banner";
 import { BranchDetails } from "./branch-contact";
 import { MatchBottomBar } from "./match-bottom-bar";
 import { MatchBanner, MatchHeading } from "./match-hero";
@@ -167,6 +169,9 @@ export function MatchDetail({
 
         {personalized ? (
           <>
+            {match.isOrganizer && canConfirmBooking(match) ? (
+              <BookingBanner match={match} onBooked={refresh} />
+            ) : null}
             <ActionPanel
               match={match}
               signedIn={user !== null}
@@ -492,7 +497,7 @@ function RoleCaption({ children }: { children: React.ReactNode }) {
 
 function organizerMessage(match: Match): string {
   return [
-    `Hola, te escribo por el partido de pádel del ${formatDateTime(match.startsAt)} en ${match.branch.name}, cancha ${match.courtNumber}.`,
+    `Hola, te escribo por el partido de pádel del ${formatDateTime(match.startsAt)} en ${match.branch.name}, ${courtLabel(match).toLowerCase()}.`,
     `${SITE_URL}/partidos/${match.code}`,
   ].join("\n");
 }

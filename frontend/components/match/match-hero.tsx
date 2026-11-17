@@ -1,8 +1,8 @@
-import { ClockIcon, LandPlotIcon, MapPinIcon, PencilIcon, TrophyIcon, UsersIcon, VenusAndMarsIcon } from "lucide-react";
+import { ClockIcon, MapPinIcon, PencilIcon, TrophyIcon, UsersIcon, VenusAndMarsIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { IconBadge } from "@/components/match/match-summary-card";
+import { CourtBadge, IconBadge } from "@/components/match/match-summary-card";
 import { StatusBadge } from "@/components/matchpa/status-badge";
 import { formatCategory, TYPE_LABELS } from "@/lib/format";
 import { MATCH_IMAGES, type MatchImage } from "@/lib/match-images";
@@ -38,7 +38,7 @@ export function MatchHeading({ match, canEdit }: { match: Match; canEdit: boolea
       </div>
       <h1 className="font-heading text-3xl font-extrabold leading-tight">{formatDateTime(match.startsAt)}</h1>
       <div className="flex flex-wrap gap-1.5">
-        <IconBadge icon={LandPlotIcon}>Cancha {match.courtNumber}</IconBadge>
+        <CourtBadge match={match} />
         <IconBadge icon={ClockIcon}>{match.durationMinutes} min</IconBadge>
         <IconBadge icon={TrophyIcon}>{formatCategory(match.category, match.categoryTier)}</IconBadge>
         <IconBadge icon={VenusAndMarsIcon}>{TYPE_LABELS[match.type]}</IconBadge>
