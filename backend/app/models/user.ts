@@ -25,9 +25,6 @@ export default class User extends compose(BaseModel, withAuthFinder(hash)) {
   @column({ serializeAs: null })
   declare googleId: string | null
 
-  @column()
-  declare avatarUrl: string | null
-
   /** Encrypted at rest with APP_KEY. Only the owner, and the organizer's accepted players, can read it. */
   @column({
     columnName: 'whatsapp_encrypted',

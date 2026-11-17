@@ -17,7 +17,6 @@ export function serializePlayerAvailability(availability: Availability) {
     category: user.category,
     categoryTier: user.categoryTier,
     gender: user.gender,
-    avatarUrl: user.avatarUrl,
     emailVerified: Boolean(user.emailVerifiedAt),
     availability: serializeAvailability(availability),
   }

@@ -30,7 +30,7 @@ Especificación de qué debe cumplir el backend y el frontend. Si el código se 
 ## Eliminar cuenta
 
 - Desde el final del perfil, escribiendo `ELIMINAR` para confirmar. No se puede deshacer.
-- Se anonimiza, no se borra la fila: nombre "Jugador eliminado", correo `deleted-<id>@matchpa.invalid`, y contraseña, Google, foto, WhatsApp, categoría, subnivel, género y verificación en `null`. Se borran su disponibilidad, suscripciones push, códigos y sugerencias de sucursal. Se conservan la fecha y la versión de términos aceptadas, como prueba del consentimiento.
+- Se anonimiza, no se borra la fila: nombre "Jugador eliminado", correo `deleted-<id>@matchpa.invalid`, y contraseña, Google, WhatsApp, categoría, subnivel, género y verificación en `null`. Se borran su disponibilidad, suscripciones push, códigos y sugerencias de sucursal. Se conservan la fecha y la versión de términos aceptadas, como prueba del consentimiento.
 - Sus partidos futuros `open` o `full` se cierran y sus solicitudes pendientes se cancelan.
 - Sus solicitudes pendientes en partidos de otros se cancelan, y sus puestos aceptados en partidos futuros se liberan como si saliera (el partido vuelve a `open` si corresponde).
 - Los partidos pasados no cambian y lo muestran como "Jugador eliminado".

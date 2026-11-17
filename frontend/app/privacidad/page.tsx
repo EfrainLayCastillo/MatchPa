@@ -20,7 +20,6 @@ const DATA_ROWS = [
   ["Correo", "Iniciar sesión, verificar tu cuenta, recuperar tu contraseña y avisarte.", "Solo tú y MatchPa."],
   ["Contraseña", "Iniciar sesión. Se guarda hasheada, nunca en texto legible.", "Nadie."],
   ["Cuenta de Google", "Entrar con Google. Guardamos el identificador de Google vinculado a tu cuenta.", "Solo MatchPa."],
-  ["Foto", "Mostrar tu avatar, si tu cuenta tiene una (por ejemplo, la de Google).", "Otros jugadores."],
   ["WhatsApp", "Si organizas un partido, que los jugadores de ese partido te escriban por WhatsApp. Se guarda cifrado.", "Los jugadores aceptados o que aceptaron tu invitación, mientras el partido está abierto o completo."],
   ["Categoría, subnivel y género", "Encontrar partidos que van contigo y respetar partidos masculinos, femeninos o mixtos.", "Cualquiera con el link del partido, aunque no tenga cuenta."],
   ["Disponibilidad", "Que los organizadores vean quién puede jugar y te inviten.", "Usuarios con sesión iniciada."],
@@ -121,7 +120,7 @@ const SECTIONS: LegalSection[] = [
         <ul>
           <li>
             Anonimizamos tu cuenta: tu nombre pasa a &quot;Jugador eliminado&quot; y borramos tu correo, contraseña,
-            Google, foto, WhatsApp, categoría, subnivel y género.
+            Google, WhatsApp, categoría, subnivel y género.
           </li>
           <li>Borramos tu disponibilidad, suscripciones push, códigos de verificación y sugerencias de sucursal.</li>
           <li>Cerramos tus partidos futuros y cancelamos tus solicitudes pendientes. Dejas libres tus puestos en partidos de otros.</li>

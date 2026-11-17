@@ -128,7 +128,6 @@ async function anonymize(user: User, trx: TransactionClientContract): Promise<vo
     email: `deleted-${user.id}@matchpa.invalid`,
     password: null,
     googleId: null,
-    avatarUrl: null,
     whatsapp: null,
     category: null,
     categoryTier: null,

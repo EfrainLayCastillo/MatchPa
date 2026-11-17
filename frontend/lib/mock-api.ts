@@ -106,7 +106,6 @@ const users: (User & { password: string })[] = [
     email: "efrain@matchpa.app",
     password: "demo",
     emailVerified: true,
-    avatarUrl: null,
     phone: "+507 6000-0001",
     category: 4,
     categoryTier: "high",
@@ -175,7 +174,6 @@ function seedPlayer(id: number, fullName: string, category: Category, gender: Ge
     email: `${fullName.split(" ")[0]?.toLowerCase()}@matchpa.app`,
     password: "demo",
     emailVerified: true,
-    avatarUrl: null,
     phone: `+507 6000-000`,
     category,
     categoryTier,
@@ -219,7 +217,6 @@ function publicUser(user: User & { password?: string }): User {
     fullName: user.fullName,
     email: user.email,
     emailVerified: user.emailVerified,
-    avatarUrl: user.avatarUrl,
     phone: user.phone,
     category: user.category,
     categoryTier: user.categoryTier,
@@ -310,7 +307,7 @@ function playersFor(date: string, branchId?: number): Player[] {
     .flatMap((u) => {
       const slot = (availabilities.get(u.id) ?? []).find((a) => a.date === date);
       if (!slot || (branchId !== undefined && slot.branchId !== branchId)) return [];
-      return [{ id: u.id, fullName: u.fullName, category: u.category!, categoryTier: u.categoryTier, gender: u.gender!, avatarUrl: null, emailVerified: u.emailVerified, availability: slot }];
+      return [{ id: u.id, fullName: u.fullName, category: u.category!, categoryTier: u.categoryTier, gender: u.gender!, emailVerified: u.emailVerified, availability: slot }];
     });
 }
 

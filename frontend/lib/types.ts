@@ -37,7 +37,6 @@ export interface User {
   fullName: string;
   email: string;
   emailVerified: boolean;
-  avatarUrl: string | null;
   phone: string | null;
   category: Category | null;
   categoryTier: CategoryTier | null;
@@ -58,7 +57,6 @@ export interface Player {
   category: Category;
   categoryTier: CategoryTier | null;
   gender: Gender;
-  avatarUrl: string | null;
   emailVerified: boolean;
   availability: Availability;
 }

@@ -23,7 +23,6 @@ test.group('login con Google', (group) => {
       id: `g-${suffix()}`,
       email,
       name: 'Cuenta Google',
-      avatarUrl: null,
       emailVerificationState: verified ? 'verified' : 'unverified',
     }
   }

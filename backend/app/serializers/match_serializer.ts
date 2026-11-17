@@ -25,7 +25,6 @@ export function serializeUser(user: User) {
     fullName: user.fullName,
     email: user.email,
     emailVerified: Boolean(user.emailVerifiedAt),
-    avatarUrl: user.avatarUrl,
     phone: user.whatsapp,
     category: user.category,
     categoryTier: user.categoryTier,

@@ -13,7 +13,7 @@ Las URLs son visibles para el usuario, así que van en español.
 | Ruta | Sesión | Descripción |
 |---|---|---|
 | `/` | No | Home |
-| `/beta` | No | Qué es la beta: el problema, por qué nació, cómo se usa y lo que viene. Enlazada desde el badge "Beta" del header |
+| `/beta` | No | Qué es la beta, para jugadores: el problema que resuelve, cómo se usa y lo que viene. Enlazada desde el badge "Beta" del header |
 | `/login` | No | Google o correo y contraseña |
 | `/registro` | No | Registro básico |
 | `/verificar` | Sí | Código de 6 dígitos para verificar el correo, con reenvío. `?origen=registro\|accion\|perfil` solo para la analítica |

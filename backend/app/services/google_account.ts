@@ -7,7 +7,6 @@ export type GoogleProfile = {
   id: string
   email: string
   name: string
-  avatarUrl: string | null
   emailVerificationState: string
   original?: { hd?: string }
 }
@@ -24,7 +23,6 @@ function createGoogleUser(profile: GoogleProfile) {
     fullName: profile.name,
     email: profile.email,
     googleId: profile.id,
-    avatarUrl: profile.avatarUrl,
     emailVerifiedAt: profile.emailVerificationState === 'verified' ? DateTime.now() : null,
   })
 }

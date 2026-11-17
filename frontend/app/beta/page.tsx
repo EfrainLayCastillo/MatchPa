@@ -9,7 +9,7 @@ import { SITE_OPEN_GRAPH } from "@/lib/seo";
 
 const TITLE = "MatchPa está en beta";
 const DESCRIPTION =
-  "Por qué nació MatchPa, cómo se usa y lo que viene: eventos especiales, Americanos, eliminación directa y más.";
+  "Hecho por jugadores para jugadores: completa tu partido sin perderte en los grupos de WhatsApp. Cómo se usa y lo que viene.";
 
 export const metadata: Metadata = {
   title: "Beta",
@@ -24,36 +24,29 @@ const CHAT = [
 ];
 
 const HOW_TO = [
-  { title: "Completa tu perfil", text: "Tu categoría, género y WhatsApp. Así te encuentran los partidos que van contigo." },
-  { title: "Publica o busca", text: "¿Tienes cancha y te falta gente? Publica el partido. ¿Quieres jugar? Mira el lobby." },
-  { title: "Ponte disponible", text: "Marca el día y, si quieres, tu horario. Los organizadores te pueden invitar: \"Ey Pa, ¿juegas?\"." },
-  { title: "¡Match!", text: "El organizador aprueba a quien pide unirse y, cuando están los 4: ¡Match!" },
-];
-
-const EXPECT = [
-  "Las funciones base ya funcionan: publicar, compartir, unirse, invitar y avisos push.",
-  "Vamos a ir cambiando cosas según cómo la usen ustedes. Algo puede moverse de lugar.",
-  "Cada comentario, error o idea que nos mandes se convierte en una mejora.",
+  { title: "Completa tu perfil", text: "Categoría, género y WhatsApp, una sola vez." },
+  { title: "Publica o busca", text: "¿Te falta gente? Publica el partido. ¿Quieres jugar? Mira el lobby." },
+  { title: "Ponte disponible", text: "Marca el día y los organizadores te invitan: \"Ey Pa, ¿juegas?\"." },
+  { title: "¡Match!", text: "El organizador acepta y, cuando están los 4, a jugar." },
 ];
 
 export default function BetaPage() {
   return (
-    <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-14 px-4 pb-20 pt-10 sm:pt-16">
+    <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-12 px-4 pb-20 pt-10 sm:pt-16">
       <header className="space-y-4">
         <BetaPill large />
         <h1 className="font-heading text-4xl font-extrabold leading-[0.95] sm:text-6xl">
-          MatchPa está en pleno
-          <span className="block font-script text-[1.15em] font-normal text-brand-teal dark:text-brand-lime">calentamiento.</span>
+          Hecho por jugadores,
+          <span className="block font-script text-[1.15em] font-normal text-brand-teal dark:text-brand-lime">para jugadores.</span>
         </h1>
         <p className="text-lg text-muted-foreground">
-          Ya puedes jugar con todo lo esencial, y vamos sumando funciones nuevas. Esta es la historia, cómo se usa y
-          lo que viene.
+          MatchPa es para quienes juegan pádel y tienen un partido que completar. Está en beta: lo esencial ya funciona
+          y lo vamos mejorando con lo que nos cuentas.
         </p>
       </header>
 
       <section aria-labelledby="problema" className="space-y-4">
-        <h2 id="problema" className="font-heading text-2xl font-bold">El problema</h2>
-        <p className="text-muted-foreground">Todos los días, en los grupos de WhatsApp de las sucursales, se repite lo mismo:</p>
+        <h2 id="problema" className="font-heading text-2xl font-bold">El problema que resolvemos</h2>
         <div className="space-y-2">
           {CHAT.map((message) => (
             <figure key={message.author} className="max-w-sm rounded-2xl rounded-tl-sm bg-muted p-3 even:ml-auto even:rounded-tl-2xl even:rounded-tr-sm">
@@ -63,16 +56,9 @@ export default function BetaPage() {
           ))}
         </div>
         <p className="text-muted-foreground">
-          La cancha ya está reservada, el partido es de 4 y casi siempre falta 1. El mensaje se pierde entre stickers y
-          audios, y el partido se cae.
-        </p>
-      </section>
-
-      <section aria-labelledby="solucion" className="space-y-3">
-        <h2 id="solucion" className="font-heading text-2xl font-bold">Por qué nació MatchPa</h2>
-        <p className="text-muted-foreground">
-          Para que encontrar pala sea tan rápido como mandar ese mensaje, pero sin que se pierda. Un lugar donde los
-          partidos que buscan gente y los jugadores con ganas de jugar se encuentran por categoría, sucursal y horario.
+          La cancha está reservada y falta 1. El mensaje se pierde entre stickers y audios, y el partido se cae. En
+          MatchPa, los partidos que buscan gente y los jugadores con ganas se encuentran por categoría, sucursal y
+          horario.
         </p>
       </section>
 
@@ -81,32 +67,20 @@ export default function BetaPage() {
         <StepCards steps={HOW_TO} heading="h3" className="sm:grid-cols-2" />
       </section>
 
-      <section aria-labelledby="esperar" className="space-y-3">
-        <h2 id="esperar" className="font-heading text-2xl font-bold">Qué esperar de la beta</h2>
-        <ul className="space-y-2">
-          {EXPECT.map((item) => (
-            <li key={item} className="flex gap-3 text-muted-foreground">
-              <span aria-hidden className="mt-2 size-2 shrink-0 rounded-full bg-brand-turquoise" />
-              {item}
-            </li>
-          ))}
-        </ul>
-        <p className="rounded-2xl border border-brand-turquoise/40 bg-brand-turquoise/10 p-4 text-sm">
-          ¿Una duda, una idea o algo que no funciona? Escríbenos a <ContactLink />.
-        </p>
-      </section>
-
       <section aria-labelledby="viene" className="space-y-4">
         <div className="space-y-1">
           <p className="font-script text-2xl text-brand-teal dark:text-brand-lime">lo que viene</p>
           <h2 id="viene" className="font-heading text-2xl font-bold">Lo que estamos preparando</h2>
         </div>
         <UpcomingFeatures />
+        <p className="rounded-2xl border border-brand-turquoise/40 bg-brand-turquoise/10 p-4 text-sm">
+          ¿Una idea o algo que no funciona? Escríbenos a <ContactLink />: cada mensaje se vuelve una mejora.
+        </p>
       </section>
 
       <div className="rounded-2xl bg-brand-teal p-6 text-brand-ivory">
         <p className="font-heading text-2xl font-bold">¿Te falta una pala?</p>
-        <p className="mt-1 text-brand-ivory/80">No esperes a lo que viene: lo esencial ya está listo.</p>
+        <p className="mt-1 text-brand-ivory/80">Lo esencial ya está listo.</p>
         <Button asChild size="lg" className="mt-4 h-12 w-full bg-brand-lime text-base font-bold text-brand-teal hover:bg-brand-lime/90 sm:w-auto">
           <Link href="/lobby">Entrar al lobby</Link>
         </Button>
