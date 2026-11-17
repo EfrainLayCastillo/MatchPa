@@ -1,12 +1,10 @@
 name: Keep backend awake
 
-# Peak hours in Panama (UTC-5): Mon–Fri 17:00–23:00, Sat–Sun 07:00–23:00.
-# Keep in sync with backend/app/services/peak_hours.ts.
+# Render Free sleeps after 15 min without traffic, so the backend is pinged all day.
+# The database is kept warm only at peak hours by backend/start/db_warmer.ts (backend/app/services/peak_hours.ts).
 on:
   schedule:
-    - cron: '*/10 22-23 * * 1-5'
-    - cron: '*/10 12-23 * * 0,6'
-    - cron: '*/10 0-3 * * *'
+    - cron: '*/10 * * * *'
   workflow_dispatch:
 
 jobs:

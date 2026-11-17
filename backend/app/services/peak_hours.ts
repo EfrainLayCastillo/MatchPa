@@ -1,12 +1,16 @@
 import { DateTime } from 'luxon'
 import { PANAMA_ZONE } from '#services/panama_time'
 
-const WEEKDAY_PEAK = { from: 17, to: 23 }
-const WEEKEND_PEAK = { from: 7, to: 23 }
+type Window = { from: number; to: number }
 
-/** Keep in sync with the cron in .github/workflows/keep-awake.yml. */
+const WEEKDAY_PEAKS: Window[] = [
+  { from: 11, to: 13 },
+  { from: 16, to: 21 },
+]
+const WEEKEND_PEAKS: Window[] = [{ from: 7, to: 21 }]
+
 export function isPeakHour(at: DateTime = DateTime.now()): boolean {
   const local = at.setZone(PANAMA_ZONE)
-  const { from, to } = local.weekday >= 6 ? WEEKEND_PEAK : WEEKDAY_PEAK
-  return local.hour >= from && local.hour < to
+  const peaks = local.weekday >= 6 ? WEEKEND_PEAKS : WEEKDAY_PEAKS
+  return peaks.some(({ from, to }) => local.hour >= from && local.hour < to)
 }
