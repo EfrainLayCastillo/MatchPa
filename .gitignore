@@ -162,7 +162,17 @@ context.md
 
 slices.md
 
-marketing/
+marketing/grabaciones/
+marketing/assets/
+marketing/videos/
+
+grabaciones/
+renders/
+videos/*/renders/
+videos/*/.hyperframes/
+*.mp4
+*.mov
+
 # Artefactos temporales de /slice
 slices.md
 ai-docs/

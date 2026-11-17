@@ -171,6 +171,26 @@ const matches: StoredMatch[] = [
     guests: [{ id: 1, name: "Diego Pinzón", category: 4, categoryTier: null, gender: "male" }],
     requests: [],
   },
+  {
+    id: 3,
+    code: "m4tch8pm",
+    organizerId: 2,
+    branchId: 1,
+    courtNumber: 3,
+    startsAt: eveningOrLater(today, "20:00"),
+    durationMinutes: 90,
+    category: 4,
+    categoryTier: null,
+    type: "mixed",
+    maxPlayers: 4,
+    updatedAt: new Date().toISOString(),
+    closed: false,
+    guests: [
+      { id: 2, name: "Mariana Ruiz", category: 3, categoryTier: null, gender: "female" },
+      { id: 3, name: "Lucía Ponce", category: 4, categoryTier: null, gender: "female" },
+    ],
+    requests: [],
+  },
 ];
 
 let me: number | null = 1;
