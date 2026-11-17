@@ -8,15 +8,30 @@ Plataforma social de pádel para completar partidos y encontrar jugadores. Pensa
 
 ## Capturas
 
+<p align="center">
+<img src="docs/capturas/flow.gif" width="260" alt="Del lobby al detalle del partido"/><br/>
+<sub>Del lobby al detalle: elegir el día, ver jugadores disponibles y revisar las solicitudes</sub>
+</p>
+
 <table>
 <tr>
 <td align="center" width="33%"><img src="docs/capturas/home.png" width="220" alt="Home"/><br/><sub><b>Home</b>: página de inicio</sub></td>
-<td align="center" width="33%"><img src="docs/capturas/lobby.png" width="220" alt="Lobby"/><br/><sub><b>Lobby</b>: partidos y jugadores del día, ordenados por tu categoría</sub></td>
-<td align="center" width="33%"><img src="docs/capturas/available.png" width="220" alt="Disponibilidad"/><br/><sub><b>Disponibilidad</b>: por día, con horario y sucursal opcionales</sub></td>
+<td align="center" width="33%"><img src="docs/capturas/lobby.png" width="220" alt="Lobby"/><br/><sub><b>Lobby</b>: tu perfil y tus próximos partidos</sub></td>
+<td align="center" width="33%"><img src="docs/capturas/matches.png" width="220" alt="Partidos del día"/><br/><sub><b>Partidos</b>: por día, sucursal y filtros</sub></td>
 </tr>
 <tr>
-<td align="center" width="33%"><img src="docs/capturas/new.png" width="220" alt="Publicar partido"/><br/><sub><b>Publicar partido</b>: formulario en dos pasos</sub></td>
-<td align="center" width="33%"><img src="docs/capturas/match.png" width="220" alt="Detalle del partido"/><br/><sub><b>Detalle</b>: puestos, solicitudes y link para compartir</sub></td>
+<td align="center" width="33%"><img src="docs/capturas/players.png" width="220" alt="Jugadores disponibles"/><br/><sub><b>Jugadores</b>: el pool del día, con "Ey Pa, ¿juegas?"</sub></td>
+<td align="center" width="33%"><img src="docs/capturas/available.png" width="220" alt="Disponibilidad"/><br/><sub><b>Disponibilidad</b>: por día, con horario opcional</sub></td>
+<td align="center" width="33%"><img src="docs/capturas/new.png" width="220" alt="Publicar partido"/><br/><sub><b>Publicar partido</b>: con la cancha reservada o por reservar</sub></td>
+</tr>
+<tr>
+<td align="center" width="33%"><img src="docs/capturas/match.png" width="220" alt="Detalle del partido"/><br/><sub><b>Detalle</b>: jugadores, cómo llegar y compartir</sub></td>
+<td align="center" width="33%"><img src="docs/capturas/match-organizer.png" width="220" alt="Panel del organizador"/><br/><sub><b>Organizador</b>: aceptar solicitudes, invitar y cerrar</sub></td>
+<td align="center" width="33%"><img src="docs/capturas/my-matches.png" width="220" alt="Mis partidas"/><br/><sub><b>Mis partidas</b>: las que organizas o juegas</sub></td>
+</tr>
+<tr>
+<td align="center" width="33%"><img src="docs/capturas/story.png" width="220" alt="Imagen para historias"/><br/><sub><b>Historia</b>: imagen 1080×1920 para Instagram</sub></td>
+<td></td>
 <td></td>
 </tr>
 </table>
@@ -33,11 +48,13 @@ La cancha ya está reservada (sucursal, # de cancha, hora), el partido es de 4 y
 
 ## La solución (MVP)
 
-1. **Publicar partido:** el organizador carga fecha, hora, sucursal, cancha, categoría, tipo y los jugadores que ya tiene. Se muestran los puestos disponibles.
-2. **Compartir:** el partido genera un link público para el grupo de WhatsApp o amistades.
+1. **Publicar partido:** el organizador carga fecha, hora, sucursal, categoría, tipo y los jugadores que ya tiene. La cancha puede ir ya reservada o reservarse cuando el partido se complete. Se muestran los puestos disponibles.
+2. **Compartir:** el partido genera un link público con vista previa en WhatsApp y una imagen vertical para historias.
 3. **Unirse:** un jugador pide unirse o el organizador lo invita desde el pool ("Ey Pa, ¿juegas?"). El organizador aprueba.
 4. **Disponibilidad:** un jugador se postula para un día y queda visible en el pool.
-5. **Cierre:** al llenarse los puestos: **¡Match!** El organizador también puede cerrarlo antes; si no, expira a la hora de la reserva.
+5. **Cierre:** al llenarse los puestos: **¡Match!** El organizador también puede cerrarlo antes; si no, expira a la hora del partido.
+
+Además: solicitudes y cambios en tiempo real, notificaciones push (se instala como PWA), **Mis partidas** con filtros, y registro con Google o correo verificado.
 
 ## Stack
 
