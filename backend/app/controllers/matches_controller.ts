@@ -4,6 +4,7 @@ import BusinessRuleError from '#exceptions/business_rule_error'
 import Match from '#models/match'
 import { serializeMatch } from '#serializers/match_serializer'
 import { notifyBookingChanged, notifyMatchClosed, notifyMatchFilled } from '#services/notifications'
+import { pushInBackground } from '#services/push'
 import {
   matchQuery,
   findMatchByCode,
@@ -72,11 +73,11 @@ export default class MatchesController {
       durationMinutes: data.durationMinutes as 60 | 90 | 120,
       guests,
     })
-    await Promise.all([
-      notifyBookingChanged(updated.match, updated.bookingChange),
-      updated.filled ? notifyMatchFilled(updated.match) : undefined,
-    ])
     matchChanged(params.code)
+    pushInBackground(
+      notifyBookingChanged(updated.match, updated.bookingChange),
+      updated.filled ? notifyMatchFilled(updated.match) : undefined
+    )
     return serializeMatch(await findMatchByCode(params.code), auth.getUserOrFail())
   }
 
@@ -86,8 +87,8 @@ export default class MatchesController {
 
     const { courtNumber } = await request.validateUsing(bookingValidator)
     const { match: booked, bookingChange } = await confirmBooking(params.code, courtNumber)
-    await notifyBookingChanged(booked, bookingChange)
     matchChanged(params.code)
+    pushInBackground(notifyBookingChanged(booked, bookingChange))
     return serializeMatch(await findMatchByCode(params.code), auth.getUserOrFail())
   }
 
@@ -100,8 +101,8 @@ export default class MatchesController {
     const playerIds = reloaded.requests
       .filter((request) => request.status === 'accepted')
       .map((request) => request.userId)
-    await notifyMatchClosed(closed, playerIds)
     matchChanged(closed.code)
+    pushInBackground(notifyMatchClosed(closed, playerIds))
     return serializeMatch(reloaded, auth.getUserOrFail())
   }
 }

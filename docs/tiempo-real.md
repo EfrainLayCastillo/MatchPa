@@ -23,7 +23,9 @@ Transmit (SSE) para eventos con la app abierta; Web Push para avisos con la app 
 | Jugador se salió | Organizador |
 | Jugador sacado | El jugador |
 
-La notificación abre `/partidos/[code]`. Las suscripciones que responden `404`/`410` se borran.
+La notificación abre `/partidos/[code]`: enfoca la pestaña si ya está ahí o navega una abierta de MatchPa. Las notificaciones del mismo partido se reemplazan entre sí, y caducan a las 6 horas si el dispositivo no las recibió.
+
+El push sale después del evento SSE y en segundo plano: nunca demora ni hace fallar la acción que lo dispara. Las suscripciones que responden `404`/`410` se borran; los demás fallos y la falta de claves VAPID quedan en el log. Si el navegador rota la suscripción, el service worker la vuelve a registrar (`pushsubscriptionchange`), y la app la reenvía al cargar la sesión.
 
 **Modal opt-in:** aparece al publicar un partido o al pedir unirse, nunca al abrir la app. Si acepta, se pide el permiso del navegador; si no, se activa luego en `/perfil`. En iPhone (iOS 16.4+) push requiere la PWA en la pantalla de inicio, así que el modal primero explica cómo instalarla.
 

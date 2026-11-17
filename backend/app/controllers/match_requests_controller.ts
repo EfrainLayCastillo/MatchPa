@@ -4,6 +4,7 @@ import MatchRequest from '#models/match_request'
 import { notifyMatchFilled, notifyRequestAnswered } from '#services/notifications'
 import { respondToRequest } from '#services/match_service'
 import { effectiveStatus } from '#services/match_rules'
+import { pushInBackground } from '#services/push'
 import { matchChanged, requestChanged } from '#services/realtime'
 import { requestActionValidator } from '#validators/match'
 
@@ -45,16 +46,16 @@ export default class MatchRequestsController {
     await bouncer.authorize('respondToRequest', existing, action)
 
     const { request: updated, match, filled } = await respondToRequest(existing.id, action)
-    await Promise.all([
+    requestChanged(existing.userId)
+    matchChanged(existing.match.code)
+    pushInBackground(
       filled && existing.kind === 'invitation'
         ? undefined
         : notifyRequestAnswered(existing.match, existing, action),
       filled
         ? notifyMatchFilled(match, existing.kind === 'join_request' ? [existing.userId] : [])
-        : undefined,
-    ])
-    requestChanged(existing.userId)
-    matchChanged(existing.match.code)
+        : undefined
+    )
     return { id: updated.id, kind: updated.kind, status: updated.status }
   }
 }

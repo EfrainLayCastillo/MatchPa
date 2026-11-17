@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { ONE_SHOT_PARAMS, setInternalTraffic, track } from "./analytics";
 import { api, ApiError } from "./api";
+import { syncPushSubscription } from "./push";
 import type { User } from "./types";
 
 interface SessionValue {
@@ -62,6 +63,11 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     void refresh();
   }, [refresh]);
+
+  const userId = user?.id;
+  useEffect(() => {
+    if (userId !== undefined) syncPushSubscription().catch(() => {});
+  }, [userId]);
 
   const value = useMemo(() => ({ user, loading, failed, refresh, setUser }), [user, loading, failed, refresh]);
   return <SessionContext.Provider value={value}>{children}</SessionContext.Provider>;

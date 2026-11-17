@@ -3,6 +3,8 @@ import { api } from "./api";
 const VAPID_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? "";
 const DISMISSED_KEY = "matchpa.push-dismissed";
 const RESUBSCRIBE_KEY = "matchpa.push-resubscribe";
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3333/api";
+const WORKER_URL = `/sw.js?api=${encodeURIComponent(API_URL)}`;
 
 export type PushResult = "enabled" | "denied" | "unsupported";
 
@@ -48,7 +50,7 @@ export async function enablePush(): Promise<PushResult> {
   if (!pushSupported()) return "unsupported";
   if ((await Notification.requestPermission()) !== "granted") return "denied";
 
-  const registration = await navigator.serviceWorker.register("/sw.js");
+  const registration = await navigator.serviceWorker.register(WORKER_URL);
   await navigator.serviceWorker.ready;
   const subscription = await registration.pushManager.subscribe({
     userVisibleOnly: true,
@@ -75,6 +77,15 @@ export async function forgetPushOnLogout(): Promise<void> {
   await disablePush().catch(() => {});
   // The browser permission survives logout, so the opt-in modal re-offers it (no native prompt) at the next publish or join.
   if (Notification.permission === "granted") writeFlag(RESUBSCRIBE_KEY, true);
+}
+
+/** Re-sends the device's subscription so the backend recovers one it dropped or never got after a rotation. */
+export async function syncPushSubscription(): Promise<void> {
+  if (!pushSupported() || Notification.permission !== "granted") return;
+  const registration = await navigator.serviceWorker.getRegistration("/sw.js");
+  await registration?.update();
+  const subscription = await registration?.pushManager.getSubscription();
+  if (subscription) await api.savePushSubscription(subscription.toJSON());
 }
 
 export async function isPushEnabled(): Promise<boolean> {

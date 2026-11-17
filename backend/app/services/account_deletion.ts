@@ -1,12 +1,12 @@
 import { DateTime } from 'luxon'
 import db from '@adonisjs/lucid/services/db'
-import logger from '@adonisjs/core/services/logger'
 import type { TransactionClientContract } from '@adonisjs/lucid/types/database'
 import Match from '#models/match'
 import MatchRequest from '#models/match_request'
 import User from '#models/user'
 import { bumpSessionVersion } from '#services/session'
 import { notifyOrganizerDeleted, notifyPlayerDeleted } from '#services/notifications'
+import { pushInBackground } from '#services/push'
 import { matchChanged, requestChanged } from '#services/realtime'
 import { effectiveStatus } from '#services/match_rules'
 import { closeLocked, lockMatchById, releaseSeat } from '#services/match_service'
@@ -155,8 +155,8 @@ export function announceAccountDeletion({
     (userId) => requestChanged(userId)
   )
 
-  Promise.all([
+  pushInBackground(
     ...closed.map(({ match, playerIds }) => notifyOrganizerDeleted(match, playerIds)),
-    ...freed.map((match) => notifyPlayerDeleted(match)),
-  ]).catch((error) => logger.error({ err: error }, 'account deletion push failed'))
+    ...freed.map((match) => notifyPlayerDeleted(match))
+  )
 }

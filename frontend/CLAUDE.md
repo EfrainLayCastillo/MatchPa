@@ -16,7 +16,7 @@
 
 - Llamadas a `NEXT_PUBLIC_API_URL` con `credentials: 'include'` (sesión por cookie).
 - SSE con `@adonisjs/transmit-client`: canales `lobby`, `users/:id`, `matches/:code`.
-- Service worker solo para `push` y `notificationclick`; sin caché offline.
+- Service worker solo para `push`, `notificationclick` y `pushsubscriptionchange`; sin caché offline.
 - El permiso de push se pide solo desde el modal opt-in (`docs/tiempo-real.md`, modal opt-in), nunca al cargar.
 
 ## Textos
