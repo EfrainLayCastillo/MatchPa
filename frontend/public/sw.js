@@ -2,6 +2,9 @@
 const API_URL = new URL(self.location.href).searchParams.get("api") ?? "/api";
 const DEFAULT_URL = "/lobby";
 
+self.addEventListener("install", () => self.skipWaiting());
+self.addEventListener("activate", (event) => event.waitUntil(self.clients.claim()));
+
 function readPayload(event) {
   if (!event.data) return {};
   try {
