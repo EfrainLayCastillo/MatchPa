@@ -1,4 +1,4 @@
-import { SITE_URL } from "./config";
+import { INSTAGRAM_URL, SITE_URL } from "./config";
 import type { Match } from "./types";
 
 /** Pages that define `openGraph` replace the layout's object instead of merging it, so they spread this. */
@@ -13,6 +13,7 @@ export const SITE_JSON_LD = {
       name: "MatchPa",
       url: SITE_URL,
       logo: `${SITE_URL}/logo.png`,
+      sameAs: [INSTAGRAM_URL],
     },
     {
       "@type": "WebSite",

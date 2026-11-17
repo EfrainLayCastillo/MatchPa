@@ -37,7 +37,7 @@ export function CookieNotice() {
       className="fixed inset-x-3 bottom-3 z-30 mx-auto flex max-w-md items-center gap-3 rounded-2xl border border-border bg-card p-3 shadow-lg [body:has([data-fixed-bottom-bar])_&]:bottom-24"
     >
       <p className="flex-1 text-sm">
-        Usamos Google Analytics para medir el uso.{" "}
+        Usamos cookies para mantener tu sesión y medir cómo se usa el sitio.{" "}
         <LegalLink href="/privacidad#cookies">Más info</LegalLink>
       </p>
       <Button

@@ -57,6 +57,11 @@
 - [ ] Clubs (comunidades de jugadores) en el perfil
 - [ ] Chat del partido con mensajes predefinidos ("Voy en camino", "Llego 10 min tarde", "No puedo ir")
 - [ ] Avisos por WhatsApp Cloud API
+- [ ] Impulso automático de partidos en Instagram
+  - [ ] Job programado que detecta partidos `open` sin solicitudes ni invitaciones aceptadas después de cierto tiempo, y antes de cierta hora del partido
+  - [ ] Genera la historia vertical del partido (reusa `/partidos/[code]/historia`): sucursal, hora, categoría y puestos libres, sin nombres de jugadores, con link `?utm_campaign=partido_boost`
+  - [ ] Publica en la cuenta de MatchPa con la API de publicación de contenido de Instagram (cuenta profesional ligada a Facebook)
+  - [ ] Opt-in del organizador al publicar ("Impulsar en Instagram si no se llena") y como máximo una historia por partido
 - [ ] Eventos especiales: página `/eventos` con los main events de cada sucursal y del año
   - [ ] Vitrina tematizada: lista y detalle `/eventos/[slug]` con portada, colores y logo propios (tema como datos, no código por evento). Los carga el admin; la inscripción, por WhatsApp a la sucursal
   - [ ] Inscripción de parejas en la app, con cupos por categoría y aprobación del admin

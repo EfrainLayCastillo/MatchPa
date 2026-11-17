@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ContactLink } from "./contact-link";
+import { INSTAGRAM_URL } from "@/lib/config";
 
 const LINKS = [
   { href: "/", label: "Inicio" },
@@ -27,7 +28,15 @@ export function SiteFooter() {
             ))}
           </nav>
           <p>
-            ¿Dudas o ideas? <ContactLink />
+            ¿Dudas o ideas? <ContactLink /> · Síguenos en{" "}
+            <a
+              href={INSTAGRAM_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex min-h-11 items-center font-semibold text-brand-teal underline underline-offset-4 dark:text-brand-lime"
+            >
+              Instagram
+            </a>
           </p>
         </div>
         <p className="sm:text-right">

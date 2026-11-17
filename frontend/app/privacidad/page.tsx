@@ -40,6 +40,12 @@ const PROVIDERS = [
   ["Servicios de notificaciones push de los navegadores (Google FCM, Mozilla, Apple, Microsoft)", "Reciben tu suscripción y el contenido de cada aviso para entregarlo a tu dispositivo, fuera de Panamá."],
 ];
 
+const COOKIES_HEAD = ["Cookie", "Para qué", "Tipo"];
+const COOKIES_ROWS = [
+  ["Sesión de MatchPa", "Mantenerte dentro de tu cuenta. Dura lo que dura tu sesión.", "Necesaria."],
+  ["Google Analytics (_ga, _ga_*)", "Contar visitas y acciones sin tu nombre, correo ni teléfono. Duran hasta 2 años.", "Analítica, de Google."],
+];
+
 const SECTIONS: LegalSection[] = [
   {
     id: "responsable",
@@ -171,10 +177,11 @@ const SECTIONS: LegalSection[] = [
     body: (
       <>
         <p>
-          Usamos una cookie de sesión para mantenerte dentro de tu cuenta. Es necesaria para que MatchPa funcione.
+          Una cookie es un archivo pequeño que el sitio guarda en tu navegador. MatchPa usa solo estas:
         </p>
+        <LegalTable head={COOKIES_HEAD} rows={COOKIES_ROWS} />
         <p>
-          También usamos Google Analytics, cargado con Google Tag Manager, para medir cómo se usa el sitio y mejorarlo.
+          Google Analytics se carga, con Google Tag Manager para medir cómo se usa el sitio y mejorarlo.
           Registra visitas y acciones como publicar un partido o pedir unirte. No enviamos tu nombre, correo ni
           teléfono, pero sí la dirección de las páginas que visitas, que puede incluir el código de un partido.
           Google puede guardar cookies propias para esta medición.
