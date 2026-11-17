@@ -59,6 +59,6 @@ function EnvelopeBadge({ icon: Icon = MailOpenIcon }: { icon?: LucideIcon }) {
 }
 
 export const INVITE_PRIMARY =
-  "bg-brand-teal font-bold text-brand-ivory hover:bg-brand-teal/90";
+  "bg-brand-teal font-bold text-brand-ivory hover:bg-brand-teal/90 hover:text-brand-lime";
 export const INVITE_SECONDARY =
   "text-brand-teal hover:bg-brand-teal/10 hover:text-brand-teal";

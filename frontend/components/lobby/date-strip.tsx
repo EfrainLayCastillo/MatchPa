@@ -46,7 +46,7 @@ function DayChip({ label, sub, selected, onClick }: { label: string; sub?: strin
       className={cn(
         "flex min-h-11 min-w-16 flex-col items-center justify-center rounded-xl border px-3 py-2 text-sm font-semibold capitalize transition-colors",
         selected
-          ? "border-brand-teal bg-brand-teal text-brand-ivory dark:border-brand-lime dark:bg-brand-lime dark:text-brand-teal"
+          ? "border-brand-teal bg-brand-teal text-brand-ivory hover:text-brand-lime dark:border-brand-lime dark:bg-brand-lime dark:text-brand-teal dark:hover:text-brand-teal"
           : "border-border bg-card hover:bg-muted",
       )}
     >

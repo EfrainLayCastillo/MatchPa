@@ -322,7 +322,7 @@ export function LobbyView() {
           </Button>
           <Button
             size="lg"
-            className="h-12 w-full bg-brand-teal text-base font-bold text-brand-ivory hover:bg-brand-teal/90 dark:bg-brand-turquoise dark:text-brand-teal dark:hover:bg-brand-turquoise/90"
+            className="h-12 w-full bg-brand-teal text-base font-bold text-brand-ivory hover:bg-brand-teal/90 hover:text-brand-lime dark:bg-brand-turquoise dark:text-brand-teal dark:hover:bg-brand-turquoise/90 dark:hover:text-brand-teal"
             onClick={() =>
               guard(() => router.push(`/partidos/nuevo?n=${Date.now()}`))
             }

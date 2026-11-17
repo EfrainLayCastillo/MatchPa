@@ -16,6 +16,16 @@ Los colores vienen de una paleta de referencia visual. El logo de esa referencia
 - **Gráficos:** estrella de 4 puntas, globo en alambre, carita sonriente en línea, trazos de la pelota.
 - **Tono:** casual y panameño: "Ey Pa, ¿juegas?", "Buscando Pa's...", "¡Match! Ya están los 4".
 
+## Hover
+
+| Fondo | Hover |
+|---|---|
+| Verde profundo (botón, tab activa, día seleccionado, header) | El texto pasa a lima (`hover:text-brand-lime`). Nunca a `foreground`: sobre verde profundo no se lee |
+| Lima (modo oscuro: tab activa, día seleccionado) | El texto se queda en verde profundo |
+| Marfil o tarjeta | Fondo `muted` o `brand-teal/10`; el texto no cambia de color |
+
+Un componente nuevo con fondo verde profundo define su hover de texto en los dos modos (`hover:` y `dark:hover:`).
+
 ## Errores y avisos
 
 El error usa el naranja `destructive` (`#c2410c`), nunca texto rojo suelto. Los avisos de éxito usan lima e íconos en verde profundo, sin verdes nuevos.
