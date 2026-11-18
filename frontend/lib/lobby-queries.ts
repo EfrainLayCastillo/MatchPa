@@ -36,24 +36,27 @@ export function useLobbyMatches(date: string | null, branchId?: number) {
   });
 }
 
-export function useLobbyPlayers(date: string, branchId?: number) {
+export function useLobbyPlayers(date: string, branchId: number | undefined, enabled: boolean) {
   return useQuery({
+    enabled,
     queryKey: lobbyKeys.players(date, branchId),
     queryFn: () => api.players({ date, branchId }),
     ...ON_VISIT,
   });
 }
 
-export function useAvailabilities() {
+export function useAvailabilities(enabled: boolean) {
   return useQuery({
+    enabled,
     queryKey: lobbyKeys.availabilities,
     queryFn: () => api.myAvailabilities(),
     ...ON_VISIT,
   });
 }
 
-export function useInvitations() {
+export function useInvitations(enabled: boolean) {
   return useQuery({
+    enabled,
     queryKey: lobbyKeys.requests,
     queryFn: () => api.myRequests(),
     select: (requests) => requests.filter((r) => r.kind === "invitation"),
@@ -61,8 +64,9 @@ export function useInvitations() {
   });
 }
 
-export function useUpcomingMatches() {
+export function useUpcomingMatches(enabled: boolean) {
   return useQuery({
+    enabled,
     queryKey: lobbyKeys.owned,
     queryFn: () => api.myMatches(),
     select: upcoming,

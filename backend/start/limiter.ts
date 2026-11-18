@@ -1,4 +1,5 @@
 import limiter from '@adonisjs/limiter/services/main'
+import { isFrontendServer } from '#config/app'
 
 /** Login and sign-up attempts per client IP. Stops password guessing and account spam. */
 export const authThrottle = limiter.define('auth', () => {
@@ -21,3 +22,9 @@ const perUser = (name: string, requests: number, duration: string) =>
 export const publishThrottle = perUser('publish', 10, '1 hour')
 export const socialThrottle = perUser('social', 30, '1 hour')
 export const writeThrottle = perUser('write', 120, '1 hour')
+
+export const anonymousReadThrottle = limiter.define('anonymousRead', ({ auth, request }) =>
+  auth.user || isFrontendServer(request)
+    ? limiter.noLimit()
+    : limiter.allowRequests(60).every('1 minute')
+)

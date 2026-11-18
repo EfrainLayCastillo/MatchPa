@@ -35,6 +35,7 @@ import type { Match, MatchRequest } from "@/lib/types";
 import { BookingBanner } from "./booking-banner";
 import { BranchDetails } from "./branch-contact";
 import { MatchBottomBar } from "./match-bottom-bar";
+import { NamesHiddenCard } from "./names-hidden-card";
 import { MatchBanner, MatchHeading } from "./match-hero";
 
 export function MatchDetail({
@@ -111,6 +112,8 @@ export function MatchDetail({
     ? whatsappUrl(match.organizer.phone, organizerMessage(match))
     : null;
 
+  const namesHidden = match.organizer.fullName === null;
+
   return (
     <div className="mx-auto w-full max-w-2xl">
       <MatchBanner image={image} />
@@ -122,12 +125,14 @@ export function MatchDetail({
 
         <section className="space-y-2">
           <SectionHeading>Jugadores</SectionHeading>
+          {namesHidden ? <NamesHiddenCard code={match.code} /> : null}
           <ul className="space-y-2">
-            {match.players.map((player) => (
+            {match.players.map((player, index) => (
               <li key={`p-${player.id}`}>
                 <Card className="px-4">
                   <PlayerSummary
-                    name={player.fullName}
+                    name={player.fullName ?? anonymousPlayerName(index)}
+                    hidden={player.fullName === null}
                     verified={player.emailVerified}
                     gender={player.gender}
                     category={player.category}
@@ -141,11 +146,12 @@ export function MatchDetail({
                 </Card>
               </li>
             ))}
-            {match.guests.map((guest) => (
+            {match.guests.map((guest, index) => (
               <li key={`g-${guest.id}`}>
                 <Card className="px-4">
                   <PlayerSummary
-                    name={guest.name}
+                    name={guest.name ?? `Invitado ${index + 1}`}
+                    hidden={guest.name === null}
                     gender={guest.gender}
                     category={guest.category}
                     tier={guest.categoryTier}
@@ -505,4 +511,8 @@ function organizerMessage(match: Match): string {
     `Hola, te escribo por el partido de pádel del ${formatDateTime(match.startsAt)} en ${match.branch.name}, ${courtLabel(match).toLowerCase()}.`,
     `${SITE_URL}/partidos/${match.code}`,
   ].join("\n");
+}
+
+function anonymousPlayerName(index: number): string {
+  return index === 0 ? "Organizador" : `Jugador ${index}`;
 }

@@ -63,7 +63,8 @@ export interface Player {
 
 export interface Guest {
   id: number;
-  name: string;
+  /** null for anonymous viewers. */
+  name: string | null;
   category: Category;
   categoryTier: CategoryTier | null;
   gender: Gender;
@@ -71,7 +72,8 @@ export interface Guest {
 
 export interface MatchPlayer {
   id: number;
-  fullName: string;
+  /** null for anonymous viewers. */
+  fullName: string | null;
   category: Category;
   categoryTier: CategoryTier | null;
   gender: Gender;
@@ -82,7 +84,7 @@ export interface MatchRequest {
   id: number;
   kind: RequestKind;
   status: RequestStatus;
-  user: MatchPlayer;
+  user: MatchPlayer & { fullName: string };
 }
 
 export interface MyRequest {
@@ -106,7 +108,7 @@ export interface MyRequest {
 export interface Match {
   id: number;
   code: string;
-  organizer: { id: number; fullName: string; phone: string | null };
+  organizer: { id: number; fullName: string | null; phone: string | null };
   branch: Branch;
   courtBooked: boolean;
   courtNumber: number | null;

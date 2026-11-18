@@ -314,4 +314,31 @@ test.group('flujo de partidos', (group) => {
     const after = await client.get('/api/me/match-requests').loginAs(players[0])
     assert.lengthOf(after.body(), 0)
   })
+
+  test('sin sesión el lobby y el detalle no traen nombres ni ids de los jugadores', async ({
+    client,
+    assert,
+  }) => {
+    const { match, players } = await fixtures(1)
+    const request = await requestToJoin(players[0], match.code)
+    await respondToRequest(request.id, 'accept')
+
+    const listing = await client.get(`/api/matches?branchId=${match.branchId}`)
+    const shown = await client.get(`/api/matches/${match.code}`)
+    const [listed, detail] = [listing.body()[0], shown.body()]
+    for (const anonymous of [listed, detail]) {
+      assert.deepEqual(anonymous.organizer, { id: 0, fullName: null, phone: null })
+      assert.deepEqual(
+        anonymous.players.map((p: { id: number; fullName: string | null }) => [p.id, p.fullName]),
+        [
+          [0, null],
+          [1, null],
+        ]
+      )
+      assert.isNull(anonymous.guests[0].name)
+    }
+
+    const signedIn = await client.get(`/api/matches/${match.code}`).loginAs(players[1])
+    assert.equal(signedIn.body().organizer.fullName, 'Org Test')
+  })
 })

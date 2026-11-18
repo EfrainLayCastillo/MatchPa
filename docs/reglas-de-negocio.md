@@ -12,6 +12,7 @@ Especificación de qué debe cumplir el backend y el frontend. Si el código se 
 - Reenvío: espera de 60 s entre códigos y máximo 5 por hora, por usuario.
 - Mientras no esté verificado, el perfil muestra un aviso con el botón "Verificar correo", que envía un código al tocarlo.
 - Publicar, pedir unirse, aceptar una invitación y sugerir una sucursal exigen correo verificado. Lobby, perfil y disponibilidad no: "Hacerlo después" deja explorar.
+- Sin cuenta se ven los partidos del lobby y su detalle. Pedir unirse, publicar, marcar disponibilidad y ver el pool de jugadores piden login. Sin sesión no se ven nombres: el detalle muestra "Organizador", "Jugador N" e "Invitado N" difuminados y "Entra para ver quién juega".
 - Las acciones del organizador sobre sus partidos (aprobar, rechazar, sacar, editar, cerrar) e invitar no lo exigen: publicar ya lo exigió, y así los partidos de cuentas anteriores a la verificación no quedan congelados.
 - El organizador no puede aprobar una solicitud de un jugador sin verificar (solicitudes creadas antes de la verificación): responde "Este jugador aún no verifica su correo".
 

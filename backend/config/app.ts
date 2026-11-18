@@ -18,6 +18,14 @@ function matchesSecret(received: string | undefined, expected: string | undefine
   return a.length === b.length && timingSafeEqual(a, b)
 }
 
+/** Next's own server-side fetches carry the proxy secret without a client IP. */
+export function isFrontendServer(request: { header(name: string): string | undefined }): boolean {
+  return (
+    !request.header('x-client-ip') &&
+    matchesSecret(request.header('x-proxy-secret'), env.get('PROXY_SECRET'))
+  )
+}
+
 /**
  * The configuration settings used by the HTTP server
  */

@@ -3,6 +3,7 @@ import transmit from '@adonisjs/transmit/services/main'
 import env from '#start/env'
 import { middleware } from '#start/kernel'
 import {
+  anonymousReadThrottle,
   authThrottle,
   publishThrottle,
   resendCooldown,
@@ -38,7 +39,8 @@ router
       router.get('auth/google/redirect', [AuthController, 'googleRedirect'])
       router.get('auth/google/callback', [AuthController, 'googleCallback'])
     }
-    router.get('matches/:code', [MatchesController, 'show'])
+    router.get('matches', [MatchesController, 'index']).use(anonymousReadThrottle)
+    router.get('matches/:code', [MatchesController, 'show']).use(anonymousReadThrottle)
 
     router
       .group(() => {
@@ -63,7 +65,6 @@ router
 
         router.get('players', [PlayersController, 'index'])
 
-        router.get('matches', [MatchesController, 'index'])
         router.post('matches', [MatchesController, 'store']).use(publishThrottle)
         router.patch('matches/:code', [MatchesController, 'update']).use(writeThrottle)
         router.post('matches/:code/booking', [MatchesController, 'booking']).use(writeThrottle)

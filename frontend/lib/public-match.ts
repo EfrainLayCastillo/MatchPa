@@ -14,7 +14,10 @@ export async function fetchPublicMatch(code: string): Promise<Match | null> {
   cacheLife("minutes");
 
   if (USING_MOCKS) throw new Error("Mock API has no server-side data");
-  const res = await fetch(`${SERVER_API_BASE}/matches/${encodeURIComponent(code)}`);
+  const secret = process.env.PROXY_SECRET;
+  const res = await fetch(`${SERVER_API_BASE}/matches/${encodeURIComponent(code)}`, {
+    headers: secret ? { "x-proxy-secret": secret } : undefined,
+  });
   if (res.status === 404) return null;
   if (!res.ok) throw new Error(`Match ${code} unavailable: ${res.status}`);
   return (await res.json()) as Match;

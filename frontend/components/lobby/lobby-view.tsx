@@ -47,16 +47,18 @@ const ALL_BRANCHES = "all";
 const SCROLL_LIST =
   "grid max-h-[60dvh] grid-cols-1 gap-3 overflow-x-hidden overflow-y-auto overscroll-contain p-0.5 md:grid-cols-2";
 const MY_MATCHES = "mine";
+const LOGIN_URL = "/login";
 
 export function LobbyView() {
   const router = useRouter();
   const { guard, handleError } = useVerifiedAction();
   const { user } = useSession();
+  const signedIn = user !== null;
   const [date, setDate] = useState<string | null>(null);
   const playerDate = date ?? todayKey();
   const [pickedFilter, setPickedFilter] = useState<string | null>(null);
 
-  const upcomingQuery = useUpcomingMatches();
+  const upcomingQuery = useUpcomingMatches(signedIn);
   const upcomingMatches = upcomingQuery.data ?? [];
   const myBranchIds = useMemo(
     () => myOpenBranchIds(upcomingQuery.data ?? [], playerDate),
@@ -73,9 +75,9 @@ export function LobbyView() {
 
   const branchesQuery = useBranches();
   const matchesQuery = useLobbyMatches(date, branchId);
-  const playersQuery = useLobbyPlayers(playerDate, branchId);
-  const availabilitiesQuery = useAvailabilities();
-  const invitations = useInvitations().data ?? [];
+  const playersQuery = useLobbyPlayers(playerDate, branchId, signedIn);
+  const availabilitiesQuery = useAvailabilities(signedIn);
+  const invitations = useInvitations(signedIn).data ?? [];
 
   const branches = branchesQuery.data ?? [];
   const onlyMine = branchFilter === MY_MATCHES;
@@ -126,6 +128,11 @@ export function LobbyView() {
     ?.slice()
     .sort(byDistanceActive ? byDistance(playerKm, byLevel) : byLevel);
 
+  function signedInOnly(action: () => void) {
+    if (signedIn) guard(action);
+    else router.push(LOGIN_URL);
+  }
+
   async function requestToJoin(match: Match) {
     setJoiningCode(match.code);
     try {
@@ -161,7 +168,12 @@ export function LobbyView() {
     <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-5 px-4 pb-44 pt-6">
       <div className="flex items-center gap-3">
         <PageTitle className="text-2xl sm:text-3xl">Lobby</PageTitle>
-        <Button asChild variant="outline" size="sm" className="shrink-0 bg-card font-semibold">
+        <Button
+          asChild
+          variant="outline"
+          size="sm"
+          className="shrink-0 bg-card font-semibold"
+        >
           <Link href="/mis-partidas">
             <CalendarDaysIcon data-icon="inline-start" />
             Mis partidas
@@ -277,7 +289,11 @@ export function LobbyView() {
                 <li key={match.id}>
                   <MatchCard
                     match={match}
-                    onJoin={(match) => guard(() => requestToJoin(match))}
+                    onJoin={(match) =>
+                      signedIn
+                        ? guard(() => requestToJoin(match))
+                        : router.push(`/partidos/${match.code}`)
+                    }
                     joining={joiningCode === match.code}
                     distanceKm={matchKm(match)}
                   />
@@ -288,23 +304,35 @@ export function LobbyView() {
         </TabsContent>
 
         <TabsContent value="players" className="mt-4">
-          <ListState
-            query={playersQuery}
-            count={sortedPlayers?.length}
-            empty="Nadie disponible para este día todavía."
-          >
-            <ul className={SCROLL_LIST}>
-              {sortedPlayers?.map((player) => (
-                <li key={player.id}>
-                  <PlayerCard
-                    player={player}
-                    branchName={branchName}
-                    distanceKm={playerKm(player)}
-                  />
-                </li>
-              ))}
-            </ul>
-          </ListState>
+          {signedIn ? (
+            <ListState
+              query={playersQuery}
+              count={sortedPlayers?.length}
+              empty="Nadie disponible para este día todavía."
+            >
+              <ul className={SCROLL_LIST}>
+                {sortedPlayers?.map((player) => (
+                  <li key={player.id}>
+                    <PlayerCard
+                      player={player}
+                      branchName={branchName}
+                      distanceKm={playerKm(player)}
+                    />
+                  </li>
+                ))}
+              </ul>
+            </ListState>
+          ) : (
+            <Empty>
+              <Link
+                href={LOGIN_URL}
+                className="font-semibold text-foreground underline underline-offset-4"
+              >
+                Entra
+              </Link>{" "}
+              para ver quién está disponible para jugar.
+            </Empty>
+          )}
         </TabsContent>
       </Tabs>
 
@@ -316,7 +344,7 @@ export function LobbyView() {
           <Button
             size="lg"
             className="h-12 w-full text-base font-bold"
-            onClick={() => setAvailabilityOpen(true)}
+            onClick={() => signedInOnly(() => setAvailabilityOpen(true))}
           >
             {availability ? "Editar mi disponibilidad" : "Estoy disponible"}
           </Button>
@@ -324,7 +352,7 @@ export function LobbyView() {
             size="lg"
             className="h-12 w-full bg-brand-teal text-base font-bold text-brand-ivory hover:bg-brand-teal/90 hover:text-brand-lime dark:bg-brand-turquoise dark:text-brand-teal dark:hover:bg-brand-turquoise/90 dark:hover:text-brand-teal"
             onClick={() =>
-              guard(() => router.push(`/partidos/nuevo?n=${Date.now()}`))
+              signedInOnly(() => router.push(`/partidos/nuevo?n=${Date.now()}`))
             }
           >
             Crear una partida

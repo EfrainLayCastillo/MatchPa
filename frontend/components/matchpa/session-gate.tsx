@@ -12,9 +12,15 @@ interface SessionGateProps {
   /** Pages that need a complete profile (category, gender, phone) redirect to onboarding. */
   requireProfile?: boolean;
   verifyBanner?: boolean;
+  allowAnonymous?: boolean;
 }
 
-export function SessionGate({ children, requireProfile = true, verifyBanner = true }: SessionGateProps) {
+export function SessionGate({
+  children,
+  requireProfile = true,
+  verifyBanner = true,
+  allowAnonymous = false,
+}: SessionGateProps) {
   const { user, loading, failed, refresh } = useSession();
   const router = useRouter();
   const pathname = usePathname();
@@ -22,9 +28,9 @@ export function SessionGate({ children, requireProfile = true, verifyBanner = tr
 
   useEffect(() => {
     if (loading || failed) return;
-    if (!user) router.replace(`/login?next=${encodeURIComponent(pathname)}`);
+    if (!user && !allowAnonymous) router.replace(`/login?next=${encodeURIComponent(pathname)}`);
     else if (profileMissing) router.replace("/onboarding");
-  }, [loading, failed, user, profileMissing, pathname, router]);
+  }, [loading, failed, user, allowAnonymous, profileMissing, pathname, router]);
 
   if (!loading && failed && !user) {
     return (
@@ -33,7 +39,7 @@ export function SessionGate({ children, requireProfile = true, verifyBanner = tr
       </div>
     );
   }
-  if (loading || !user || profileMissing) {
+  if (loading || (!user && !allowAnonymous) || profileMissing) {
     return (
       <div className="flex flex-1 flex-col">
         <DetailSkeleton />

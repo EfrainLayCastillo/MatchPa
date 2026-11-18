@@ -1,6 +1,6 @@
 # API (MVP)
 
-Base `/api`. Solo acepta JSON (`application/json`); formularios y multipart se rechazan. Las escrituras con sesión tienen límite por cuenta y responden 429 al superarlo (ver `seguridad.md`). Todo requiere sesión salvo auth, `GET /branches` y `GET /matches/:code`. Los partidos se identifican por `code`.
+Base `/api`. Solo acepta JSON (`application/json`); formularios y multipart se rechazan. Las escrituras con sesión tienen límite por cuenta y responden 429 al superarlo (ver `seguridad.md`). Todo requiere sesión salvo auth, `GET /branches`, `GET /matches` y `GET /matches/:code`. Los partidos se identifican por `code`.
 
 ## Auth y perfil
 
@@ -37,8 +37,8 @@ Base `/api`. Solo acepta JSON (`application/json`); formularios y multipart se r
 | Método | Endpoint | Descripción |
 |---|---|---|
 | `POST` | `/matches` | Publicar (con invitados y `categoryTier` opcional). `courtBooked` (bool) y `courtNumber` (1–50, obligatorio si `courtBooked`, si no se ignora). 422 si `branchId` no existe. 403 `EMAIL_NOT_VERIFIED` si el correo no está verificado |
-| `GET` | `/matches` | Partidos `open` (`date`, `branchId`, `type`) |
-| `GET` | `/matches/:code` | Detalle público; incluye solicitudes si eres organizador |
+| `GET` | `/matches` | Partidos `open` (`date`, `branchId`, `type`). Sin sesión, como el detalle: sin nombres |
+| `GET` | `/matches/:code` | Detalle público; incluye solicitudes si eres organizador. Sin sesión, `fullName`/`name` del organizador, jugadores e invitados son `null` y sus `id` son la posición en el partido (`players[0]` es el organizador). Ambos públicos tienen 60 peticiones por minuto por IP sin sesión |
 | `PATCH` | `/matches/:code` | Editar mientras está `open` (mismo body que publicar; puede reservar o quitar la reserva) |
 | `POST` | `/matches/:code/booking` | Organizador: `{ courtNumber }` confirma o cambia la cancha reservada. `open`, `full` o `closed` antes de la hora; si no, 422 |
 | `POST` | `/matches/:code/close` | Cerrar |

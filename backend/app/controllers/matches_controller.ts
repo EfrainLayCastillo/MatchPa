@@ -2,7 +2,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import { DateTime } from 'luxon'
 import BusinessRuleError from '#exceptions/business_rule_error'
 import Match from '#models/match'
-import { serializeMatch } from '#serializers/match_serializer'
+import { serializeAnonymousMatch, serializeMatch } from '#serializers/match_serializer'
 import { notifyBookingChanged, notifyMatchClosed, notifyMatchFilled } from '#services/notifications'
 import { pushInBackground } from '#services/push'
 import {
@@ -19,7 +19,7 @@ import { bookingValidator, matchFiltersValidator, matchValidator } from '#valida
 
 export default class MatchesController {
   async index({ auth, request }: HttpContext) {
-    const viewer = auth.getUserOrFail()
+    const viewer = auth.user ?? null
     const { date, branchId, type } = await request.validateUsing(matchFiltersValidator)
     const matches = await matchQuery()
       .where('status', 'open')
@@ -31,7 +31,9 @@ export default class MatchesController {
       .if(branchId, (query) => query.where('branch_id', branchId!))
       .if(type, (query) => query.where('type', type!))
       .orderBy('starts_at')
-    return matches.map((match) => serializeMatch(match, viewer))
+    return matches.map((match) =>
+      viewer ? serializeMatch(match, viewer) : serializeAnonymousMatch(match)
+    )
   }
 
   async store({ auth, request }: HttpContext) {
@@ -54,7 +56,7 @@ export default class MatchesController {
 
   async show({ auth, params }: HttpContext) {
     const match = await findMatchByCode(params.code)
-    return serializeMatch(match, auth.user ?? null)
+    return auth.user ? serializeMatch(match, auth.user) : serializeAnonymousMatch(match)
   }
 
   async update({ auth, bouncer, params, request }: HttpContext) {

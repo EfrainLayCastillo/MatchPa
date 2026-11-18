@@ -8,6 +8,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 import {
   CATEGORY_TIER_LABELS,
   GENDER_LABELS,
@@ -111,6 +112,7 @@ export function TierBadge({ tier }: { tier: CategoryTier | null }) {
 
 interface PlayerSummaryProps extends LevelProps {
   name: string;
+  hidden?: boolean;
   verified?: boolean;
   caption?: React.ReactNode;
   extraBadges?: React.ReactNode;
@@ -120,6 +122,7 @@ interface PlayerSummaryProps extends LevelProps {
 /** Avatar, name with gender and category, then tier and any extra badges. */
 export function PlayerSummary({
   name,
+  hidden = false,
   verified,
   gender,
   category,
@@ -131,11 +134,16 @@ export function PlayerSummary({
   const hasSecondRow = tier !== null || extraBadges !== undefined;
   return (
     <div className="flex items-center gap-3">
-      <InitialAvatar name={name} verified={verified} />
+      <InitialAvatar name={hidden ? "?" : name} verified={verified} />
       <div className="min-w-0 flex-1 space-y-1">
         {caption}
         <div className="flex items-center gap-1.5">
-          <p className="min-w-0 truncate font-heading text-base font-bold leading-tight">
+          <p
+            className={cn(
+              "min-w-0 truncate font-heading text-base font-bold leading-tight",
+              hidden && "select-none blur-[3px]",
+            )}
+          >
             {name}
           </p>
           <span className="flex shrink-0 gap-1">

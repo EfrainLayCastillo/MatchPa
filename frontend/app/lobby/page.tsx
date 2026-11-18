@@ -3,7 +3,7 @@ import { SessionGate } from "@/components/matchpa/session-gate";
 
 export default function LobbyPage() {
   return (
-    <SessionGate>
+    <SessionGate allowAnonymous>
       <LobbyView />
     </SessionGate>
   );

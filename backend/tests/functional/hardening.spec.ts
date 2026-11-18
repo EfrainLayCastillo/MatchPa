@@ -85,4 +85,24 @@ test.group('endurecimiento', (group) => {
       .form({ email: user.email, password: 'secret123' })
     assert.include([415, 422], response.status())
   })
+
+  test('sin sesión el listado público se limita por IP, salvo el servidor de Next', async ({
+    client,
+    assert,
+  }) => {
+    const statusAfter61 = async (headers: Record<string, string>) => {
+      let last = 0
+      for (let attempt = 0; attempt < 61; attempt++) {
+        const response = await client.get('/api/matches').headers(headers)
+        last = response.status()
+      }
+      return last
+    }
+
+    assert.equal(
+      await statusAfter61({ 'x-proxy-secret': SECRET, 'x-client-ip': '203.0.113.9' }),
+      429
+    )
+    assert.equal(await statusAfter61({ 'x-proxy-secret': SECRET }), 200)
+  })
 })

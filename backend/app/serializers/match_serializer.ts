@@ -105,3 +105,14 @@ export function serializeMatch(match: Match, viewer: User | null) {
     requests: isOrganizer ? match.requests.map(serializeRequest) : undefined,
   }
 }
+
+/** Ids are positions in the match, so nobody can be followed across matches; players[0] is the organizer. */
+export function serializeAnonymousMatch(match: Match) {
+  const serialized = serializeMatch(match, null)
+  return {
+    ...serialized,
+    organizer: { id: 0, fullName: null, phone: null },
+    guests: serialized.guests.map((guest, index) => ({ ...guest, id: index, name: null })),
+    players: serialized.players.map((player, index) => ({ ...player, id: index, fullName: null })),
+  }
+}

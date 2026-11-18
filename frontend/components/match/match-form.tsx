@@ -117,7 +117,7 @@ function MatchFormBody({ match }: { match?: Match }) {
   const [guests, setGuests] = useState<GuestDraft[]>(() =>
     match
       ? match.guests.map(({ name, category, categoryTier, gender }) => ({
-          name,
+          name: name ?? "",
           category,
           categoryTier,
           gender,

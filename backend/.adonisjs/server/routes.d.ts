@@ -14,6 +14,7 @@ export type ScannedRoutes = {
     'auth.reset_password': { paramsTuple?: []; params?: {} }
     'auth.google_redirect': { paramsTuple?: []; params?: {} }
     'auth.google_callback': { paramsTuple?: []; params?: {} }
+    'matches.index': { paramsTuple?: []; params?: {} }
     'matches.show': { paramsTuple: [ParamValue]; params: {'code': ParamValue} }
     'auth.logout': { paramsTuple?: []; params?: {} }
     'auth.verify_email': { paramsTuple?: []; params?: {} }
@@ -28,7 +29,6 @@ export type ScannedRoutes = {
     'my_matches.index': { paramsTuple?: []; params?: {} }
     'match_requests.index': { paramsTuple?: []; params?: {} }
     'players.index': { paramsTuple?: []; params?: {} }
-    'matches.index': { paramsTuple?: []; params?: {} }
     'matches.store': { paramsTuple?: []; params?: {} }
     'matches.update': { paramsTuple: [ParamValue]; params: {'code': ParamValue} }
     'matches.booking': { paramsTuple: [ParamValue]; params: {'code': ParamValue} }
@@ -45,26 +45,26 @@ export type ScannedRoutes = {
     'branches.index': { paramsTuple?: []; params?: {} }
     'auth.google_redirect': { paramsTuple?: []; params?: {} }
     'auth.google_callback': { paramsTuple?: []; params?: {} }
+    'matches.index': { paramsTuple?: []; params?: {} }
     'matches.show': { paramsTuple: [ParamValue]; params: {'code': ParamValue} }
     'me.show': { paramsTuple?: []; params?: {} }
     'availabilities.index': { paramsTuple?: []; params?: {} }
     'my_matches.index': { paramsTuple?: []; params?: {} }
     'match_requests.index': { paramsTuple?: []; params?: {} }
     'players.index': { paramsTuple?: []; params?: {} }
-    'matches.index': { paramsTuple?: []; params?: {} }
   }
   HEAD: {
     'event_stream': { paramsTuple?: []; params?: {} }
     'branches.index': { paramsTuple?: []; params?: {} }
     'auth.google_redirect': { paramsTuple?: []; params?: {} }
     'auth.google_callback': { paramsTuple?: []; params?: {} }
+    'matches.index': { paramsTuple?: []; params?: {} }
     'matches.show': { paramsTuple: [ParamValue]; params: {'code': ParamValue} }
     'me.show': { paramsTuple?: []; params?: {} }
     'availabilities.index': { paramsTuple?: []; params?: {} }
     'my_matches.index': { paramsTuple?: []; params?: {} }
     'match_requests.index': { paramsTuple?: []; params?: {} }
     'players.index': { paramsTuple?: []; params?: {} }
-    'matches.index': { paramsTuple?: []; params?: {} }
   }
   POST: {
     'subscribe': { paramsTuple?: []; params?: {} }
