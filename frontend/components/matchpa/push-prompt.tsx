@@ -43,7 +43,7 @@ export function PushPrompt({ open, onOpenChange, reason }: PushPromptProps) {
         ) : null}
         <DialogFooter className="gap-2 sm:gap-2">
           <Button variant="outline" onClick={close} disabled={status === "busy"}>
-            Ahora no
+            {iosNeedsInstall ? "Entendido" : "Ahora no"}
           </Button>
           {iosNeedsInstall ? null : (
             <Button onClick={accept} disabled={status === "busy"}>

@@ -13,16 +13,21 @@ export function pushSupported(): boolean {
   return "serviceWorker" in navigator && "PushManager" in window && "Notification" in window;
 }
 
-function isAndroid(): boolean {
-  return /Android/i.test(navigator.userAgent);
+function isInstalledApp(): boolean {
+  return window.matchMedia("(display-mode: standalone)").matches;
+}
+
+function isAndroidBrowser(): boolean {
+  return /Android/i.test(navigator.userAgent) && !isInstalledApp();
 }
 
 export function isIosWithoutInstall(): boolean {
-  const ios = /iPad|iPhone|iPod/.test(navigator.userAgent);
-  return ios && !window.matchMedia("(display-mode: standalone)").matches;
+  return /iPad|iPhone|iPod/.test(navigator.userAgent) && !isInstalledApp();
 }
 
+/** iOS only exposes push inside the installed app, so Safari users get the install steps instead. */
 export function shouldAskForPush(): boolean {
+  if (isIosWithoutInstall()) return !readFlag(DISMISSED_KEY);
   if (!pushSupported()) return false;
   if (Notification.permission === "granted") return readFlag(RESUBSCRIBE_KEY);
   if (Notification.permission !== "default") return false;
@@ -63,7 +68,7 @@ export async function enablePush(): Promise<PushResult> {
   });
   await api.savePushSubscription(subscription.toJSON());
   writeFlag(RESUBSCRIBE_KEY, false);
-  if (isAndroid()) suggestAndroidHeadsUp();
+  if (isAndroidBrowser()) suggestAndroidHeadsUp();
   return "enabled";
 }
 
