@@ -34,7 +34,7 @@ export const CATEGORIES = [1, 2, 3, 4, 5, 6, 7] as const satisfies Category[];
 type Bookable = { status: MatchStatus; startsAt: string };
 
 export function acceptsBooking(match: Bookable): boolean {
-  return match.status !== "expired" && new Date(match.startsAt) > new Date();
+  return (match.status === "open" || match.status === "full") && new Date(match.startsAt) > new Date();
 }
 
 export function canConfirmBooking(match: Bookable & { courtBooked: boolean }): boolean {

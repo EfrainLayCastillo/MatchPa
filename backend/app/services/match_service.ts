@@ -97,7 +97,7 @@ export async function confirmBooking(
 ): Promise<{ match: Match; bookingChange: BookingChange }> {
   return db.transaction(async (trx) => {
     const locked = await lockMatchByCode(code, trx)
-    if (locked.startsAt <= DateTime.now())
+    if (locked.status === 'closed' || locked.startsAt <= DateTime.now())
       throw new BusinessRuleError('Este partido ya no está disponible')
 
     const previousCourt = locked.courtNumber

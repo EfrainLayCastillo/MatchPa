@@ -125,6 +125,18 @@ test.group('reserva de cancha', (group) => {
     response.assertStatus(422)
   })
 
+  test('no se confirma la reserva de un partido cerrado', async ({ client }) => {
+    const { organizer, match } = await setup()
+    await Match.query()
+      .where('id', match.id)
+      .update({ status: 'closed', closed_at: DateTime.now().toSQL() })
+    const response = await client
+      .post(`/api/matches/${match.code}/booking`)
+      .json({ courtNumber: 2 })
+      .loginAs(organizer)
+    response.assertStatus(422)
+  })
+
   test('confirmar la reserva con el partido lleno funciona', async ({ client, assert }) => {
     const { organizer, match } = await setup(3)
     const stored = await Match.findOrFail(match.id)

@@ -25,7 +25,7 @@ import { BranchDetails } from "./branch-contact";
 
 export function BookingBanner({ match, onBooked }: { match: Match; onBooked: () => void }) {
   const [open, setOpen] = useState(false);
-  const urgent = match.status === "full" || match.status === "closed";
+  const urgent = match.status === "full";
 
   return (
     <section
@@ -74,7 +74,6 @@ export function BookingBanner({ match, onBooked }: { match: Match; onBooked: () 
 
 function headline(match: Match): string {
   if (match.status === "full") return `¡Match! Ahora reserva la cancha en ${match.branch.name}`;
-  if (match.status === "closed") return `Reserva la cancha en ${match.branch.name}`;
   return "Reserva la cancha cuando se complete";
 }
 
