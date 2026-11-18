@@ -169,7 +169,7 @@ const matches: StoredMatch[] = [
     updatedAt: new Date().toISOString(),
     closed: false,
     guests: [{ id: 1, name: "Diego Pinzón", category: 4, categoryTier: null, gender: "male" }],
-    requests: [],
+    requests: [{ id: 50, userId: 6, kind: "join_request", status: "pending" }],
   },
   {
     id: 3,
