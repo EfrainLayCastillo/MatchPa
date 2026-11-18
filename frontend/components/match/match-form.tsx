@@ -91,7 +91,7 @@ function MatchFormBody({ match }: { match?: Match }) {
       : (validDate(presetDate) ?? todayKey()),
   );
   const [time, setTime] = useState(() =>
-    match ? formatClock(match.startsAt) : "18:00",
+    match ? formatClock(match.startsAt) : keepUpcoming("18:00", date),
   );
   const [duration, setDuration] = useState<MatchDuration>(
     match?.durationMinutes ?? 90,
@@ -289,7 +289,10 @@ function MatchFormBody({ match }: { match?: Match }) {
               id="date"
               value={date}
               min={todayKey()}
-              onChange={setDate}
+              onChange={(next) => {
+                setDate(next);
+                setTime((current) => keepUpcoming(current, next));
+              }}
               disabled={dateLocked}
             />
           </Field>
@@ -311,7 +314,7 @@ function MatchFormBody({ match }: { match?: Match }) {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {timeOptions(time).map((option) => (
+                  {timeOptions(time, date).map((option) => (
                     <SelectItem key={option} value={option}>
                       {formatClock12(option)}
                     </SelectItem>
@@ -720,13 +723,29 @@ export function MatchForm({ match }: { match?: Match }) {
   return <MatchFormBody key={visit} match={match} />;
 }
 
-/** Every half hour of the day, plus the current value when it is off the grid (an edited match). */
-function timeOptions(current: string): string[] {
-  const halfHours = Array.from({ length: 48 }, (_, i) => {
-    const hours = String(Math.floor(i / 2)).padStart(2, "0");
-    return `${hours}:${i % 2 === 0 ? "00" : "30"}`;
-  });
-  return halfHours.includes(current)
-    ? halfHours
-    : [current, ...halfHours].sort();
+const HALF_HOURS = Array.from({ length: 48 }, (_, i) => {
+  const hours = String(Math.floor(i / 2)).padStart(2, "0");
+  return `${hours}:${i % 2 === 0 ? "00" : "30"}`;
+});
+
+/** Half hours still ahead on `date` (all of them on a later day), in Panama time. */
+function upcomingHalfHours(date: string): string[] {
+  if (date !== todayKey()) return HALF_HOURS;
+  const now = formatClock(new Date().toISOString());
+  return HALF_HOURS.filter((slot) => slot > now);
+}
+
+/** Upcoming half hours, plus the current value when it is off the grid (an edited match). */
+function timeOptions(current: string, date: string): string[] {
+  const upcoming = upcomingHalfHours(date);
+  return upcoming.includes(current) || current < (upcoming[0] ?? "24:00")
+    ? upcoming
+    : [current, ...upcoming].sort();
+}
+
+/** Keeps `time` when still ahead on `date`; otherwise moves it to the next free half hour. */
+function keepUpcoming(time: string, date: string): string {
+  const upcoming = upcomingHalfHours(date);
+  if (upcoming.length === 0 || time > upcoming[0]) return time;
+  return upcoming[0];
 }
