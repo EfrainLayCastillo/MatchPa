@@ -328,14 +328,16 @@ function ActionPanel({
     return (
       <div className="flex items-center justify-between gap-3 rounded-xl border border-border p-4 text-sm">
         <span>¡Ya estás en el partido!</span>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => onLeave({ id: request.id })}
-          disabled={busy}
-        >
-          Salirme
-        </Button>
+        {match.status === "open" ? (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onLeave({ id: request.id })}
+            disabled={busy}
+          >
+            Salirme
+          </Button>
+        ) : null}
       </div>
     );
   }
@@ -364,6 +366,7 @@ function OrganizerPanel({
     (r) => r.status === "pending" && r.kind === "invitation",
   );
   const accepted = requests.filter((r) => r.status === "accepted");
+  const canRemove = match.status === "open" || match.status === "full";
 
   return (
     <section className="space-y-2">
@@ -411,14 +414,16 @@ function OrganizerPanel({
           >
             {accepted.map((request) => (
               <RequestRow key={request.id} request={request}>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => onRespond(request, "remove")}
-                  disabled={busy}
-                >
-                  Sacar
-                </Button>
+                {canRemove ? (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => onRespond(request, "remove")}
+                    disabled={busy}
+                  >
+                    Sacar
+                  </Button>
+                ) : null}
               </RequestRow>
             ))}
           </RequestGroup>

@@ -206,7 +206,14 @@ export async function respondToRequest(
       await assertDailyLimit(request.userId, match, trx)
     }
 
+    if (action === 'remove' && !['open', 'full'].includes(effectiveStatus(match)))
+      throw new BusinessRuleError(
+        'Ya no puedes sacar jugadores: la búsqueda terminó o el partido empezó'
+      )
+
     if (action === 'leave') {
+      if (effectiveStatus(match) !== 'open')
+        throw new BusinessRuleError('Ya no puedes salirte: la búsqueda de este partido terminó')
       await releaseSeat(request, trx)
       return { request, match, filled: false }
     }

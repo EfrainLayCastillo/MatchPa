@@ -51,8 +51,8 @@ Base `/api`. Solo acepta JSON (`application/json`); formularios y multipart se r
 | `action` | Desde | Quién |
 |---|---|---|
 | `accept` / `reject` | `pending` | Organizador (`join_request`) o invitado (`invitation`) |
-| `leave` | `accepted` | El jugador |
-| `remove` | `accepted` | El organizador |
+| `leave` | `accepted`, con el partido `open` | El jugador |
+| `remove` | `accepted`, con el partido `open` o `full` | El organizador |
 
 ## Push
 

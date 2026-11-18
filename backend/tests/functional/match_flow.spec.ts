@@ -9,6 +9,7 @@ import MatchRequest from '#models/match_request'
 import User from '#models/user'
 import {
   MAX_MATCHES_PER_DAY,
+  closeMatch,
   findMatchByCode,
   inviteToMatch,
   publishMatch,
@@ -77,13 +78,73 @@ test.group('flujo de partidos', (group) => {
     return request.status
   }
 
-  test('al salir un jugador, el puesto vuelve a abrirse', async ({ assert }) => {
+  test('con la búsqueda abierta el jugador puede salirse', async ({ assert }) => {
+    const { match, players } = await fixtures(1)
+    const request = await requestToJoin(players[0], match.code)
+    await respondToRequest(request.id, 'accept')
+
+    await respondToRequest(request.id, 'leave')
+    assert.equal(await requestStatus(request.id), 'left')
+  })
+
+  test('con el partido completo el jugador ya no puede salirse', async ({ assert }) => {
     const { match, players } = await fixtures(2)
     const request = await requestToJoin(players[0], match.code)
     await respondToRequest(request.id, 'accept')
     assert.equal(await statusOf(match.code), 'full')
 
-    await respondToRequest(request.id, 'leave')
+    await assert.rejects(() => respondToRequest(request.id, 'leave'), BusinessRuleError)
+    assert.equal(await requestStatus(request.id), 'accepted')
+  })
+
+  test('con la búsqueda cerrada el jugador ya no puede salirse', async ({ assert }) => {
+    const { match, players } = await fixtures(1)
+    const request = await requestToJoin(players[0], match.code)
+    await respondToRequest(request.id, 'accept')
+    await closeMatch(match.code)
+
+    await assert.rejects(() => respondToRequest(request.id, 'leave'), BusinessRuleError)
+  })
+
+  test('después de la hora del partido el jugador ya no puede salirse', async ({ assert }) => {
+    const { match, players } = await fixtures(1)
+    const request = await requestToJoin(players[0], match.code)
+    await respondToRequest(request.id, 'accept')
+    await Match.query()
+      .where('id', match.id)
+      .update({ starts_at: DateTime.now().minus({ hours: 2 }).toSQL() })
+
+    await assert.rejects(() => respondToRequest(request.id, 'leave'), BusinessRuleError)
+  })
+
+  test('con la búsqueda cerrada el organizador ya no puede sacar', async ({ assert }) => {
+    const { match, players } = await fixtures(1)
+    const request = await requestToJoin(players[0], match.code)
+    await respondToRequest(request.id, 'accept')
+    await closeMatch(match.code)
+
+    await assert.rejects(() => respondToRequest(request.id, 'remove'), BusinessRuleError)
+  })
+
+  test('después de la hora del partido el organizador ya no puede sacar', async ({ assert }) => {
+    const { match, players } = await fixtures(2)
+    const request = await requestToJoin(players[0], match.code)
+    await respondToRequest(request.id, 'accept')
+    await Match.query()
+      .where('id', match.id)
+      .update({ starts_at: DateTime.now().minus({ hours: 2 }).toSQL() })
+
+    await assert.rejects(() => respondToRequest(request.id, 'remove'), BusinessRuleError)
+  })
+
+  test('al sacar un jugador de un partido completo, el puesto vuelve a abrirse', async ({
+    assert,
+  }) => {
+    const { match, players } = await fixtures(2)
+    const request = await requestToJoin(players[0], match.code)
+    await respondToRequest(request.id, 'accept')
+
+    await respondToRequest(request.id, 'remove')
     assert.equal(await statusOf(match.code), 'open')
   })
 
