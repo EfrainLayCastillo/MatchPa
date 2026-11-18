@@ -9,7 +9,7 @@ import { MATCH_IMAGES, type MatchImage } from "@/lib/match-images";
 import { formatDateTime } from "@/lib/panamaFormatDate";
 import type { Match } from "@/lib/types";
 
-export type MatchSummary = Pick<Match, "code" | "status" | "category" | "categoryTier" | "startsAt"> & {
+type MatchSummary = Pick<Match, "code" | "status" | "category" | "categoryTier" | "startsAt"> & {
   branch: { name: string };
 };
 

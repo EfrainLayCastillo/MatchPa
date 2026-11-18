@@ -70,10 +70,6 @@ export function byCategoryDistance(mine: { category: Category | null; categoryTi
 
 export const MATCH_DURATIONS: MatchDuration[] = [60, 90, 120];
 
-export function formatDuration(minutes: MatchDuration): string {
-  return `${minutes} minutos`;
-}
-
 export function firstName(fullName: string): string {
   return fullName.split(" ")[0] ?? fullName;
 }

@@ -59,7 +59,7 @@ function maskMatchCode(path: string): string {
 }
 
 /** Masks match codes and drops personal params so GA4 never sees them in `page_location`. */
-export function cleanUrl(href: string): string {
+function cleanUrl(href: string): string {
   const url = new URL(href, "https://matchpa.invalid");
   const absolute = /^[a-z][a-z0-9+.-]*:/i.test(href);
   STRIPPED_PARAMS.forEach((name) => url.searchParams.delete(name));

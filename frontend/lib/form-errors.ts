@@ -8,7 +8,7 @@ export interface FormErrors {
   form: string | null;
 }
 
-export const NO_ERRORS: FormErrors = { fields: {}, form: null };
+const NO_ERRORS: FormErrors = { fields: {}, form: null };
 
 export function toFormErrors(err: unknown, fallback: string): FormErrors {
   if (!(err instanceof ApiError)) return { fields: {}, form: fallback };

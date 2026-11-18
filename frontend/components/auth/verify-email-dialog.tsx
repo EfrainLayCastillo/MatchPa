@@ -67,7 +67,7 @@ interface VerifyEmailDialogProps {
   email?: string;
 }
 
-export function VerifyEmailDialog({ open, onOpenChange, email }: VerifyEmailDialogProps) {
+function VerifyEmailDialog({ open, onOpenChange, email }: VerifyEmailDialogProps) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [failed, setFailed] = useState(false);

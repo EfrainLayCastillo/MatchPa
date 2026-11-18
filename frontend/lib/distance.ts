@@ -13,7 +13,7 @@ export interface Zone {
 const EARTH_RADIUS_KM = 6371;
 const toRadians = (degrees: number) => (degrees * Math.PI) / 180;
 
-export function distanceKm(from: Point, to: Point): number {
+function distanceKm(from: Point, to: Point): number {
   const dLat = toRadians(to.latitude - from.latitude);
   const dLng = toRadians(to.longitude - from.longitude);
   const h =
@@ -22,7 +22,7 @@ export function distanceKm(from: Point, to: Point): number {
   return 2 * EARTH_RADIUS_KM * Math.asin(Math.sqrt(h));
 }
 
-export function branchPoint(branch: Branch | undefined): Point | null {
+function branchPoint(branch: Branch | undefined): Point | null {
   if (branch?.latitude == null || branch.longitude == null) return null;
   return { latitude: branch.latitude, longitude: branch.longitude };
 }

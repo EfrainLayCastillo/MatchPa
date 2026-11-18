@@ -72,7 +72,7 @@ export function LevelBadges({ category, tier, gender }: LevelProps) {
   );
 }
 
-export function GenderBadge({ gender }: { gender: Gender | null }) {
+function GenderBadge({ gender }: { gender: Gender | null }) {
   if (!gender) return null;
   const GenderIcon = GENDER_ICONS[gender];
   return (
@@ -83,7 +83,7 @@ export function GenderBadge({ gender }: { gender: Gender | null }) {
   );
 }
 
-export function CategoryBadge({ category }: { category: Category | null }) {
+function CategoryBadge({ category }: { category: Category | null }) {
   if (category === null) return null;
   return (
     <Badge
@@ -96,7 +96,7 @@ export function CategoryBadge({ category }: { category: Category | null }) {
   );
 }
 
-export function TierBadge({ tier }: { tier: CategoryTier | null }) {
+function TierBadge({ tier }: { tier: CategoryTier | null }) {
   if (!tier) return null;
   const TierIcon = TIER_ICONS[tier];
   return (

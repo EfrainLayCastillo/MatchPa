@@ -1,0 +1,7 @@
+{
+  "supportEntry": ["tests/**/*.spec.ts", "tests/bootstrap.ts", "bin/test.ts", "ace.js"],
+  "ignorePatterns": [".adonisjs/**"],
+  "ignoreDependencies": ["pg", "hot-hook", "@japa/runner", "@poppinss/ts-exec"],
+  "ignoreExports": [{ "file": "tests/bootstrap.ts", "exports": ["*"] }],
+  "overrides": [{ "files": ["app/models/**"], "rules": { "circular-dependencies": "off" } }]
+}

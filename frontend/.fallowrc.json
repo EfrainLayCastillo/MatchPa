@@ -1,0 +1,5 @@
+{
+  "dynamicallyLoaded": ["public/sw.js"],
+  "ignoreExports": [{ "file": "components/ui/**", "exports": ["*"] }],
+  "ignoreDependencies": ["@tailwindcss/turbopack", "shadcn"]
+}
