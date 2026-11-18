@@ -2,13 +2,19 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { CourtState } from "@/components/matchpa/court-state/court-state";
 
 interface LoadFailedProps {
   onRetry: () => Promise<unknown>;
   message?: string;
 }
 
-export function LoadFailed({ onRetry, message = "No pudimos cargar esto. Puede que el servidor esté despertando." }: LoadFailedProps) {
+export function LoadFailed({ onRetry, message }: LoadFailedProps) {
+  if (!message) return <CourtState variant="failed" onRetry={onRetry} />;
+  return <ServerAnswered message={message} onRetry={onRetry} />;
+}
+
+function ServerAnswered({ onRetry, message }: Required<LoadFailedProps>) {
   const [retrying, setRetrying] = useState(false);
 
   async function retry() {

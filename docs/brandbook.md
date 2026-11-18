@@ -15,6 +15,7 @@ Los colores vienen de una paleta de referencia visual. El logo de esa referencia
 - **Logo:** **Match** en bold + **Pa** en script.
 - **Gráficos:** estrella de 4 puntas, globo en alambre, carita sonriente en línea, trazos de la pelota.
 - **Tono:** casual y panameño: "Ey Pa, ¿juegas?", "Buscando Pa's...", "¡Match! Ya están los 4".
+- **Puntuación:** los textos de la UI no usan dos puntos ni punto y coma. Se separa con coma o con punto: "Ni la vio pasar. El servidor sigue medio dormido."
 
 ## Hover
 

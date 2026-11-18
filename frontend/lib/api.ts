@@ -1,4 +1,5 @@
 import { ApiError } from "./errors";
+import { SIMULATED_OUTAGE } from "./config";
 import { mockRequest } from "./mock-api";
 import type {
   Availability,
@@ -25,6 +26,8 @@ async function request<T>(
   path: string,
   body?: unknown,
 ): Promise<T> {
+  if (SIMULATED_OUTAGE === "waking") return new Promise<T>(() => {});
+  if (SIMULATED_OUTAGE === "failed") throw new ApiError(0, [{ message: "Simulated outage" }]);
   if (USE_MOCKS) return mockRequest<T>(method, path, body);
 
   const res = await fetch(`${API_URL}${path}`, {

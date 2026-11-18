@@ -59,6 +59,11 @@ Contenido para Instagram (Reels, Stories y carruseles) hecho con [HyperFrames](h
 - Las ilustraciones salen de anatomy o de un cuadro de un reel (`npx hyperframes snapshot --at <s> --zoom 'x,y,w,h'`), no de fotos de stock. Referencia: `carruseles/2026-11-17-nadie-responde` (la grada sale del reel "Qué es MatchPa").
 - Si sale la app, se graba en modo mock (`grabar.mjs` encuentra la pieza en `carruseles/<slug>/`). No uses las capturas de `docs/capturas/` ni de `assets/marca/`: muestran clubes reales.
 - El chat del problema se dibuja con burbujas en colores de la marca, sin la interfaz ni el logo de WhatsApp.
+- Footer en todos los slides, a 56 px del borde de abajo y con los mismos márgenes laterales que el texto (80 px):
+  - Portada y slides intermedios: footer minimalista con el logo chico (40 px de alto, `logo.svg` sobre verde y `logo-verde.svg` sobre marfil) a la izquierda. A la derecha, "Desliza →" en lima en la portada y `@matchpa.app` al 60 % en los demás.
+  - Último slide: badge de Instagram centrado, "Síguenos pa' más contenido" y `@matchpa.app` en lima, con el ícono de Instagram.
+- La app sale con la pantalla completa en un teléfono, sin recortes. Para enfocar algo, se pone encima un zoom más grande con borde lima. Si el zoom queda lejos de su origen, se une con un cono de vidrio lima (punta en el elemento, base en el zoom). Referencia: `carruseles/2026-11-17-para-organizadores`.
+- En los slides de pasos, el número y el título van en la misma fila, y el título en una sola línea.
 
 ## Grabaciones de la app
 

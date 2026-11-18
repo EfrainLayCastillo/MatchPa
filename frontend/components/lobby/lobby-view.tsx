@@ -3,6 +3,8 @@
 import { CalendarDaysIcon } from "lucide-react";
 import { CardListSkeleton } from "@/components/matchpa/skeletons";
 import { LoadFailed } from "@/components/matchpa/load-failed";
+import { SlowLoad } from "@/components/matchpa/slow-load";
+import { CourtState } from "@/components/matchpa/court-state/court-state";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
@@ -282,7 +284,7 @@ export function LobbyView() {
           <ListState
             query={matchesQuery}
             count={sortedMatches?.length}
-            empty="No hay partidos buscando pala para este día."
+            empty={<CourtState variant="noMatches" />}
           >
             <ul className={SCROLL_LIST}>
               {sortedMatches?.map((match) => (
@@ -308,7 +310,7 @@ export function LobbyView() {
             <ListState
               query={playersQuery}
               count={sortedPlayers?.length}
-              empty="Nadie disponible para este día todavía."
+              empty={<CourtState variant="empty" />}
             >
               <ul className={SCROLL_LIST}>
                 {sortedPlayers?.map((player) => (
@@ -323,15 +325,7 @@ export function LobbyView() {
               </ul>
             </ListState>
           ) : (
-            <Empty>
-              <Link
-                href={LOGIN_URL}
-                className="font-semibold text-foreground underline underline-offset-4"
-              >
-                Entra
-              </Link>{" "}
-              para ver quién está disponible para jugar.
-            </Empty>
+            <CourtState variant="signedOut" />
           )}
         </TabsContent>
       </Tabs>
@@ -396,22 +390,14 @@ function myOpenBranchIds(matches: Match[], day: string): number[] {
 interface ListStateProps {
   query: { isError: boolean; refetch: () => Promise<unknown> };
   count: number | undefined;
-  empty: string;
+  empty: React.ReactElement;
   children: React.ReactNode;
 }
 
 function ListState({ query, count, empty, children }: ListStateProps) {
   if (count === undefined && query.isError)
     return <LoadFailed onRetry={query.refetch} />;
-  if (count === undefined) return <CardListSkeleton />;
-  if (count === 0) return <Empty>{empty}</Empty>;
+  if (count === undefined) return <SlowLoad><CardListSkeleton /></SlowLoad>;
+  if (count === 0) return empty;
   return children;
-}
-
-function Empty({ children }: { children: React.ReactNode }) {
-  return (
-    <p className="rounded-xl border border-dashed border-border py-10 text-center text-sm text-muted-foreground">
-      {children}
-    </p>
-  );
 }

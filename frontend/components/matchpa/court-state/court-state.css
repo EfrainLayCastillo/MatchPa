@@ -1,0 +1,294 @@
+.court-state {
+  --sw-ink: var(--foreground);
+  --sw-paper: var(--card);
+  --sw-shadow: var(--foreground);
+  --sw-glow: var(--card);
+  --sw-line: var(--brand-teal);
+
+  --anatomy-paper: var(--sw-paper);
+  --anatomy-face: color-mix(in oklab, var(--sw-glow) 6%, var(--sw-paper));
+  --anatomy-top: color-mix(in oklab, var(--sw-glow) 9%, var(--sw-paper));
+  --anatomy-lit-top: var(--anatomy-top);
+  --anatomy-lit-shade: var(--anatomy-shade-2);
+  --anatomy-shade-0: color-mix(in oklab, var(--sw-shadow) 16%, var(--sw-paper));
+  --anatomy-shade-1: color-mix(in oklab, var(--sw-shadow) 11%, var(--sw-paper));
+  --anatomy-shade-2: color-mix(in oklab, var(--sw-shadow) 7%, var(--sw-paper));
+  --anatomy-shade-3: color-mix(in oklab, var(--sw-shadow) 4%, var(--sw-paper));
+  --anatomy-hi: var(--sw-ink);
+  --anatomy-mid: color-mix(in oklab, var(--sw-ink) 55%, var(--sw-paper));
+  --anatomy-lo: color-mix(in oklab, var(--sw-ink) 30%, var(--sw-paper));
+  --anatomy-faint: color-mix(in oklab, var(--sw-ink) 15%, var(--sw-paper));
+  --anatomy-lit: var(--sw-ink);
+  --anatomy-dot: var(--sw-ink);
+  --anatomy-halo: var(--sw-shadow);
+  --anatomy-halo-opacity: 0.22;
+}
+
+.dark .court-state {
+  --sw-shadow: black;
+  --sw-glow: var(--foreground);
+  --anatomy-halo-opacity: 0.7;
+}
+
+.court-state [data-m] {
+  vector-effect: none;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.court-state circle[data-m] {
+  stroke: none;
+}
+
+.court-state .sw-edge {
+  stroke: var(--sw-line);
+}
+.court-state circle.sw-edge {
+  fill: var(--sw-line);
+}
+
+.court-state [data-m="skin"] {
+  --body: var(--brand-ivory);
+  --shade: color-mix(in oklab, var(--brand-teal) 14%, var(--brand-ivory));
+  --shine: white;
+}
+.court-state [data-m="shirt"] {
+  --body: var(--brand-teal);
+  --shade: color-mix(in oklab, black 32%, var(--brand-teal));
+  --shine: color-mix(in oklab, var(--brand-turquoise) 40%, var(--brand-teal));
+}
+.court-state [data-m="shorts"] {
+  --body: white;
+  --shade: color-mix(in oklab, var(--brand-teal) 14%, white);
+  --shine: white;
+}
+.dark .court-state path.sw-edge[data-m="shirt"] {
+  stroke: color-mix(in oklab, var(--brand-turquoise) 55%, var(--brand-teal));
+}
+.court-state [data-m="cloth"],
+.court-state [data-m="grip"] {
+  --body: color-mix(in oklab, var(--brand-teal) 88%, var(--brand-turquoise));
+  --shade: color-mix(in oklab, black 30%, var(--brand-teal));
+  --shine: color-mix(in oklab, var(--brand-turquoise) 45%, var(--brand-teal));
+}
+.court-state [data-m="sock"] {
+  --body: white;
+  --shade: color-mix(in oklab, var(--brand-teal) 10%, white);
+  --shine: white;
+}
+.court-state [data-m="band"],
+.court-state [data-m="ball"] {
+  --body: var(--brand-lime);
+  --shade: color-mix(in oklab, var(--brand-teal) 22%, var(--brand-lime));
+  --shine: color-mix(in oklab, white 70%, var(--brand-lime));
+}
+
+.court-state path.sw-body,
+.court-state path.sw-shade,
+.court-state path.sw-shine {
+  stroke: var(--body);
+}
+.court-state path.sw-shade {
+  stroke: var(--shade);
+}
+.court-state path.sw-shine {
+  stroke: var(--shine);
+}
+.court-state circle.sw-body {
+  fill: var(--body);
+}
+.court-state circle.sw-shade {
+  fill: var(--shade);
+}
+.court-state circle.sw-shine {
+  fill: var(--shine);
+}
+
+.court-state .sw-hair,
+.court-state .sw-visor {
+  fill: var(--brand-teal);
+  stroke: var(--sw-line);
+  stroke-width: 0.75;
+  stroke-linejoin: round;
+  vector-effect: none;
+}
+.court-state .sw-brim {
+  --anatomy-paper: var(--brand-teal);
+  --anatomy-top: color-mix(in oklab, var(--brand-turquoise) 40%, var(--brand-teal));
+  --anatomy-shade-0: var(--brand-teal);
+  --anatomy-shade-1: var(--brand-teal);
+  --anatomy-shade-2: var(--brand-teal);
+  --anatomy-shade-3: var(--brand-teal);
+  --anatomy-hi: var(--sw-line);
+}
+
+.court-state .sw-eye {
+  fill: var(--brand-teal);
+}
+.court-state .sw-mouth {
+  fill: none;
+  stroke: var(--brand-teal);
+  stroke-width: 0.8;
+  stroke-linecap: round;
+  vector-effect: none;
+}
+.court-state .sw-stripe {
+  fill: none;
+  stroke: var(--brand-teal);
+  stroke-width: 1.1;
+  stroke-linecap: round;
+  vector-effect: none;
+}
+.court-state .sw-wrap {
+  fill: none;
+  stroke: color-mix(in oklab, var(--brand-turquoise) 55%, var(--brand-teal));
+  stroke-width: 0.6;
+  stroke-linecap: round;
+  vector-effect: none;
+}
+.court-state .sw-seam {
+  fill: none;
+  stroke: white;
+  stroke-width: 0.9;
+  stroke-linecap: round;
+  vector-effect: none;
+}
+
+.court-state .sw-frame {
+  fill: var(--brand-teal);
+  stroke: var(--sw-line);
+  stroke-width: 0.75;
+  stroke-linejoin: round;
+  vector-effect: none;
+}
+.court-state .sw-face {
+  fill: color-mix(in oklab, var(--brand-turquoise) 75%, var(--brand-ivory));
+  stroke: color-mix(in oklab, var(--brand-teal) 70%, var(--brand-turquoise));
+  stroke-width: 0.6;
+  vector-effect: none;
+}
+.court-state .sw-guard {
+  fill: none;
+  stroke: var(--brand-lime);
+  stroke-width: 1.2;
+  stroke-linecap: round;
+  vector-effect: none;
+}
+.court-state .sw-hole {
+  fill: var(--brand-teal);
+  opacity: 0.75;
+}
+
+.court-state .sw-laces circle {
+  fill: var(--brand-teal);
+}
+.court-state .sw-shadow {
+  fill: var(--sw-shadow);
+  filter: blur(1.2px);
+}
+.court-state .sw-court-line > .iso-top,
+.court-state .sw-court-line > .iso-fill {
+  fill: color-mix(in oklab, white 85%, var(--anatomy-top));
+}
+
+.court-state .sw-logo {
+  fill: var(--brand-lime);
+  font-family: var(--font-yellowtail), cursive;
+}
+
+.court-state .sw-glass {
+  fill: url(#sw-glass-fill);
+  stroke: color-mix(in oklab, white 70%, var(--brand-turquoise));
+  stroke-width: 0.7;
+  stroke-linejoin: round;
+}
+.court-state .sw-glass-stop-top {
+  stop-color: white;
+  stop-opacity: 0.55;
+}
+.court-state .sw-glass-stop-bottom {
+  stop-color: var(--brand-turquoise);
+  stop-opacity: 0.16;
+}
+.court-state .sw-glare {
+  fill: white;
+  opacity: 0.35;
+}
+.court-state .sw-glow {
+  opacity: 0.55;
+}
+.court-state .sw-glow[data-glow="0"] {
+  fill: var(--brand-turquoise);
+}
+.court-state .sw-glow[data-glow="1"] {
+  fill: var(--brand-lime);
+}
+.court-state .sw-glow[data-glow="2"] {
+  fill: var(--brand-teal);
+  opacity: 0.25;
+}
+
+.dark .court-state .sw-glass-stop-top {
+  stop-opacity: 0.16;
+}
+.dark .court-state .sw-glass-stop-bottom {
+  stop-opacity: 0.08;
+}
+.dark .court-state .sw-glass {
+  stroke: color-mix(in oklab, white 35%, var(--brand-turquoise));
+}
+.dark .court-state .sw-glare {
+  opacity: 0.12;
+}
+.dark .court-state .sw-glow[data-glow="2"] {
+  fill: var(--brand-ivory);
+  opacity: 0.12;
+}
+
+.court-state .cs-seat {
+  --anatomy-paper: var(--brand-turquoise);
+  --anatomy-top: color-mix(in oklab, white 22%, var(--brand-turquoise));
+  --anatomy-shade-0: color-mix(in oklab, var(--brand-teal) 34%, var(--brand-turquoise));
+  --anatomy-shade-1: color-mix(in oklab, var(--brand-teal) 26%, var(--brand-turquoise));
+  --anatomy-shade-2: color-mix(in oklab, var(--brand-teal) 18%, var(--brand-turquoise));
+  --anatomy-shade-3: color-mix(in oklab, var(--brand-teal) 10%, var(--brand-turquoise));
+  --anatomy-hi: var(--brand-teal);
+  --anatomy-lo: color-mix(in oklab, var(--brand-teal) 45%, var(--brand-turquoise));
+  --anatomy-dot: var(--brand-teal);
+}
+.court-state .cs-seat[data-lime] {
+  --anatomy-paper: var(--brand-lime);
+  --anatomy-top: color-mix(in oklab, white 30%, var(--brand-lime));
+  --anatomy-shade-0: color-mix(in oklab, var(--brand-teal) 30%, var(--brand-lime));
+  --anatomy-shade-1: color-mix(in oklab, var(--brand-teal) 22%, var(--brand-lime));
+  --anatomy-shade-2: color-mix(in oklab, var(--brand-teal) 15%, var(--brand-lime));
+  --anatomy-shade-3: color-mix(in oklab, var(--brand-teal) 8%, var(--brand-lime));
+  --anatomy-lo: color-mix(in oklab, var(--brand-teal) 40%, var(--brand-lime));
+}
+.court-state .cs-spot {
+  fill: var(--brand-lime);
+  opacity: 0.32;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
+.dark .court-state .cs-spot {
+  opacity: 0.22;
+  mix-blend-mode: screen;
+}
+.court-state .cs-shell {
+  stroke: var(--anatomy-shade-0);
+  stroke-width: 0.4;
+  stroke-linejoin: round;
+}
+.court-state .cs-cap {
+  fill: var(--anatomy-shade-1);
+  stroke: var(--anatomy-hi);
+  stroke-width: 0.6;
+  stroke-linejoin: round;
+}
+.court-state .cs-bracket {
+  --anatomy-paper: var(--sw-paper);
+  --anatomy-top: color-mix(in oklab, var(--sw-glow) 9%, var(--sw-paper));
+  --anatomy-hi: var(--sw-ink);
+}

@@ -9,3 +9,6 @@ export class ApiError extends Error {
     super(errors[0]?.message ?? `Error ${status}`);
   }
 }
+
+export const answeredMessage = (error: unknown) =>
+  error instanceof ApiError && error.status >= 400 && error.status < 500 ? error.message : undefined;

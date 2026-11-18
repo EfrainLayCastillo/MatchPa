@@ -2,6 +2,7 @@
 
 import { VerifyEmailBanner } from "@/components/auth/verify-email-banner";
 import { LoadFailed } from "@/components/matchpa/load-failed";
+import { SlowLoad } from "@/components/matchpa/slow-load";
 import { DetailSkeleton } from "@/components/matchpa/skeletons";
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect } from "react";
@@ -34,7 +35,7 @@ export function SessionGate({
 
   if (!loading && failed && !user) {
     return (
-      <div className="mx-auto w-full max-w-md px-4 pt-10">
+      <div className="mx-auto w-full max-w-3xl px-4 pt-10">
         <LoadFailed onRetry={refresh} />
       </div>
     );
@@ -42,7 +43,7 @@ export function SessionGate({
   if (loading || (!user && !allowAnonymous) || profileMissing) {
     return (
       <div className="flex flex-1 flex-col">
-        <DetailSkeleton />
+        <SlowLoad><DetailSkeleton /></SlowLoad>
       </div>
     );
   }

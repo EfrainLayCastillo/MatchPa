@@ -2,41 +2,48 @@
 
 import { DetailSkeleton } from "@/components/matchpa/skeletons";
 import { LoadFailed } from "@/components/matchpa/load-failed";
+import { SlowLoad } from "@/components/matchpa/slow-load";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { PageTitle } from "@/components/matchpa/page-title";
-import { api, ApiError } from "@/lib/api";
+import { api } from "@/lib/api";
+import { answeredMessage } from "@/lib/errors";
 import type { Match } from "@/lib/types";
 import { MatchForm } from "./match-form";
 
 export function MatchEdit({ code }: { code: string }) {
   const [match, setMatch] = useState<Match | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [attempt, setAttempt] = useState(0);
+  const [error, setError] = useState<{ message?: string } | null>(null);
+  const load = useCallback(
+    (isActive: () => boolean = () => true) =>
+      api
+        .match(code)
+        .then((data) => {
+          if (!isActive()) return;
+          setMatch(data);
+          setError(null);
+        })
+        .catch((err) => isActive() && setError({ message: answeredMessage(err) })),
+    [code],
+  );
 
   useEffect(() => {
     let active = true;
-    api
-      .match(code)
-      .then((data) => active && setMatch(data))
-      .catch((err) => active && setError(err instanceof ApiError ? err.message : "No encontramos este partido"));
+    void load(() => active);
     return () => {
       active = false;
     };
-  }, [code, attempt]);
+  }, [load]);
 
   if (error)
     return (
       <LoadFailed
-        message={error}
-        onRetry={async () => {
-          setError(null);
-          setAttempt((n) => n + 1);
-        }}
+        message={error.message}
+        onRetry={() => load()}
       />
     );
-  if (!match) return <DetailSkeleton />;
+  if (!match) return <SlowLoad><DetailSkeleton /></SlowLoad>;
 
   if (!match.isOrganizer || match.status !== "open") {
     return (

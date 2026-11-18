@@ -19,10 +19,12 @@ import { PlayerSummary } from "@/components/matchpa/player-identity";
 import { SectionHeading } from "@/components/matchpa/section-heading";
 import { levelGap, matchRole, track } from "@/lib/analytics";
 import { useVerifiedAction } from "@/components/auth/verify-email-dialog";
-import { api, ApiError } from "@/lib/api";
+import { api } from "@/lib/api";
+import { answeredMessage } from "@/lib/errors";
 import { canConfirmBooking, courtLabel } from "@/lib/format";
 import { notifyError } from "@/lib/notify";
 import { LoadFailed } from "@/components/matchpa/load-failed";
+import { SlowLoad } from "@/components/matchpa/slow-load";
 import { toMatchImage } from "@/lib/match-images";
 import { shouldAskForPush } from "@/lib/push";
 import {
@@ -52,11 +54,7 @@ export function MatchDetail({
   const refresh = useRefreshMatch(code);
   useMatchRealtime(code);
   const match = query.data ?? null;
-  const loadError = query.error
-    ? query.error instanceof ApiError
-      ? query.error.message
-      : "No encontramos este partido"
-    : null;
+  const loadError = answeredMessage(query.error);
   const [busy, setBusy] = useState(false);
   const [pushOpen, setPushOpen] = useState(false);
   const image = toMatchImage(useSearchParams().get("img"));
@@ -73,13 +71,13 @@ export function MatchDetail({
     });
   }, [match, personalized, sessionLoading, user]);
 
-  if (loadError && !match)
+  if (query.error && !match)
     return (
       <div className="p-6">
         <LoadFailed message={loadError} onRetry={query.refetch} />
       </div>
     );
-  if (!match) return <DetailSkeleton />;
+  if (!match) return <SlowLoad><DetailSkeleton /></SlowLoad>;
 
   async function run(action: () => Promise<unknown>, afterRequest = false) {
     setBusy(true);
