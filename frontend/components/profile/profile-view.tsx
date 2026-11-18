@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { PageTitle } from "@/components/matchpa/page-title";
 import { PlayerSummary } from "@/components/matchpa/player-identity";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { api, ApiError } from "@/lib/api";
 import { disablePush, enablePush, isPushEnabled, pushSupported } from "@/lib/push";
 import { useSession } from "@/lib/session";
@@ -37,18 +36,9 @@ export function ProfileView() {
 
       {user?.emailVerified === false ? <VerifyEmailNotice /> : null}
 
-      <Tabs defaultValue="data">
-        <TabsList className="w-full">
-          <TabsTrigger value="data">Mis datos</TabsTrigger>
-          <TabsTrigger value="notifications">Notificaciones</TabsTrigger>
-        </TabsList>
-        <TabsContent value="data" className="mt-4">
-          <ProfileForm mode="profile" />
-        </TabsContent>
-        <TabsContent value="notifications" className="mt-4">
-          <PushToggle />
-        </TabsContent>
-      </Tabs>
+      <PushToggle />
+
+      <ProfileForm mode="profile" />
 
       <Button variant="outline" className="w-full" onClick={logout}>
         Cerrar sesión
@@ -148,6 +138,7 @@ function PushToggle() {
   return (
     <Card className="gap-3 py-4">
       <CardContent className="space-y-3">
+        <h2 className="font-semibold">Notificaciones</h2>
         <p className="text-sm">{copy[state]}</p>
         {state === "off" || state === "on" ? (
           <Button variant={state === "on" ? "outline" : "default"} onClick={toggle} disabled={busy}>
