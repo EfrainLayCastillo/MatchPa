@@ -59,7 +59,7 @@ export function MatchEdit({ code }: { code: string }) {
   return (
     <div className="space-y-8">
       <PageTitle hint="Puedes cambiar la hora, la cancha, el tipo y los jugadores que ya tienes.">Editar partido</PageTitle>
-      <MatchForm match={match} />
+      <MatchForm key={match.updatedAt ?? match.code} match={match} />
     </div>
   );
 }

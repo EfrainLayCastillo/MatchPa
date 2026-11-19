@@ -132,7 +132,9 @@ function MatchFormBody({ match }: { match?: Match }) {
   // The publish button sits where "Siguiente" was; it stays disabled briefly so a second tap can't publish by accident.
   const [publishReady, setPublishReady] = useState(false);
 
-  const seatsForGuests = Number(maxPlayers) - 1;
+  const acceptedPlayers =
+    match?.requests?.filter((request) => request.status === "accepted").length ?? 0;
+  const seatsForGuests = Number(maxPlayers) - 1 - acceptedPlayers;
   const branchLocked =
     inviteeId !== null && presetBranch !== null && branchId === presetBranch;
   const dateLocked = inviteeId !== null && date === validDate(presetDate);
