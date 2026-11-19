@@ -142,6 +142,7 @@ function MatchRow({ match }: { match: Match }) {
       startsAt={match.startsAt}
       branchName={match.branch.name}
       locationLabel={match.branch.locationLabel}
+      status={match.status}
       badges={[
         <IconBadge key="role" icon={match.isOrganizer ? CrownIcon : UserCheckIcon}>
           {match.isOrganizer ? "Organizas" : "Juegas"}
@@ -153,9 +154,13 @@ function MatchRow({ match }: { match: Match }) {
         <IconBadge key="type" icon={VenusAndMarsIcon}>
           {TYPE_LABELS[match.type]}
         </IconBadge>,
-        <IconBadge key="spots" icon={UsersIcon}>
-          {match.spotsLeft > 0 ? `Faltan ${match.spotsLeft}` : "Completo"}
-        </IconBadge>,
+        ...(match.status === "open"
+          ? [
+              <IconBadge key="spots" icon={UsersIcon}>
+                Faltan {match.spotsLeft}
+              </IconBadge>,
+            ]
+          : []),
       ]}
     />
   );

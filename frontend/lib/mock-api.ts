@@ -200,9 +200,40 @@ const matches: StoredMatch[] = [
     ],
     requests: [],
   },
+  {
+    id: 4,
+    code: "llego30m",
+    organizerId: 2,
+    branchId: 1,
+    courtNumber: 5,
+    startsAt: new Date(Date.now() + 30 * 60_000).toISOString(),
+    durationMinutes: 90,
+    category: 4,
+    categoryTier: null,
+    type: "mixed",
+    maxPlayers: 4,
+    updatedAt: new Date().toISOString(),
+    closed: false,
+    guests: [],
+    requests: [
+      { id: 60, userId: 1, kind: "join_request", status: "accepted" },
+      { id: 61, userId: 3, kind: "invitation", status: "accepted" },
+      { id: 62, userId: 4, kind: "join_request", status: "accepted" },
+    ],
+    signals: [
+      { userId: 2, kind: "arrived", createdAt: minutesAgo(8) },
+      { userId: 3, kind: "on_the_way", createdAt: minutesAgo(5) },
+      { userId: 1, kind: "on_the_way", createdAt: minutesAgo(4) },
+      { userId: 4, kind: "running_late", createdAt: minutesAgo(2) },
+    ],
+  },
 ];
 
 let me: number | null = 1;
+
+function minutesAgo(minutes: number): string {
+  return new Date(Date.now() - minutes * 60_000).toISOString();
+}
 let nextId = 100;
 
 function seedPlayer(id: number, fullName: string, category: Category, gender: Gender, categoryTier: CategoryTier | null = null): User & { password: string } {
