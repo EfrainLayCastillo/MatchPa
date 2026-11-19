@@ -23,6 +23,7 @@ import { leadTime, track } from "@/lib/analytics";
 import { clearInvitee, readInvitee, type Invitee } from "@/lib/invitee-handoff";
 import { useVerifiedAction } from "@/components/auth/verify-email-dialog";
 import { api } from "@/lib/api";
+import { refreshMatchPage } from "@/app/partidos/[code]/actions";
 import {
   invalidProps,
   toFormErrors,
@@ -198,6 +199,7 @@ function MatchFormBody({ match }: { match?: Match }) {
     try {
       if (match) {
         const updated = await api.updateMatch(match.code, buildInput());
+        await refreshMatchPage(updated.code).catch(() => {});
         router.push(`/partidos/${updated.code}`);
         return;
       }

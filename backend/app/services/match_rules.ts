@@ -2,6 +2,9 @@ import { DateTime } from 'luxon'
 import type Match from '#models/match'
 import type { MatchStatus } from '#models/match'
 
+export const MIN_PLAYERS = 4
+export const MAX_PLAYERS_LIMIT = 6
+
 export type EffectiveStatus = MatchStatus | 'expired'
 
 /** Players still needed: the organizer is one seat, guests and accepted requests take the rest. */

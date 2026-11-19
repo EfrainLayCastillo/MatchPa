@@ -35,7 +35,7 @@ export function MatchCard({
           {TYPE_LABELS[match.type]}
         </IconBadge>,
         <IconBadge key="spots" icon={UsersIcon}>
-          Faltan {match.spotsLeft} de {match.maxPlayers - 1}
+          Faltan {match.spotsLeft} de {match.maxPlayers}
         </IconBadge>,
       ]}
       footer={joinAction({ match, onJoin, joining })}

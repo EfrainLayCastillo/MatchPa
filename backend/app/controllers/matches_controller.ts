@@ -6,6 +6,7 @@ import { serializeAnonymousMatch, serializeMatch } from '#serializers/match_seri
 import { notifyBookingChanged, notifyMatchClosed, notifyMatchFilled } from '#services/notifications'
 import { pushInBackground } from '#services/push'
 import {
+  addSeat,
   matchQuery,
   findMatchByCode,
   closeMatch,
@@ -106,6 +107,15 @@ export default class MatchesController {
     matchChanged(closed.code)
     pushInBackground(notifyMatchClosed(closed, playerIds))
     return serializeMatch(reloaded, auth.getUserOrFail())
+  }
+
+  async seats({ auth, bouncer, params }: HttpContext) {
+    const match = await Match.query().where('code', params.code).firstOrFail()
+    await bouncer.authorize('manageMatch', match)
+
+    const updated = await addSeat(params.code)
+    matchChanged(updated.code)
+    return serializeMatch(updated, auth.getUserOrFail())
   }
 }
 

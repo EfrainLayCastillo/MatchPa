@@ -68,6 +68,8 @@ export function byCategoryDistance(mine: { category: Category | null; categoryTi
   return <T extends { category: Category; categoryTier?: CategoryTier | null }>(a: T, b: T) => distance(a) - distance(b);
 }
 
+export const MAX_PLAYERS = 6;
+
 export const MATCH_DURATIONS: MatchDuration[] = [60, 90, 120];
 
 export function firstName(fullName: string): string {

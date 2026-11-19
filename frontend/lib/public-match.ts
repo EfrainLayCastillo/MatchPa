@@ -1,9 +1,11 @@
-import { cacheLife } from "next/cache";
+import { cacheLife, cacheTag } from "next/cache";
 import { API_BASE, USING_MOCKS } from "./api";
 import type { Match } from "./types";
 
 /** Server-side fetches need an absolute URL; in production `API_BASE` is the relative `/api` rewrite. */
 const SERVER_API_BASE = process.env.BACKEND_URL ? `${process.env.BACKEND_URL}/api` : API_BASE;
+
+export const matchTag = (code: string) => `match-${code}`;
 
 /**
  * Public match read for metadata and the share image. Cached briefly so seat counts stay fresh.
@@ -12,6 +14,7 @@ const SERVER_API_BASE = process.env.BACKEND_URL ? `${process.env.BACKEND_URL}/ap
 export async function fetchPublicMatch(code: string): Promise<Match | null> {
   "use cache";
   cacheLife("minutes");
+  cacheTag(matchTag(code));
 
   if (USING_MOCKS) throw new Error("Mock API has no server-side data");
   const secret = process.env.PROXY_SECRET;

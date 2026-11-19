@@ -20,8 +20,9 @@ import { SectionHeading } from "@/components/matchpa/section-heading";
 import { levelGap, matchRole, track } from "@/lib/analytics";
 import { useVerifiedAction } from "@/components/auth/verify-email-dialog";
 import { api } from "@/lib/api";
+import { refreshMatchPage } from "@/app/partidos/[code]/actions";
 import { answeredMessage } from "@/lib/errors";
-import { canConfirmBooking, courtLabel } from "@/lib/format";
+import { canConfirmBooking, courtLabel, MAX_PLAYERS } from "@/lib/format";
 import { notifyError } from "@/lib/notify";
 import { LoadFailed } from "@/components/matchpa/load-failed";
 import { SlowLoad } from "@/components/matchpa/slow-load";
@@ -83,6 +84,7 @@ export function MatchDetail({
     setBusy(true);
     try {
       await action();
+      refreshMatchPage(code).catch(() => {});
       if (afterRequest && shouldAskForPush()) setPushOpen(true);
       refresh();
     } catch (err) {
@@ -215,6 +217,7 @@ export function MatchDetail({
                   run(() => respond(match, request.id, action))
                 }
                 onClose={() => run(() => api.closeMatch(match.code))}
+                onAddSeat={() => run(() => api.addSeat(match.code))}
               />
             ) : null}
 
@@ -353,6 +356,7 @@ function OrganizerPanel({
   busy,
   onRespond,
   onClose,
+  onAddSeat,
 }: {
   match: Match;
   busy: boolean;
@@ -361,6 +365,7 @@ function OrganizerPanel({
     action: "accept" | "reject" | "remove",
   ) => void;
   onClose: () => void;
+  onAddSeat: () => void;
 }) {
   const requests = match.requests ?? [];
   const pending = requests.filter(
@@ -441,6 +446,22 @@ function OrganizerPanel({
             >
               Cerrar búsqueda
             </Button>
+          ) : null}
+
+          {match.status === "full" && match.maxPlayers < MAX_PLAYERS ? (
+            <div className="space-y-2">
+              <Button
+                variant="outline"
+                className="h-11 w-full"
+                onClick={onAddSeat}
+                disabled={busy}
+              >
+                Sumar un puesto
+              </Button>
+              <p className="text-sm text-muted-foreground">
+                Pasa a {match.maxPlayers + 1} jugadores y vuelve a abrirse para que alguien más se una.
+              </p>
+            </div>
           ) : null}
         </CardContent>
       </Card>

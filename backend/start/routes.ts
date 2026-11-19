@@ -69,6 +69,7 @@ router
         router.patch('matches/:code', [MatchesController, 'update']).use(writeThrottle)
         router.post('matches/:code/booking', [MatchesController, 'booking']).use(writeThrottle)
         router.post('matches/:code/close', [MatchesController, 'close']).use(publishThrottle)
+        router.post('matches/:code/seats', [MatchesController, 'seats']).use(writeThrottle)
         router
           .post('matches/:code/join-requests', [JoinRequestsController, 'store'])
           .use(socialThrottle)

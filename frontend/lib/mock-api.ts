@@ -1,7 +1,7 @@
 // In-memory stand-in for the AdonisJS API, enabled with NEXT_PUBLIC_MOCK_API=true.
 // It mirrors the README contract so screens can be built before the backend exists.
 import { ApiError } from "./errors";
-import { acceptsBooking } from "./format";
+import { acceptsBooking, MAX_PLAYERS } from "./format";
 import { dateKey } from "./panamaFormatDate";
 
 import type {
@@ -499,6 +499,15 @@ export async function mockRequest<T>(method: Method, fullPath: string, body?: un
     match.closed = true;
     match.updatedAt = new Date().toISOString();
     match.requests.forEach((r) => r.status === "pending" && (r.status = "cancelled"));
+    return viewOf(match);
+  });
+  on(/^POST \/matches\/([^/]+)\/seats$/, (m) => {
+    const match = findMatch(m[1]);
+    requireOrganizer(match);
+    if (statusOf(match) !== "full") fail(422, "Solo puedes sumar un puesto a un partido completo");
+    if (match.maxPlayers >= MAX_PLAYERS) fail(422, `El partido ya tiene el máximo de ${MAX_PLAYERS} jugadores`);
+    match.maxPlayers += 1;
+    match.updatedAt = new Date().toISOString();
     return viewOf(match);
   });
   on(/^POST \/matches\/([^/]+)\/join-requests$/, (m) => {

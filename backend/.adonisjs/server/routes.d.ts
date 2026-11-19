@@ -33,6 +33,7 @@ export type ScannedRoutes = {
     'matches.update': { paramsTuple: [ParamValue]; params: {'code': ParamValue} }
     'matches.booking': { paramsTuple: [ParamValue]; params: {'code': ParamValue} }
     'matches.close': { paramsTuple: [ParamValue]; params: {'code': ParamValue} }
+    'matches.seats': { paramsTuple: [ParamValue]; params: {'code': ParamValue} }
     'join_requests.store': { paramsTuple: [ParamValue]; params: {'code': ParamValue} }
     'invitations.store': { paramsTuple: [ParamValue]; params: {'code': ParamValue} }
     'match_requests.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -80,6 +81,7 @@ export type ScannedRoutes = {
     'matches.store': { paramsTuple?: []; params?: {} }
     'matches.booking': { paramsTuple: [ParamValue]; params: {'code': ParamValue} }
     'matches.close': { paramsTuple: [ParamValue]; params: {'code': ParamValue} }
+    'matches.seats': { paramsTuple: [ParamValue]; params: {'code': ParamValue} }
     'join_requests.store': { paramsTuple: [ParamValue]; params: {'code': ParamValue} }
     'invitations.store': { paramsTuple: [ParamValue]; params: {'code': ParamValue} }
     'branch_suggestions.store': { paramsTuple?: []; params?: {} }

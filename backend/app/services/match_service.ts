@@ -8,7 +8,7 @@ import MatchGuest from '#models/match_guest'
 import MatchRequest, { type RequestStatus } from '#models/match_request'
 import User from '#models/user'
 import { assertEmailVerified } from '#services/email_verification'
-import { effectiveStatus, spotsLeft } from '#services/match_rules'
+import { MAX_PLAYERS_LIMIT, effectiveStatus, spotsLeft } from '#services/match_rules'
 import { PANAMA_ZONE, panamaDayBounds } from '#services/panama_time'
 
 export type RequestAction = 'accept' | 'reject' | 'leave' | 'remove'
@@ -125,6 +125,21 @@ export async function closeMatch(code: string): Promise<Match> {
       throw new BusinessRuleError('Este partido ya no está disponible')
 
     await closeLocked(match, trx)
+    return loadMatch(match.id, trx)
+  })
+}
+
+export async function addSeat(code: string): Promise<Match> {
+  return db.transaction(async (trx) => {
+    const match = await lockMatchByCode(code, trx)
+    if (effectiveStatus(match) !== 'full')
+      throw new BusinessRuleError('Solo puedes sumar un puesto a un partido completo')
+    if (match.maxPlayers >= MAX_PLAYERS_LIMIT)
+      throw new BusinessRuleError(`El partido ya tiene el máximo de ${MAX_PLAYERS_LIMIT} jugadores`)
+
+    match.maxPlayers += 1
+    await match.useTransaction(trx).save()
+    await syncStatus(match.id, trx)
     return loadMatch(match.id, trx)
   })
 }

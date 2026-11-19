@@ -18,6 +18,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { track } from "@/lib/analytics";
 import { api } from "@/lib/api";
+import { refreshMatchPage } from "@/app/partidos/[code]/actions";
 import { invalidProps, toFormErrors, useFormErrors } from "@/lib/form-errors";
 import { cn } from "@/lib/utils";
 import type { Match } from "@/lib/types";
@@ -100,6 +101,7 @@ function BookingForm({
     try {
       await api.confirmBooking(match.code, Number(courtNumber));
       track("confirm_booking", { branch: match.branch.slug, match_status: match.status });
+      await refreshMatchPage(match.code).catch(() => {});
       onBooked();
     } catch (err) {
       if (handleError(err)) return;

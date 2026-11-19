@@ -43,7 +43,7 @@ export function MatchHeading({ match, canEdit }: { match: Match; canEdit: boolea
         <IconBadge icon={TrophyIcon}>{formatCategory(match.category, match.categoryTier)}</IconBadge>
         <IconBadge icon={VenusAndMarsIcon}>{TYPE_LABELS[match.type]}</IconBadge>
         <IconBadge icon={UsersIcon}>
-          Faltan {match.spotsLeft} de {match.maxPlayers - 1}
+          Faltan {match.spotsLeft} de {match.maxPlayers}
         </IconBadge>
       </div>
     </header>

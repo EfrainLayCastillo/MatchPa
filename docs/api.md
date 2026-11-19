@@ -42,6 +42,7 @@ Base `/api`. Solo acepta JSON (`application/json`); formularios y multipart se r
 | `PATCH` | `/matches/:code` | Editar mientras está `open` (mismo body que publicar; puede reservar o quitar la reserva) |
 | `POST` | `/matches/:code/booking` | Organizador: `{ courtNumber }` confirma o cambia la cancha reservada. `open`, `full` o `closed` antes de la hora; si no, 422 |
 | `POST` | `/matches/:code/close` | Cerrar |
+| `POST` | `/matches/:code/seats` | Organizador. Suma un puesto a un partido `full` antes de la hora con máximo menor que 6. Devuelve el partido. Si no, 422 |
 | `POST` | `/matches/:code/join-requests` | Pedir unirse. 403 `EMAIL_NOT_VERIFIED` si el correo no está verificado |
 | `POST` | `/matches/:code/invitations` | Invitar (`userId`) |
 | `PATCH` | `/match-requests/:id` | Ejecutar `action`. 403 `EMAIL_NOT_VERIFIED` si el invitado acepta sin correo verificado |

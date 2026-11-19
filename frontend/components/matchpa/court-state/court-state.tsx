@@ -13,6 +13,7 @@ interface Copy {
   title: string;
   body: string;
   role: "status" | "alert";
+  retry?: string;
   figure: "serve" | "stands";
   link?: { label: string; href: string };
 }
@@ -23,6 +24,7 @@ const VARIANTS: Record<CourtStateVariant, Copy> = {
   waking: {
     title: "El servidor está calentando",
     body: "Se estaba echando una siesta. En unos segundos sale a la cancha.",
+    retry: "Sacar ya",
     role: "status",
     figure: "serve",
   },
@@ -103,7 +105,7 @@ export function CourtState({ variant, onRetry }: CourtStateProps) {
             onClick={retry}
             disabled={retrying}
           >
-            {retrying ? "Sacando…" : "Sacar otra vez"}
+            {retrying ? "Sacando…" : (copy.retry ?? "Sacar otra vez")}
           </Button>
         ) : null}
         {copy.link ? (

@@ -1,4 +1,10 @@
 import vine from '@vinejs/vine'
+import { MAX_PLAYERS_LIMIT, MIN_PLAYERS } from '#services/match_rules'
+
+const PLAYER_COUNTS = Array.from(
+  { length: MAX_PLAYERS_LIMIT - MIN_PLAYERS + 1 },
+  (_, i) => MIN_PLAYERS + i
+)
 
 const guest = vine.object({
   name: vine.string().trim().minLength(2).maxLength(80),
@@ -28,7 +34,7 @@ export const matchValidator = vine.create({
     .nullable()
     .optional(),
   type: vine.enum(['male', 'female', 'mixed'] as const),
-  maxPlayers: vine.number().in([4, 5, 6]),
+  maxPlayers: vine.number().in(PLAYER_COUNTS),
   guests: vine.array(guest).maxLength(5).optional(),
 })
 
