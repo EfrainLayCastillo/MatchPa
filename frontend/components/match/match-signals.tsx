@@ -65,25 +65,41 @@ export function MatchSignals({ match }: { match: Match }) {
   return (
     <section className="space-y-3">
       <SectionHeading>Actividad</SectionHeading>
-      {canSend ? (
-        <div className="flex flex-wrap gap-2" role="group" aria-label="Avisar al grupo">
-          {kinds.map((kind) => (
-            <SignalChip key={kind} kind={kind} used={sent.has(kind)} pending={send.isPending} onSend={onSend} />
-          ))}
+      <div className="overflow-hidden rounded-2xl border border-border bg-card">
+        <div className="bg-muted/60 px-3 py-4">
+          {signals.length > 0 ? (
+            <ul className="space-y-2" aria-live="polite">
+              {signals.map((signal) => (
+                <SignalBubble
+                  key={`${signal.userId}-${signal.kind}`}
+                  signal={signal}
+                  own={signal.userId === user?.id}
+                  organizer={signal.userId === match.organizer.id}
+                  now={now}
+                />
+              ))}
+            </ul>
+          ) : (
+            <p className="py-2 text-center text-sm text-muted-foreground">Avisa al grupo cuando vayas para la cancha</p>
+          )}
         </div>
-      ) : null}
-      {signals.length > 0 ? (
-        <ul className="space-y-2">
-          {signals.map((signal) => (
-            <SignalItem key={`${signal.userId}-${signal.kind}`} signal={signal} now={now} />
-          ))}
-        </ul>
-      ) : null}
+        {canSend ? (
+          <div
+            className="flex gap-2 overflow-x-auto border-t border-border p-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            role="group"
+            aria-label="Avisar al grupo"
+          >
+            {kinds.map((kind) => (
+              <SignalButton key={kind} kind={kind} used={sent.has(kind)} pending={send.isPending} onSend={onSend} />
+            ))}
+          </div>
+        ) : null}
+      </div>
     </section>
   );
 }
 
-function SignalChip({
+function SignalButton({
   kind,
   used,
   pending,
@@ -101,10 +117,10 @@ function SignalChip({
       disabled={used || pending}
       onClick={() => onSend(kind)}
       className={cn(
-        "inline-flex min-h-11 items-center gap-2 rounded-full border px-4 text-sm font-semibold transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
+        "inline-flex min-h-11 flex-1 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-full border px-3 text-sm font-semibold transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed",
         used
-          ? "border-brand-teal bg-brand-lime/40 text-foreground dark:border-brand-lime"
-          : "border-border bg-card hover:bg-muted",
+          ? "border-transparent bg-muted text-muted-foreground"
+          : "border-border bg-card hover:bg-muted active:scale-95 motion-reduce:active:scale-100",
       )}
     >
       {used ? <CheckIcon aria-hidden className="size-4" /> : <Icon aria-hidden className="size-4" />}
@@ -114,23 +130,45 @@ function SignalChip({
   );
 }
 
-function SignalItem({ signal, now }: { signal: Match["signals"][number]; now: number }) {
+function SignalBubble({
+  signal,
+  own,
+  organizer,
+  now,
+}: {
+  signal: Match["signals"][number];
+  own: boolean;
+  organizer: boolean;
+  now: number;
+}) {
   const { label, icon: Icon } = SIGNALS[signal.kind];
   return (
-    <li className="flex items-center gap-3 motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-1 motion-safe:duration-300">
-      <span
-        aria-hidden
-        className="flex size-8 shrink-0 items-center justify-center rounded-full bg-brand-teal font-heading text-sm font-extrabold text-brand-lime"
+    <li
+      className={cn(
+        "flex motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-1 motion-safe:duration-300",
+        own ? "justify-end" : "justify-start",
+      )}
+    >
+      <div
+        className={cn(
+          "max-w-[80%] rounded-2xl px-3 py-2 shadow-sm",
+          own ? "rounded-br-sm bg-brand-lime text-brand-teal" : "rounded-bl-sm bg-card text-foreground",
+        )}
       >
-        {signal.fullName.charAt(0).toUpperCase()}
-      </span>
-      <p className="min-w-0 flex-1 text-sm">
-        <span className="font-semibold">{signal.fullName.split(" ")[0]}</span>
-        <span className="text-muted-foreground"> · </span>
-        <Icon aria-hidden className="mr-1 inline size-3.5 align-[-2px]" />
-        {label}
-        <span className="text-muted-foreground"> · {timeAgo(signal.createdAt, now)}</span>
-      </p>
+        {own ? null : (
+          <p className="text-xs font-bold text-brand-teal dark:text-brand-turquoise">
+            {signal.fullName.split(" ")[0]}
+            {organizer ? <span className="font-medium text-muted-foreground"> · Organizador</span> : null}
+          </p>
+        )}
+        <p className="flex items-center gap-1.5 text-sm font-semibold">
+          <Icon aria-hidden className="size-4 shrink-0" />
+          {label}
+        </p>
+        <p className={cn("text-right text-[11px]", own ? "text-brand-teal/70" : "text-muted-foreground")}>
+          {timeAgo(signal.createdAt, now)}
+        </p>
+      </div>
     </li>
   );
 }
