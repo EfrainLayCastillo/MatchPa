@@ -21,7 +21,6 @@ test.group('eliminar cuenta', (group) => {
       category: 4,
       categoryTier: 'high',
       gender: 'male',
-      whatsapp: '+50760000000',
       emailVerifiedAt: DateTime.now(),
     })
     return user.refresh()
@@ -74,7 +73,6 @@ test.group('eliminar cuenta', (group) => {
     assert.equal(user.fullName, 'Jugador eliminado')
     assert.equal(user.email, `deleted-${user.id}@matchpa.invalid`)
     assert.isNull(user.password)
-    assert.isNull(user.whatsapp)
     assert.isNull(user.category)
     assert.isNull(user.categoryTier)
     assert.isNull(user.gender)

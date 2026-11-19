@@ -37,7 +37,6 @@ export interface User {
   fullName: string;
   email: string;
   emailVerified: boolean;
-  phone: string | null;
   category: Category | null;
   categoryTier: CategoryTier | null;
   gender: Gender | null;
@@ -105,10 +104,19 @@ export interface MyRequest {
   };
 }
 
+export type SignalKind = "on_the_way" | "arrived" | "running_late";
+
+export interface MatchSignal {
+  userId: number;
+  fullName: string;
+  kind: SignalKind;
+  createdAt: string;
+}
+
 export interface Match {
   id: number;
   code: string;
-  organizer: { id: number; fullName: string | null; phone: string | null };
+  organizer: { id: number; fullName: string | null };
   branch: Branch;
   courtBooked: boolean;
   courtNumber: number | null;
@@ -126,6 +134,7 @@ export interface Match {
   isOrganizer: boolean;
   myRequest: { id: number; kind: RequestKind; status: RequestStatus } | null;
   requests?: MatchRequest[];
+  signals: MatchSignal[];
 }
 
 export interface NewMatchInput {
@@ -161,7 +170,10 @@ export type NotificationType =
   | "court_unbooked"
   | "match_closed"
   | "match_cancelled"
-  | "player_deleted";
+  | "player_deleted"
+  | "signal_on_the_way"
+  | "signal_arrived"
+  | "signal_running_late";
 
 export interface InboxNotification {
   id: number;

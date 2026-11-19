@@ -1,6 +1,5 @@
 import { DateTime } from 'luxon'
 import { compose } from '@adonisjs/core/helpers'
-import encryption from '@adonisjs/core/services/encryption'
 import hash from '@adonisjs/core/services/hash'
 import { withAuthFinder } from '@adonisjs/auth/mixins/lucid'
 import { BaseModel, column, hasMany } from '@adonisjs/lucid/orm'
@@ -24,15 +23,6 @@ export default class User extends compose(BaseModel, withAuthFinder(hash)) {
 
   @column({ serializeAs: null })
   declare googleId: string | null
-
-  /** Encrypted at rest with APP_KEY. Only the owner, and the organizer's accepted players, can read it. */
-  @column({
-    columnName: 'whatsapp_encrypted',
-    serializeAs: null,
-    prepare: (value: string | null) => (value ? encryption.encrypt(value) : null),
-    consume: (value: string | null) => (value ? encryption.decrypt<string>(value) : null),
-  })
-  declare whatsapp: string | null
 
   @column()
   declare category: number | null

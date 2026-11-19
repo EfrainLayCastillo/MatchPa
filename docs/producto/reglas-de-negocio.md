@@ -31,7 +31,7 @@ Especificación de qué debe cumplir el backend y el frontend. Si el código se 
 ## Eliminar cuenta
 
 - Desde el final del perfil, escribiendo `ELIMINAR` para confirmar. No se puede deshacer.
-- Se anonimiza, no se borra la fila: nombre "Jugador eliminado", correo `deleted-<id>@matchpa.invalid`, y contraseña, Google, WhatsApp, categoría, subnivel, género y verificación en `null`. Se borran su disponibilidad, suscripciones push, notificaciones, códigos y sugerencias de sucursal. Se conservan la fecha y la versión de términos aceptadas, como prueba del consentimiento.
+- Se anonimiza, no se borra la fila: nombre "Jugador eliminado", correo `deleted-<id>@matchpa.invalid`, y contraseña, Google, categoría, subnivel, género y verificación en `null`. Se borran su disponibilidad, suscripciones push, notificaciones, señales, códigos y sugerencias de sucursal. Se conservan la fecha y la versión de términos aceptadas, como prueba del consentimiento.
 - Sus partidos futuros `open` o `full` se cierran y sus solicitudes pendientes se cancelan.
 - Sus solicitudes pendientes en partidos de otros se cancelan, y sus puestos aceptados en partidos futuros se liberan como si saliera (el partido vuelve a `open` si corresponde).
 - Los partidos pasados no cambian y lo muestran como "Jugador eliminado".
@@ -93,12 +93,28 @@ Una sola entidad, `match_requests`, con `kind`:
 
 - Una `pending` de un partido expirado no se muestra en "Te invitaron" ni en Mis partidas, y no se puede responder. Sigue `pending` en la BD porque `expired` se calcula al consultar, sin cron.
 
+## Señales del partido
+
+Avisos de un toque para coordinar la llegada, sin chat libre ni teléfonos.
+
+| `kind` | UI | Quién la manda |
+|---|---|---|
+| `on_the_way` | 🚗 Voy en camino | Jugador aceptado |
+| `arrived` | 📍 Ya llegué | Jugador aceptado u organizador |
+| `running_late` | ⏰ Llego tarde | Jugador aceptado u organizador |
+
+- Solo el organizador y los jugadores aceptados, con el partido `open` o `full` (no `closed`).
+- Ventana: desde 60 minutos antes de `starts_at` hasta 15 minutos después. Fuera de ella los botones no aparecen y la API responde 422.
+- Cada usuario manda cada señal una sola vez por partido. La ya usada queda marcada y deshabilitada; repetirla responde 409.
+- Se ven en "Actividad", en el detalle del partido, solo para el organizador y los aceptados: nombre, señal y hace cuánto, la más vieja primero. Se actualiza en vivo.
+- La señal de un jugador avisa al organizador (push y bandeja). En la bandeja queda una sola fila por partido: la última señal reemplaza a la anterior. La del organizador no notifica: solo aparece en Actividad.
+- Si el jugador sale o lo sacan, sus señales se quedan en Actividad.
+
 ## Link para compartir
 
 - URL: `matchpa.app/partidos/<code>`, con `code` aleatorio de 8 caracteres (no el `id`, para evitar enumeración).
 - Se muestra al publicar y en el detalle.
 - Ver no requiere cuenta. Unirse sí: login → onboarding → vuelve al partido y envía la solicitud.
-- El WhatsApp del organizador solo lo reciben el propio organizador y los jugadores aceptados, y solo mientras el partido está `open` o `full`. Si el partido expiró o se cerró, la API no lo devuelve y el botón no aparece.
 - Si el partido no está `open`, muestra su estado en vez del botón de unirse.
 - Botón Compartir con `navigator.share`; si el navegador no lo tiene, copia el link. El link lleva UTM de `share` (ver `../ingenieria/analitica.md`).
 - Vista previa Open Graph dinámica (`generateMetadata` + `opengraph-image`): estado, fecha, hora, sucursal, categoría, tipo y puestos. Mismos datos en la imagen vertical de historias.
@@ -173,6 +189,7 @@ Sección "Sucursal" con nombre, zona y los datos que el club publique. "Cómo ll
 | `match_closed` | Aceptados | Partido cerrado · El organizador cerró la búsqueda |
 | `match_cancelled` | Aceptados | Partido cancelado · El organizador eliminó su cuenta |
 | `player_deleted` | Organizador | Se liberó un puesto · Un jugador eliminó su cuenta |
+| `signal_on_the_way` / `signal_arrived` / `signal_running_late` | Organizador | Voy en camino / Ya llegué / Llego tarde · Un jugador de tu partido. El push lleva el nombre: "Ana · Voy en camino" |
 
 ## Estados del jugador (UI)
 

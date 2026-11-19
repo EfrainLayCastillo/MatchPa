@@ -18,7 +18,7 @@ Base `/api`. Solo acepta JSON (`application/json`); formularios y multipart se r
 | `GET` | `/health` | `{ ok: true }` sin tocar la base. Lo usa el workflow que mantiene despierto el backend |
 | `GET` | `/me` | Usuario actual, con `emailVerified` y `termsAccepted` (aceptó la versión vigente). Justo después de un login con Google trae una sola vez `authEvent`: `google_signup` o `google_login`. Todas las respuestas con el usuario incluyen `termsAccepted` |
 | `POST` | `/me/terms` | Acepta la versión vigente de términos y privacidad. Devuelve el usuario |
-| `PATCH` | `/me` | Actualizar perfil (`category`, `categoryTier`, `gender`, `phone`) |
+| `PATCH` | `/me` | Actualizar perfil (`category`, `categoryTier`, `gender`) |
 | `DELETE` | `/me` | Eliminar la cuenta con `{ confirm: "ELIMINAR" }`. Anonimiza, cierra o libera sus partidos futuros y cierra la sesión. 204 |
 
 ## Jugadores y disponibilidad
@@ -38,11 +38,12 @@ Base `/api`. Solo acepta JSON (`application/json`); formularios y multipart se r
 |---|---|---|
 | `POST` | `/matches` | Publicar (con invitados y `categoryTier` opcional). `courtBooked` (bool) y `courtNumber` (1–50, obligatorio si `courtBooked`, si no se ignora). 422 si `branchId` no existe. 403 `EMAIL_NOT_VERIFIED` si el correo no está verificado |
 | `GET` | `/matches` | Partidos `open` (`date`, `branchId`, `type`). Sin sesión, como el detalle: sin nombres |
-| `GET` | `/matches/:code` | Detalle público; incluye solicitudes si eres organizador. Sin sesión, `fullName`/`name` del organizador, jugadores e invitados son `null` y sus `id` son la posición en el partido (`players[0]` es el organizador). Ambos públicos tienen 60 peticiones por minuto por IP sin sesión |
+| `GET` | `/matches/:code` | Detalle público; incluye solicitudes si eres organizador. Sin sesión, `fullName`/`name` del organizador, jugadores e invitados son `null` y sus `id` son la posición en el partido (`players[0]` es el organizador). `signals` (`userId`, `fullName`, `kind`, `createdAt`, la más vieja primero) solo llega al organizador y a los aceptados; para el resto es `[]`. Ambos públicos tienen 60 peticiones por minuto por IP sin sesión |
 | `PATCH` | `/matches/:code` | Editar mientras está `open` (mismo body que publicar; puede reservar o quitar la reserva) |
 | `POST` | `/matches/:code/booking` | Organizador: `{ courtNumber }` confirma o cambia la cancha reservada. `open`, `full` o `closed` antes de la hora; si no, 422 |
 | `POST` | `/matches/:code/close` | Cerrar |
 | `POST` | `/matches/:code/seats` | Organizador. Suma un puesto a un partido `full` antes de la hora con máximo menor que 6. Devuelve el partido. Si no, 422 |
+| `POST` | `/matches/:code/signals` | Organizador o aceptado: `{ kind }` manda una señal. 201 con la señal. 403 si no es del partido, 422 fuera de la ventana, con el partido `closed` o con un `kind` que no le toca, 409 si ya la mandó |
 | `POST` | `/matches/:code/join-requests` | Pedir unirse. 403 `EMAIL_NOT_VERIFIED` si el correo no está verificado |
 | `POST` | `/matches/:code/invitations` | Invitar (`userId`) |
 | `PATCH` | `/match-requests/:id` | Ejecutar `action`. 403 `EMAIL_NOT_VERIFIED` si el invitado acepta sin correo verificado |

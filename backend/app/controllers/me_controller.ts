@@ -1,11 +1,9 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import { deleteAccountValidator } from '#validators/account'
 import { updateProfileValidator } from '#validators/profile'
-import BusinessRuleError from '#exceptions/business_rule_error'
 import { serializeUser } from '#serializers/match_serializer'
 import { announceAccountDeletion, deleteAccount } from '#services/account_deletion'
 import { acceptTerms } from '#services/terms'
-import { normalizeWhatsapp } from '#services/whatsapp'
 
 export default class MeController {
   async show({ auth, session }: HttpContext) {
@@ -15,12 +13,7 @@ export default class MeController {
 
   async update({ auth, request }: HttpContext) {
     const user = auth.getUserOrFail()
-    const { phone, ...data } = await request.validateUsing(updateProfileValidator)
-    if (phone !== undefined) {
-      const whatsapp = normalizeWhatsapp(phone)
-      if (!whatsapp) throw new BusinessRuleError('El número de WhatsApp no es válido')
-      user.whatsapp = whatsapp
-    }
+    const data = await request.validateUsing(updateProfileValidator)
     user.merge(data)
     await user.save()
     return serializeUser(user)

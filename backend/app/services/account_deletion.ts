@@ -21,6 +21,7 @@ export interface AccountDeletionResult {
   closed: ClosedMatch[]
   freed: Match[]
   cancelledMatchCodes: string[]
+  signalMatchCodes: string[]
 }
 
 export async function deleteAccount(user: User): Promise<AccountDeletionResult> {
@@ -29,12 +30,30 @@ export async function deleteAccount(user: User): Promise<AccountDeletionResult> 
     const result = await leaveMatches(user, trx)
     await db.from('availabilities').useTransaction(trx).where('user_id', user.id).delete()
     await db.from('push_subscriptions').useTransaction(trx).where('user_id', user.id).delete()
+    result.signalMatchCodes = await deleteSignals(user.id, trx)
     await db.from('notifications').useTransaction(trx).where('user_id', user.id).delete()
     await db.from('email_verifications').useTransaction(trx).where('user_id', user.id).delete()
     await db.from('branch_suggestions').useTransaction(trx).where('user_id', user.id).delete()
     await anonymize(user, trx)
     return result
   })
+}
+
+async function deleteSignals(userId: number, trx: TransactionClientContract): Promise<string[]> {
+  const rows = await db
+    .from('match_signals')
+    .useTransaction(trx)
+    .where('user_id', userId)
+    .delete()
+    .returning('match_id')
+  if (rows.length === 0) return []
+  const matches = await Match.query({ client: trx })
+    .whereIn(
+      'id',
+      rows.map((row: { match_id: number }) => row.match_id)
+    )
+    .select('code')
+  return matches.map((match) => match.code)
 }
 
 /**
@@ -54,7 +73,12 @@ async function leaveMatches(
   user: User,
   trx: TransactionClientContract
 ): Promise<AccountDeletionResult> {
-  const result: AccountDeletionResult = { closed: [], freed: [], cancelledMatchCodes: [] }
+  const result: AccountDeletionResult = {
+    closed: [],
+    freed: [],
+    cancelledMatchCodes: [],
+    signalMatchCodes: [],
+  }
   const now = DateTime.now().toSQL()!
 
   const organized = await Match.query({ client: trx })
@@ -129,7 +153,6 @@ async function anonymize(user: User, trx: TransactionClientContract): Promise<vo
     email: `deleted-${user.id}@matchpa.invalid`,
     password: null,
     googleId: null,
-    whatsapp: null,
     category: null,
     categoryTier: null,
     gender: null,
@@ -145,11 +168,13 @@ export function announceAccountDeletion({
   closed,
   freed,
   cancelledMatchCodes,
+  signalMatchCodes,
 }: AccountDeletionResult) {
   const codes = [
     ...closed.map(({ match }) => match.code),
     ...freed.map((m) => m.code),
     ...cancelledMatchCodes,
+    ...signalMatchCodes,
   ]
   new Set(codes).forEach((code) => matchChanged(code))
   new Set(closed.flatMap(({ playerIds, requesterIds }) => [...playerIds, ...requesterIds])).forEach(

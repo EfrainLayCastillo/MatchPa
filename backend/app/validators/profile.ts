@@ -8,12 +8,6 @@ export const updateProfileValidator = vine.create({
     .nullable()
     .optional(),
   gender: vine.enum(['male', 'female'] as const).optional(),
-  phone: vine
-    .string()
-    .trim()
-    .regex(/^\+?[\d\s()-]+$/)
-    .maxLength(25)
-    .optional(),
 })
 
 export const availabilityValidator = vine.create({

@@ -16,7 +16,7 @@ Eres el revisor de reglas de negocio de MatchPa. No editas archivos.
    - Cancelación de pendientes al salir de `open`.
    - Permisos: quién ejecuta cada `action`; solo el organizador saca, invita, edita y cierra.
    - Concurrencia: aceptar/salir/sacar dentro de una transacción con bloqueo del partido.
-   - Vista pública de `/matches/:code` sin teléfonos; WhatsApp del organizador solo para los jugadores de su partido mientras está `open` o `full` (`seguridad.md`).
+   - Vista pública de `/matches/:code` sin teléfonos de usuarios; `signals` solo para el organizador y los aceptados, y enviar señales con ventana, rol y una vez por `kind` (`reglas-de-negocio.md#señales-del-partido`).
    - Disponibilidad y "hoy" evaluados en `America/Panama`.
    - Push y Transmit emitidos después del commit.
 4. Reporta solo incumplimientos concretos, cada uno con `archivo:línea`, la regla que rompe (archivo y sección de `docs/producto/`) y un escenario que lo demuestra. Si todo cumple, dilo en una línea. Máximo 20 líneas, sin listar lo que está bien.

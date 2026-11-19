@@ -20,8 +20,8 @@ const DATA_ROWS = [
   ["Correo", "Iniciar sesión, verificar tu cuenta, recuperar tu contraseña y avisarte.", "Solo tú y MatchPa."],
   ["Contraseña", "Iniciar sesión. Se guarda hasheada, nunca en texto legible.", "Nadie."],
   ["Cuenta de Google", "Entrar con Google. Guardamos el identificador de Google vinculado a tu cuenta.", "Solo MatchPa."],
-  ["WhatsApp", "Si organizas un partido, que los jugadores de ese partido te escriban por WhatsApp. Se guarda cifrado.", "Los jugadores aceptados o que aceptaron tu invitación, mientras el partido está abierto o completo."],
   ["Categoría, subnivel y género", "Encontrar partidos que van contigo y respetar partidos masculinos, femeninos o mixtos.", "Cualquiera con el link del partido, aunque no tenga cuenta."],
+  ["Señales del partido", "Avisar tu llegada con un toque (Voy en camino, Ya llegué, Llego tarde). Duran lo que dura el partido y se borran si eliminas tu cuenta.", "El organizador y los jugadores aceptados de ese partido."],
   ["Disponibilidad", "Que los organizadores vean quién puede jugar y te inviten.", "Usuarios con sesión iniciada."],
   ["Solicitudes y partidos", "Gestionar partidos que publicas, pides o te invitan, y el historial.", "Los jugadores de ese partido."],
   ["Suscripciones push", "Enviarte avisos de invitaciones, solicitudes y cambios en tu partido.", "Solo MatchPa y el servicio de notificaciones de tu navegador."],
@@ -79,25 +79,6 @@ const SECTIONS: LegalSection[] = [
     ),
   },
   {
-    id: "whatsapp",
-    title: "Tu WhatsApp",
-    body: (
-      <ul>
-        <li>Se guarda cifrado.</li>
-        <li>
-          Si organizas un partido, lo ven los jugadores de ese partido (los que aceptaste o los que aceptaron tu
-          invitación), y solo mientras esté abierto o completo. Cuando se cierra o vence, deja de mostrarse.
-        </li>
-        <li>
-          <strong>Tu número no se comparte con el organizador</strong> de un partido al que pides unirte: el que se
-          muestra es el del organizador a los jugadores aceptados, no al revés.
-        </li>
-        <li>No aparece en listas, notificaciones ni en las vistas públicas de un partido.</li>
-        <li>No lo usamos para publicidad ni lo compartimos con terceros.</li>
-      </ul>
-    ),
-  },
-  {
     id: "proveedores",
     title: "Proveedores y transferencias fuera de Panamá",
     body: (
@@ -126,9 +107,9 @@ const SECTIONS: LegalSection[] = [
         <ul>
           <li>
             Anonimizamos tu cuenta: tu nombre pasa a &quot;Jugador eliminado&quot; y borramos tu correo, contraseña,
-            Google, WhatsApp, categoría, subnivel y género.
+            Google, categoría, subnivel y género.
           </li>
-          <li>Borramos tu disponibilidad, suscripciones push, códigos de verificación y sugerencias de sucursal.</li>
+          <li>Borramos tu disponibilidad, tus señales de partido, suscripciones push, códigos de verificación y sugerencias de sucursal.</li>
           <li>Cerramos tus partidos futuros y cancelamos tus solicitudes pendientes. Dejas libres tus puestos en partidos de otros.</li>
           <li>Los partidos pasados se quedan como historial de los demás jugadores, con tu nombre como &quot;Jugador eliminado&quot;.</li>
           <li>Cerramos todas tus sesiones.</li>
@@ -208,7 +189,7 @@ const SECTIONS: LegalSection[] = [
     title: "Seguridad",
     body: (
       <ul>
-        <li>Tu contraseña se guarda hasheada y tu WhatsApp, cifrado.</li>
+        <li>Tu contraseña se guarda hasheada, nunca en texto legible.</li>
         <li>La conexión al sitio va protegida con HTTPS y la sesión usa una cookie que el navegador no deja leer a scripts.</li>
         <li>Limitamos los intentos de inicio de sesión y de verificación para frenar abusos.</li>
         <li>Si hubiera una brecha que te afecte, te avisamos a ti y a la autoridad en el plazo que exige la ley.</li>

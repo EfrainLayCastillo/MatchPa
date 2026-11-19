@@ -4,6 +4,7 @@ import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations'
 import Branch from '#models/branch'
 import MatchGuest from '#models/match_guest'
 import MatchRequest from '#models/match_request'
+import MatchSignal from '#models/match_signal'
 import User from '#models/user'
 
 export type MatchStatus = 'open' | 'full' | 'closed'
@@ -63,6 +64,9 @@ export default class Match extends BaseModel {
 
   @hasMany(() => MatchRequest)
   declare requests: HasMany<typeof MatchRequest>
+
+  @hasMany(() => MatchSignal)
+  declare signals: HasMany<typeof MatchSignal>
 
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime

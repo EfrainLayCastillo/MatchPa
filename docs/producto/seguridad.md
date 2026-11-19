@@ -1,7 +1,6 @@
 # Seguridad y datos sensibles
 
-- **WhatsApp cifrado:** el número se guarda con el servicio de cifrado de AdonisJS (llave `APP_KEY`). Solo acepta números: dígitos, `+`, espacios, paréntesis y guiones, entre 7 y 15 dígitos. Se normaliza antes de guardarse.
-- **Uso único:** el número del organizador lo ven solo él y los jugadores de su partido (aceptados o que aceptaron su invitación), mientras el partido está `open` o `full`, para escribirle por WhatsApp. El número de un jugador no se comparte con nadie. No aparece en listas, notificaciones ni vistas públicas.
+- **Sin teléfonos de usuarios:** MatchPa no pide ni guarda el teléfono de los jugadores. La coordinación del partido va por las [señales](reglas-de-negocio.md#señales-del-partido), visibles solo para el organizador y los aceptados.
 - **Sesión:** cookie `httpOnly`, `SameSite=Lax`, y `secure` en producción. CORS solo acepta el origen de `FRONTEND_URL`, con credenciales.
 - **Límite de intentos:** registro y login aceptan 10 peticiones por minuto por IP; después responden 429. La IP es la del cliente: el proxy de Next (`frontend/proxy.ts`) borra los headers entrantes y manda `x-client-ip` con `x-proxy-secret`; el backend (`getIp` en `config/app.ts`) solo cree `x-client-ip` si el secreto coincide (`PROXY_SECRET`, comparación en tiempo constante) y es una IP válida. Nunca usa `X-Forwarded-For`: la URL de Render es pública.
 - **Correo único:** se valida antes de insertar, y si hay una carrera la violación de la base responde 422 con el mismo mensaje, sin SQL.
@@ -17,7 +16,7 @@
 - **Web Push:** el endpoint de la suscripción solo se acepta de los servicios de push de los navegadores (FCM, Mozilla, Apple, Windows) por HTTPS, porque el servidor le hace POST. Envíos con timeout de 5 s. Al cerrar sesión, el frontend borra la suscripción del dispositivo antes del logout.
 - **Solo JSON:** el bodyparser no acepta formularios ni multipart. Un formulario de otro sitio no puede iniciar sesión, registrar ni cambiar contraseña (CSRF de login), aunque Shield tenga CSRF apagado.
 - **Errores:** en producción no se muestran detalles internos; en el frontend, los errores de servidor muestran un mensaje genérico. En producción, todo 5xx o error sin status responde `Algo salió mal. Intenta de nuevo.`; el detalle queda en el log. El frontend muestra ese mismo texto en cualquier 5xx.
-- **Llave `APP_KEY`:** no cambiarla nunca en producción; si cambia, los WhatsApp cifrados dejan de descifrarse.
+- **Llave `APP_KEY`:** no cambiarla en producción salvo filtración; si cambia, se cierran las sesiones y los códigos de correo pendientes dejan de validar.
 - **Headers del sitio (Next, `next.config.ts`):** `X-Frame-Options: DENY`, `nosniff`, `Referrer-Policy: strict-origin-when-cross-origin` y `Permissions-Policy` sin cámara, micrófono ni pagos; ubicación solo para el propio sitio (`geolocation=(self)`), para "cerca de ti" en el lobby. HSTS lo pone Vercel.
 - **CSP:** va en Next y no en Shield, porque el navegador la aplica a documentos HTML y la API solo responde JSON. Está en `Content-Security-Policy-Report-Only`: las violaciones salen en la consola del navegador. Lista blanca: GTM y GA4. Sin nonces porque con `cacheComponents` harían dinámicas todas las páginas, así que los scripts inline usan `'unsafe-inline'`. Cuando no haya violaciones, se cambia el header a `Content-Security-Policy`.
 - **Límites por cuenta** (`start/limiter.ts`, store `database`, clave por usuario):
@@ -37,8 +36,8 @@
 |---|---|
 | Detectar | Fuente (logs de Render, alerta de un proveedor, reporte de un usuario), hora y qué datos pudieron salir |
 | Contener | Cerrar el acceso: revocar llaves del proveedor afectado (Neon, Resend, Google, VAPID), subir `session_version` de todos si hay sesiones comprometidas |
-| Rotar | Secretos expuestos. `APP_KEY` solo si se filtró: antes de cambiarla, descifrar los WhatsApp con la vieja y volver a cifrarlos con la nueva |
-| Evaluar | Usuarios y datos afectados (el WhatsApp va cifrado; las contraseñas, hasheadas) |
+| Rotar | Secretos expuestos. `APP_KEY` solo si se filtró |
+| Evaluar | Usuarios y datos afectados (las contraseñas van hasheadas) |
 | Notificar | A la ANTAI y a los afectados dentro del plazo del Decreto Ejecutivo 285 de 2021 (confirmar el plazo con el abogado), con qué pasó, qué datos y qué hacer |
 | Registrar | Fecha, alcance, causa y medidas, aunque no haya obligación de notificar |
 

@@ -1,6 +1,9 @@
+import db from '@adonisjs/lucid/services/db'
 import logger from '@adonisjs/core/services/logger'
 import type Match from '#models/match'
 import type MatchRequest from '#models/match_request'
+import type { SignalKind } from '#models/match_signal'
+import type User from '#models/user'
 import type { BookingChange, RequestAction } from '#services/match_service'
 import Notification, { type NotificationType } from '#models/notification'
 import { notifyUsers, type PushPayload } from '#services/push'
@@ -156,4 +159,35 @@ export function notifyBookingChanged(match: Match, change: BookingChange): Promi
     .map((request) => request.userId)
   const { type, title, body } = bodies[change]
   return deliver(type, match, playerIds, { title, body, url: linkTo(match) })
+}
+
+const SIGNAL_COPY = {
+  on_the_way: { type: 'signal_on_the_way', label: 'Voy en camino' },
+  arrived: { type: 'signal_arrived', label: 'Ya llegué' },
+  running_late: { type: 'signal_running_late', label: 'Llego tarde' },
+} as const
+
+const SIGNAL_TYPES = Object.values(SIGNAL_COPY).map(({ type }) => type)
+
+/** One inbox row per match: the latest signal replaces the previous one. */
+export async function notifySignal(match: Match, sender: User, kind: SignalKind): Promise<void> {
+  const { type, label } = SIGNAL_COPY[kind]
+  await db.transaction(async (trx) => {
+    await trx.rawQuery('select pg_advisory_xact_lock(?, ?)', [match.id, match.organizerId])
+    await Notification.query({ client: trx })
+      .where('user_id', match.organizerId)
+      .where('match_id', match.id)
+      .whereIn('type', SIGNAL_TYPES)
+      .delete()
+    await Notification.create(
+      { userId: match.organizerId, matchId: match.id, type },
+      { client: trx }
+    )
+  })
+  notificationCreated(match.organizerId)
+  await notifyUsers([match.organizerId], {
+    title: `${sender.fullName} · ${label}`,
+    body: match.branch.name,
+    url: linkTo(match),
+  })
 }

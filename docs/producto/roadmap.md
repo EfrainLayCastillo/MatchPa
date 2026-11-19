@@ -12,9 +12,7 @@
 - [x] Salir, sacar, cerrar y expirar
 - [x] Tiempo real con Transmit
 - [x] PWA + Web Push con modal opt-in
-- [x] Botón `wa.me` al organizador (solo jugadores aceptados, partido abierto o completo)
 - [x] Límites: 7 partidos por día y sin solapamientos
-- [x] WhatsApp cifrado y visibilidad restringida
 - [x] Mis partidas con orden y filtro por sucursal
 
 ## Beta
@@ -28,6 +26,8 @@
 - [x] Dominio propio `matchpa.app`: Vercel, redirección desde `match-pa.vercel.app` y propiedad de dominio en Search Console
 - [x] Registro con verificación de correo: código de 6 dígitos con expiración e intentos limitados; la cuenta no publica ni se une hasta verificar. Incluye el envío con Resend en `matchpa.app` (SPF/DKIM/DMARC)
 - [x] Recuperación de contraseña por correo
+- [ ] Quitar el teléfono del usuario (columna, perfil, botón `wa.me` y textos legales)
+- [ ] Señales del partido: Voy en camino, Ya llegué y Llego tarde, una vez por señal, cerca de la hora y con aviso al organizador
 - [x] Google desactivado detrás de un flag (botón oculto y rutas apagadas)
 - [ ] Endurecer seguridad
   - [x] Headers de seguridad y CSP en Next (Report-Only)
@@ -46,6 +46,10 @@
 
 - [x] Reactivar Google y vincularlo a la cuenta con el mismo correo solo si ese correo está verificado
 - [x] Bandeja de notificaciones: campana en el lobby con no leídas en vivo y página `/notificaciones`
+- [ ] Escala de categorías de la APP (Reglamento del Ranking Nacional)
+  - [ ] Pro y 1ra a 6ta como la APP; la 7ma pasa a "Iniciación" (por debajo de 6ta, sin equivalente en la APP), sin borrar a quienes la tienen
+  - [ ] Migración de los valores guardados (usuarios, partidos e invitados) y del nivel efectivo, manteniendo el orden del lobby
+  - [ ] Ícono "?" junto a la categoría en el perfil, que explica que la escala es la de la Asociación Panameña de Pádel (APP) y que Iniciación es propia de MatchPa
 
 ## Después
 
@@ -56,7 +60,6 @@
   - [ ] Auditoría: quién cambió qué y cuándo
 
 - [ ] Clubs (comunidades de jugadores) en el perfil
-- [ ] Chat del partido con mensajes predefinidos ("Voy en camino", "Llego 10 min tarde", "No puedo ir")
 - [ ] Avisos por WhatsApp Cloud API
 - [ ] Impulso automático de partidos en Instagram
 - [ ] Purga de notificaciones de más de 30 días
@@ -66,7 +69,7 @@
   - [ ] Opt-in del organizador al publicar ("Impulsar en Instagram si no se llena") y como máximo una historia por partido
 - [ ] Eventos especiales: página `/eventos` con los main events de cada sucursal y del año
   - [ ] Vitrina tematizada: lista y detalle `/eventos/[slug]` con portada, colores y logo propios (tema como datos, no código por evento). Los carga el admin; la inscripción, por WhatsApp a la sucursal
-  - [ ] Inscripción de parejas en la app, con cupos por categoría y aprobación del admin
+  - [ ] Inscripción de parejas en la app, con cupos por categoría y aprobación del admin. Regla de la APP: la categoría de la pareja sale del promedio de los dos jugadores, el mejor no baja más de una categoría y la pareja puede inscribirse en una categoría superior
   - [ ] Eliminación directa: cuadro generado desde los inscritos, resultados en vivo con Transmit
   - [ ] Liguilla (fase de grupos + eliminación) con tabla de posiciones
   - [ ] Americano / Mexicano: ranking individual por puntos con rotación de compañero

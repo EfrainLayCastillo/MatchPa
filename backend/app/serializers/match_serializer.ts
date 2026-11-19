@@ -1,6 +1,7 @@
 import type Branch from '#models/branch'
 import type Match from '#models/match'
 import type MatchRequest from '#models/match_request'
+import type MatchSignal from '#models/match_signal'
 import type User from '#models/user'
 import { effectiveStatus, spotsLeft } from '#services/match_rules'
 import { hasAcceptedCurrentTerms } from '#services/terms'
@@ -25,7 +26,6 @@ export function serializeUser(user: User) {
     fullName: user.fullName,
     email: user.email,
     emailVerified: Boolean(user.emailVerifiedAt),
-    phone: user.whatsapp,
     category: user.category,
     categoryTier: user.categoryTier,
     gender: user.gender,
@@ -55,16 +55,21 @@ function serializeRequest(request: MatchRequest) {
   }
 }
 
-/** Expects `branch`, `organizer`, `guests`, `requests` (with `user`) preloaded. */
+function serializeSignal(signal: MatchSignal) {
+  return {
+    userId: signal.userId,
+    fullName: signal.user.fullName,
+    kind: signal.kind,
+    createdAt: signal.createdAt.toISO(),
+  }
+}
+
+/** Expects `branch`, `organizer`, `guests`, `requests` (with `user`) preloaded; `signals` only on detail views. */
 export function serializeMatch(match: Match, viewer: User | null) {
   const isOrganizer = viewer?.id === match.organizerId
-  // The organizer's WhatsApp is for the organizer and the players who joined, nobody else.
-  const isLive = ['open', 'full'].includes(effectiveStatus(match))
-  const canSeeWhatsapp =
-    isLive &&
-    viewer !== null &&
-    (isOrganizer || match.requests.some((r) => r.userId === viewer.id && r.status === 'accepted'))
   const accepted = match.requests.filter((request) => request.status === 'accepted')
+  const isMember =
+    viewer !== null && (isOrganizer || accepted.some((request) => request.userId === viewer.id))
   const mine = viewer
     ? match.requests.find(
         (request) =>
@@ -78,7 +83,6 @@ export function serializeMatch(match: Match, viewer: User | null) {
     organizer: {
       id: match.organizer.id,
       fullName: match.organizer.fullName,
-      phone: canSeeWhatsapp ? match.organizer.whatsapp : null,
     },
     branch: serializeBranch(match.branch),
     courtBooked: match.courtBookedAt !== null,
@@ -103,6 +107,7 @@ export function serializeMatch(match: Match, viewer: User | null) {
     isOrganizer,
     myRequest: mine ? { id: mine.id, kind: mine.kind, status: mine.status } : null,
     requests: isOrganizer ? match.requests.map(serializeRequest) : undefined,
+    signals: isMember ? (match.signals ?? []).map(serializeSignal) : [],
   }
 }
 
@@ -111,7 +116,7 @@ export function serializeAnonymousMatch(match: Match) {
   const serialized = serializeMatch(match, null)
   return {
     ...serialized,
-    organizer: { id: 0, fullName: null, phone: null },
+    organizer: { id: 0, fullName: null },
     guests: serialized.guests.map((guest, index) => ({ ...guest, id: index, name: null })),
     players: serialized.players.map((player, index) => ({ ...player, id: index, fullName: null })),
   }

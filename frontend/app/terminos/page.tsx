@@ -37,7 +37,7 @@ const SECTIONS: LegalSection[] = [
     body: (
       <ul>
         <li>Para crear una cuenta debes tener <strong>18 años o más</strong>.</li>
-        <li>Los datos que pongas (nombre, categoría, género y WhatsApp) tienen que ser verdaderos y estar al día.</li>
+        <li>Los datos que pongas (nombre, categoría y género) tienen que ser verdaderos y estar al día.</li>
         <li>Tu cuenta es personal. Cuídala y no la compartas: lo que se haga con ella es responsabilidad tuya.</li>
         <li>Puedes tener una sola cuenta por persona.</li>
       </ul>
@@ -51,8 +51,8 @@ const SECTIONS: LegalSection[] = [
         <li>Si el organizador te aceptó, preséntate. Si no puedes ir, sal del partido a tiempo para que liberen tu puesto.</li>
         <li>Trata con respeto a los demás jugadores, antes, durante y después del partido.</li>
         <li>
-          El WhatsApp de otros jugadores es para coordinar el partido y nada más. No lo uses para publicidad, spam,
-          acoso ni lo compartas con terceros.
+          Las señales del partido (Voy en camino, Ya llegué, Llego tarde) son para coordinar la llegada y nada más.
+          No las uses para molestar ni para acosar a otros jugadores.
         </li>
         <li>No publiques partidos falsos ni te hagas pasar por otra persona.</li>
         <li>No intentes dañar el servicio, saltarte sus límites ni acceder a cuentas ajenas.</li>
@@ -65,8 +65,8 @@ const SECTIONS: LegalSection[] = [
     body: (
       <>
         <p>
-          Podemos suspender o eliminar una cuenta que incumpla estos términos, por ejemplo por acoso, uso indebido del
-          WhatsApp de otros o partidos falsos.
+          Podemos suspender o eliminar una cuenta que incumpla estos términos, por ejemplo por acoso, uso indebido de
+          las señales del partido o partidos falsos.
         </p>
         <p>
           Tú puedes eliminar tu cuenta cuando quieras desde el final de tu perfil. Qué pasa con tus datos está en la{" "}

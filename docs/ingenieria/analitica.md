@@ -21,10 +21,11 @@ El frontend los empuja al `dataLayer` con `track()` (`frontend/lib/analytics.ts`
 | `set_availability` | Tras marcar disponibilidad | `branch`, `has_time_window`, `day`: `today` \| `tomorrow` \| `later` |
 | `confirm_booking` | El organizador confirma la cancha ("Ya reservé") | `branch`, `match_status` |
 | `invite_player` | Tras invitar desde el pool o al publicar | `branch`, `entry_point`: `pool` \| `new_match` |
+| `send_signal` | Al mandar una señal del partido | `kind`: `on_the_way` \| `arrived` \| `running_late`, `viewer_role`: `organizer` \| `player` |
 
 `branch` es el `slug` de la sucursal. El contrato tipado vive en `frontend/lib/analytics.ts`.
 
-La app empuja su propio `page_view` en la carga y en cada cambio de ruta. Todo `push` lleva `page_location` y `page_referrer` ya limpios (`cleanUrl` en `lib/analytics.ts`: el `code` pasa a `:code`, también dentro de `?next=`, y se quitan `invitar`, `nombre`, `email` e `internal`) y `traffic_type: internal` en los navegadores marcados con `?internal=1` (`?internal=0` desmarca). La medición mejorada de GA4 va apagada por completo: duplicaría las visitas sin limpiar y sus clics salientes mandarían `wa.me/<teléfono>`.
+La app empuja su propio `page_view` en la carga y en cada cambio de ruta. Todo `push` lleva `page_location` y `page_referrer` ya limpios (`cleanUrl` en `lib/analytics.ts`: el `code` pasa a `:code`, también dentro de `?next=`, y se quitan `invitar`, `nombre`, `email` e `internal`) y `traffic_type: internal` en los navegadores marcados con `?internal=1` (`?internal=0` desmarca). La medición mejorada de GA4 va apagada por completo: duplicaría las visitas sin limpiar y sus clics salientes mandarían URLs sin limpiar.
 
 ## Reglas
 

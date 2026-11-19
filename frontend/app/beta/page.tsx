@@ -24,7 +24,7 @@ const CHAT = [
 ];
 
 const HOW_TO = [
-  { title: "Completa tu perfil", text: "Categoría, género y WhatsApp, una sola vez." },
+  { title: "Completa tu perfil", text: "Categoría y género, una sola vez." },
   { title: "Publica o busca", text: "¿Te falta gente? Publica el partido. ¿Quieres jugar? Mira el lobby." },
   { title: "Ponte disponible", text: "Marca el día y los organizadores te invitan: \"Ey Pa, ¿juegas?\"." },
   { title: "¡Match!", text: "El organizador acepta y, cuando están los 4, a jugar." },

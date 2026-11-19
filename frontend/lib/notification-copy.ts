@@ -10,6 +10,7 @@ import {
   XCircleIcon,
   type LucideIcon,
 } from "lucide-react";
+import { SIGNALS } from "./signals";
 import type { InboxNotification, NotificationType } from "./types";
 
 type Match = InboxNotification["match"];
@@ -38,6 +39,9 @@ export const NOTIFICATION_COPY: Record<NotificationType, Copy> = {
   match_closed: { title: "Partido cerrado", body: fixed("El organizador cerró la búsqueda"), icon: LockIcon },
   match_cancelled: { title: "Partido cancelado", body: fixed("El organizador eliminó su cuenta"), icon: BanIcon },
   player_deleted: { title: "Se liberó un puesto", body: fixed("Un jugador eliminó su cuenta"), icon: UserMinusIcon },
+  signal_on_the_way: { title: SIGNALS.on_the_way.label, body: fixed("Un jugador de tu partido"), icon: SIGNALS.on_the_way.icon },
+  signal_arrived: { title: SIGNALS.arrived.label, body: fixed("Un jugador de tu partido"), icon: SIGNALS.arrived.icon },
+  signal_running_late: { title: SIGNALS.running_late.label, body: fixed("Un jugador de tu partido"), icon: SIGNALS.running_late.icon },
 };
 
 function courtBody(match: Match): string {

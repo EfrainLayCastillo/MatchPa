@@ -23,6 +23,7 @@ const MatchesController = () => import('#controllers/matches_controller')
 const JoinRequestsController = () => import('#controllers/join_requests_controller')
 const InvitationsController = () => import('#controllers/invitations_controller')
 const MatchRequestsController = () => import('#controllers/match_requests_controller')
+const SignalsController = () => import('#controllers/signals_controller')
 const MyMatchesController = () => import('#controllers/my_matches_controller')
 const PushSubscriptionsController = () => import('#controllers/push_subscriptions_controller')
 
@@ -71,6 +72,7 @@ router
         router.post('matches/:code/booking', [MatchesController, 'booking']).use(writeThrottle)
         router.post('matches/:code/close', [MatchesController, 'close']).use(publishThrottle)
         router.post('matches/:code/seats', [MatchesController, 'seats']).use(writeThrottle)
+        router.post('matches/:code/signals', [SignalsController, 'store']).use(writeThrottle)
         router
           .post('matches/:code/join-requests', [JoinRequestsController, 'store'])
           .use(socialThrottle)

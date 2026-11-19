@@ -352,7 +352,7 @@ test.group('flujo de partidos', (group) => {
     const shown = await client.get(`/api/matches/${match.code}`)
     const [listed, detail] = [listing.body()[0], shown.body()]
     for (const anonymous of [listed, detail]) {
-      assert.deepEqual(anonymous.organizer, { id: 0, fullName: null, phone: null })
+      assert.deepEqual(anonymous.organizer, { id: 0, fullName: null })
       assert.deepEqual(
         anonymous.players.map((p: { id: number; fullName: string | null }) => [p.id, p.fullName]),
         [

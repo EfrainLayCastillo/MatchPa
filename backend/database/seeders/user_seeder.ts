@@ -13,7 +13,6 @@ export default class UserSeeder extends BaseSeeder {
         password: 'secret123',
         category: 4,
         gender: 'female',
-        whatsapp: '+507 6000-0101',
       },
       {
         fullName: 'Beto Dummy',
@@ -21,7 +20,6 @@ export default class UserSeeder extends BaseSeeder {
         password: 'secret123',
         category: 3,
         gender: 'male',
-        whatsapp: '+507 6000-0102',
       },
     ])
   }

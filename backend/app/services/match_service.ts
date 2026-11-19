@@ -263,6 +263,7 @@ export function loadMatch(id: number, trx: TransactionClientContract): Promise<M
     .preload('requests', (query) => query.preload('user'))
     .preload('branch')
     .preload('organizer')
+    .preload('signals', (query) => query.preload('user').orderBy('created_at').orderBy('id'))
     .firstOrFail()
 }
 
@@ -376,7 +377,7 @@ async function cancelPending(matchId: number, trx: TransactionClientContract): P
     .update({ status: 'cancelled' })
 }
 
-function lockMatchByCode(code: string, trx: TransactionClientContract): Promise<Match> {
+export function lockMatchByCode(code: string, trx: TransactionClientContract): Promise<Match> {
   return Match.query({ client: trx })
     .where('code', code)
     .forUpdate()
@@ -402,5 +403,8 @@ export function matchQuery() {
 }
 
 export function findMatchByCode(code: string): Promise<Match> {
-  return matchQuery().where('code', code).firstOrFail()
+  return matchQuery()
+    .where('code', code)
+    .preload('signals', (query) => query.preload('user').orderBy('created_at').orderBy('id'))
+    .firstOrFail()
 }

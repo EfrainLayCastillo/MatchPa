@@ -1,7 +1,7 @@
 import { sendGTMEvent } from "@next/third-parties/google";
 import { dateKey, nextDayKeys, todayKey } from "./panamaFormatDate";
 import { effectiveLevel } from "./format";
-import type { Category, CategoryTier, Match, MatchStatus, MatchType } from "./types";
+import type { Category, CategoryTier, Match, MatchStatus, MatchType, SignalKind } from "./types";
 
 export const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID;
 
@@ -38,6 +38,7 @@ interface AnalyticsEvents {
     spots_left: number;
     branch: string;
   };
+  send_signal: { kind: SignalKind; viewer_role: Exclude<Role, "visitor"> };
   join_intent: { branch: string };
   join_request: { entry_point: "lobby" | "match_page"; branch: string; level_gap: "0" | "1" | "2_plus" };
   join_approved: { branch: string; fills_match: boolean };

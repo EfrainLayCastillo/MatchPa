@@ -10,7 +10,7 @@ import { isProfileComplete, useSession } from "@/lib/session";
 
 interface SessionGateProps {
   children: React.ReactNode;
-  /** Pages that need a complete profile (category, gender, phone) redirect to onboarding. */
+  /** Pages that need a complete profile (category, gender) redirect to onboarding. */
   requireProfile?: boolean;
   verifyBanner?: boolean;
   allowAnonymous?: boolean;

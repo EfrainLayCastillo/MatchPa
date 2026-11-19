@@ -24,7 +24,7 @@ import { useSession } from "@/lib/session";
 const CONFIRM_WORD = "ELIMINAR";
 
 const EFFECTS = [
-  "Se borran tu nombre, correo, WhatsApp y disponibilidad.",
+  "Se borran tu nombre, correo y disponibilidad.",
   "Los partidos futuros que organizas se cancelan.",
   "Sales de los partidos en los que estás.",
   "Los partidos pasados quedan como \"Jugador eliminado\".",

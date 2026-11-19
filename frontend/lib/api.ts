@@ -10,6 +10,8 @@ import type {
   Gender,
   Match,
   MatchRequest,
+  MatchSignal,
+  SignalKind,
   MyRequest,
   MatchType,
   NewMatchInput,
@@ -86,7 +88,6 @@ interface ProfileInput {
   category?: Category;
   categoryTier?: CategoryTier | null;
   gender?: Gender;
-  phone?: string;
 }
 
 export const api = {
@@ -127,6 +128,8 @@ export const api = {
   createMatch: (input: NewMatchInput) => request<Match>("POST", "/matches", input),
   updateMatch: (code: string, input: NewMatchInput) =>
     request<Match>("PATCH", `/matches/${code}`, input),
+  sendSignal: (code: string, kind: SignalKind) =>
+    request<MatchSignal>("POST", `/matches/${code}/signals`, { kind }),
   closeMatch: (code: string) => request<Match>("POST", `/matches/${code}/close`),
   addSeat: (code: string) => request<Match>("POST", `/matches/${code}/seats`),
   confirmBooking: (code: string, courtNumber: number) =>

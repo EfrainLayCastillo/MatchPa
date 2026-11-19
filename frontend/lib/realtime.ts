@@ -12,7 +12,7 @@ function transmit(): Transmit {
 }
 
 /** Calls `onMessage` for every event on the channel. Returns the cleanup function. */
-export function subscribe(channel: string, onMessage: () => void): () => void {
+export function subscribe(channel: string, onMessage: (message: unknown) => void): () => void {
   if (USING_MOCKS) return () => {};
 
   const subscription = transmit().subscription(channel);

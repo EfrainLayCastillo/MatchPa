@@ -17,4 +17,5 @@ export const controllers = {
   Notifications: () => import('#controllers/notifications_controller'),
   Players: () => import('#controllers/players_controller'),
   PushSubscriptions: () => import('#controllers/push_subscriptions_controller'),
+  Signals: () => import('#controllers/signals_controller'),
 }

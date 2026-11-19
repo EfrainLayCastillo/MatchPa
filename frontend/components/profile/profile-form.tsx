@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -9,7 +8,6 @@ import { CategoryTierPicker } from "@/components/matchpa/category-tier-picker";
 import { FormAlert } from "@/components/matchpa/form-alert";
 import { Button } from "@/components/ui/button";
 import { FieldError } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { api } from "@/lib/api";
@@ -25,18 +23,17 @@ export function ProfileForm() {
   const [category, setCategory] = useState<Category>(user?.category ?? 4);
   const [categoryTier, setCategoryTier] = useState<CategoryTier | null>(user?.categoryTier ?? null);
   const [gender, setGender] = useState<Gender | null>(user?.gender ?? null);
-  const [phone, setPhone] = useState(user?.phone ?? "");
   const { errors, formRef, fail, reset, clearField } = useFormErrors();
   const [busy, setBusy] = useState(false);
 
   async function save(event: React.FormEvent) {
     event.preventDefault();
-    const fields = validate(gender, phone);
+    const fields = validate(gender);
     if (!gender || Object.keys(fields).length > 0) return fail({ fields, form: null });
     setBusy(true);
     reset();
     try {
-      setUser(await api.updateMe({ category, categoryTier, gender, phone: phone.trim() }));
+      setUser(await api.updateMe({ category, categoryTier, gender }));
       toast.success("Perfil guardado");
       router.push("/lobby");
     } catch (err) {
@@ -77,16 +74,6 @@ export function ProfileForm() {
         error={errors.fields.categoryTier}
       />
 
-      <div className="space-y-1.5">
-        <Label htmlFor="phone">Teléfono (WhatsApp)</Label>
-        <Input id="phone" type="tel" inputMode="tel" autoComplete="tel" placeholder="+507 6000-0000" value={phone} onChange={(e) => { setPhone(e.target.value.replace(/[^\d+\s()-]/g, "")); clearField("phone"); }} maxLength={25} required {...invalidProps("phone", errors.fields.phone)} />
-        <FieldError id="phone-error">{errors.fields.phone}</FieldError>
-        <p className="text-xs text-muted-foreground">
-          Se guarda cifrado. Si organizas un partido, los jugadores de tu partido (aceptados o que aceptaron tu invitación) podrán escribirte por WhatsApp mientras esté abierto o completo.{" "}
-          <Link href="/privacidad#whatsapp" target="_blank" className="font-semibold underline underline-offset-4">Privacidad</Link>
-        </p>
-      </div>
-
       <FormAlert message={errors.form} />
 
       <Button type="submit" size="lg" className="h-12 w-full text-base font-bold" disabled={busy}>
@@ -96,10 +83,6 @@ export function ProfileForm() {
   );
 }
 
-function validate(gender: Gender | null, phone: string): Record<string, string> {
-  const digits = phone.replace(/\D/g, "");
-  return {
-    ...(gender ? {} : { gender: "Elige tu género" }),
-    ...(digits.length >= 7 && digits.length <= 15 ? {} : { phone: "Escribe un número de WhatsApp válido" }),
-  };
+function validate(gender: Gender | null): Record<string, string> {
+  return gender ? {} : { gender: "Elige tu género" };
 }

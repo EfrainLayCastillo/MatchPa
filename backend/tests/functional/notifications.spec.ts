@@ -27,7 +27,6 @@ test.group('bandeja de notificaciones', (group) => {
       category: 4,
       categoryTier: 'high',
       gender: 'male',
-      whatsapp: '+50760000000',
       emailVerifiedAt: DateTime.now(),
     })
   }

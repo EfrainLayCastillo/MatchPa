@@ -1,9 +1,6 @@
 "use client";
 
 import { DetailSkeleton } from "@/components/matchpa/skeletons";
-import { whatsappUrl } from "@/lib/whatsapp";
-import { SITE_URL } from "@/lib/config";
-import { formatDateTime } from "@/lib/panamaFormatDate";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -19,7 +16,7 @@ import { useVerifiedAction } from "@/components/auth/verify-email-dialog";
 import { api } from "@/lib/api";
 import { refreshMatchPage } from "@/app/partidos/[code]/actions";
 import { answeredMessage } from "@/lib/errors";
-import { canConfirmBooking, courtLabel, MAX_PLAYERS } from "@/lib/format";
+import { canConfirmBooking, MAX_PLAYERS } from "@/lib/format";
 import { notifyError } from "@/lib/notify";
 import { LoadFailed } from "@/components/matchpa/load-failed";
 import { SlowLoad } from "@/components/matchpa/slow-load";
@@ -40,6 +37,7 @@ import { MatchCelebration } from "./match-celebration";
 import { RequestCard } from "./request-card";
 import { StatusNote } from "./status-note";
 import { MatchHeading } from "./match-hero";
+import { MatchSignals } from "./match-signals";
 
 export function MatchDetail({
   code,
@@ -106,10 +104,6 @@ export function MatchDetail({
         fills_match: current.spotsLeft === 1,
       });
   }
-
-  const whatsappHref = match.organizer.phone
-    ? whatsappUrl(match.organizer.phone, organizerMessage(match))
-    : null;
 
   const namesHidden = match.organizer.fullName === null;
 
@@ -183,19 +177,7 @@ export function MatchDetail({
               />
             ) : null}
 
-            {whatsappHref &&
-            match.myRequest?.status === "accepted" &&
-            (match.status === "open" || match.status === "full") ? (
-              <Button asChild variant="outline" className="w-full">
-                <a
-                  href={whatsappHref}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Escribir al organizador por WhatsApp
-                </a>
-              </Button>
-            ) : null}
+            <MatchSignals match={match} />
           </>
         ) : (
           <div aria-hidden className="h-12 animate-pulse rounded-lg bg-muted" />
@@ -394,11 +376,4 @@ function OrganizerPanel({
       </div>
     </section>
   );
-}
-
-function organizerMessage(match: Match): string {
-  return [
-    `Hola, te escribo por el partido de pádel del ${formatDateTime(match.startsAt)} en ${match.branch.name}, ${courtLabel(match).toLowerCase()}.`,
-    `${SITE_URL}/partidos/${match.code}`,
-  ].join("\n");
 }

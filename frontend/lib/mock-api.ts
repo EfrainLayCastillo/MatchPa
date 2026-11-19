@@ -13,10 +13,12 @@ import type {
   Gender,
   Match,
   MatchRequest,
+  MatchSignal,
   MatchStatus,
   MatchType,
   Player,
   RequestStatus,
+  SignalKind,
   User,
 } from "./types";
 
@@ -38,6 +40,7 @@ interface StoredMatch {
   closed: boolean;
   guests: Match["guests"];
   requests: { id: number; userId: number; kind: MatchRequest["kind"]; status: RequestStatus }[];
+  signals?: { userId: number; kind: SignalKind; createdAt: string }[];
 }
 
 function courtNumberOf(input: Record<string, unknown>): number | null {
@@ -115,7 +118,6 @@ const users: (User & { password: string })[] = [
     email: "efrain@matchpa.app",
     password: "demo",
     emailVerified: true,
-    phone: "+507 6000-0001",
     category: 4,
     categoryTier: "high",
     gender: "male",
@@ -210,7 +212,6 @@ function seedPlayer(id: number, fullName: string, category: Category, gender: Ge
     email: `${fullName.split(" ")[0]?.toLowerCase()}@matchpa.app`,
     password: "demo",
     emailVerified: true,
-    phone: `+507 6000-000`,
     category,
     categoryTier,
     gender,
@@ -253,7 +254,6 @@ function publicUser(user: User & { password?: string }): User {
     fullName: user.fullName,
     email: user.email,
     emailVerified: user.emailVerified,
-    phone: user.phone,
     category: user.category,
     categoryTier: user.categoryTier,
     gender: user.gender,
@@ -295,10 +295,15 @@ function viewOf(match: StoredMatch): Match {
       }))
     : undefined;
 
+  const isMember = isOrganizer || mine?.status === "accepted";
+  const signals: MatchSignal[] = isMember
+    ? (match.signals ?? []).map((s) => ({ ...s, fullName: users.find((u) => u.id === s.userId)?.fullName ?? "Jugador" }))
+    : [];
+
   return {
     id: match.id,
     code: match.code,
-    organizer: { id: organizer.id, fullName: organizer.fullName, phone: isOrganizer || me ? organizer.phone : null },
+    organizer: { id: organizer.id, fullName: organizer.fullName },
     branch: branches.find((c) => c.id === match.branchId)!,
     courtBooked: match.courtNumber !== null,
     courtNumber: match.courtNumber,
@@ -316,6 +321,7 @@ function viewOf(match: StoredMatch): Match {
     isOrganizer,
     myRequest: mine ? { id: mine.id, kind: mine.kind, status: mine.status } : null,
     requests,
+    signals,
   };
 }
 
@@ -528,6 +534,24 @@ export async function mockRequest<T>(method: Method, fullPath: string, body?: un
     const request = { id: nextId++, userId: user.id, kind: "join_request" as const, status: "pending" as const };
     match.requests.push(request);
     return { id: request.id, kind: request.kind, status: request.status, user: playerOf(user.id) };
+  });
+  on(/^POST \/matches\/([^/]+)\/signals$/, (m) => {
+    const match = findMatch(m[1]);
+    const user = requireMe();
+    const isOrganizer = match.organizerId === user.id;
+    if (!isOrganizer && !match.requests.some((r) => r.userId === user.id && r.status === "accepted")) {
+      fail(403, "Solo los jugadores del partido pueden avisar");
+    }
+    const kind = input.kind as SignalKind;
+    const start = new Date(match.startsAt).getTime();
+    const inWindow = Date.now() >= start - 60 * 60_000 && Date.now() <= start + 15 * 60_000;
+    if (match.closed || !inWindow) fail(422, "Todavía no es hora de avisar, o ya pasó");
+    if (isOrganizer && kind === "on_the_way") fail(422, "Esa señal no es para el organizador");
+    const signals = (match.signals ??= []);
+    if (signals.some((s) => s.userId === user.id && s.kind === kind)) fail(409, "Ya mandaste esta señal");
+    const signal = { userId: user.id, kind, createdAt: new Date().toISOString() };
+    signals.push(signal);
+    return { ...signal, fullName: user.fullName };
   });
   on(/^POST \/matches\/([^/]+)\/invitations$/, (m) => {
     const match = findMatch(m[1]);

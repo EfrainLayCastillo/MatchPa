@@ -17,3 +17,7 @@ export function requestChanged(userId: number): void {
 export function notificationCreated(userId: number): void {
   transmit.broadcast(`users/${userId}`, { type: 'notification.created' })
 }
+
+export function matchSignal(code: string): void {
+  transmit.broadcast(`matches/${code}`, { type: 'match.signal' })
+}

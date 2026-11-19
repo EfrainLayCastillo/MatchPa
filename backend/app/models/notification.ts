@@ -19,6 +19,9 @@ export const NOTIFICATION_TYPES = [
   'match_closed',
   'match_cancelled',
   'player_deleted',
+  'signal_on_the_way',
+  'signal_arrived',
+  'signal_running_late',
 ] as const
 
 export type NotificationType = (typeof NOTIFICATION_TYPES)[number]
