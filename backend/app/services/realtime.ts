@@ -13,3 +13,7 @@ export function lobbyChanged(): void {
 export function requestChanged(userId: number): void {
   transmit.broadcast(`users/${userId}`, { type: 'request.updated' })
 }
+
+export function notificationCreated(userId: number): void {
+  transmit.broadcast(`users/${userId}`, { type: 'notification.created' })
+}

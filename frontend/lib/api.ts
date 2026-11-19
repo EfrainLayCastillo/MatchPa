@@ -14,6 +14,7 @@ import type {
   MatchType,
   NewMatchInput,
   Player,
+  NotificationInbox,
   User,
 } from "./types";
 
@@ -138,6 +139,8 @@ export const api = {
     request<MatchRequest>("PATCH", `/match-requests/${requestId}`, { action }),
   myMatches: () => request<Match[]>("GET", "/me/matches"),
   myRequests: () => request<MyRequest[]>("GET", "/me/match-requests"),
+  notifications: () => request<NotificationInbox>("GET", "/notifications"),
+  markNotificationsRead: () => request<void>("POST", "/notifications/read"),
 
   savePushSubscription: (subscription: PushSubscriptionJSON) =>
     request<void>("POST", "/push-subscriptions", subscription),

@@ -56,7 +56,7 @@ function useStoryImage(code: string | null): File | null {
   useEffect(() => {
     if (!code || typeof navigator.canShare !== "function") return;
     let active = true;
-    fetch(`/partidos/${code}/historia`)
+    fetch(`/partidos/${code}/opengraph-image`)
       .then((res) => (res.ok ? res.blob() : null))
       .then((blob) => {
         if (!active || !blob) return;

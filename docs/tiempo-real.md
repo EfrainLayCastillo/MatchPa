@@ -7,7 +7,7 @@ Transmit (SSE) para eventos con la app abierta; Web Push para avisos con la app 
 | Canal | Suscriptores | Eventos |
 |---|---|---|
 | `lobby` | Usuarios en `/lobby` | `match.created`, `match.updated`, `availability.changed` |
-| `users/:id` | El propio usuario | `request.created`, `request.updated` |
+| `users/:id` | El propio usuario | `request.created`, `request.updated`, `notification.created` |
 | `matches/:code` | Organizador y jugadores | `match.updated` |
 
 ## Push
@@ -22,6 +22,8 @@ Transmit (SSE) para eventos con la app abierta; Web Push para avisos con la app 
 | Partido cerrado | Jugadores aceptados |
 | Jugador se salió | Organizador |
 | Jugador sacado | El jugador |
+
+Cada push también queda en la bandeja `/notificaciones` ([reglas](reglas-de-negocio.md#bandeja-de-notificaciones)) y emite `notification.created` en `users/:id`, que actualiza la campana del lobby.
 
 La notificación abre `/partidos/[code]`: enfoca la pestaña si ya está ahí o navega una abierta de MatchPa. Las notificaciones del mismo partido se reemplazan entre sí, y caducan a las 6 horas si el dispositivo no las recibió.
 

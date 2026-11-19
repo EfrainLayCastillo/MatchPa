@@ -1,10 +1,10 @@
 "use client";
 
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect } from "react";
 import { api } from "@/lib/api";
 import { subscribe } from "@/lib/realtime";
-import type { Match } from "@/lib/types";
+import type { Match, NotificationInbox } from "@/lib/types";
 
 /** Keys are hierarchical so one invalidation can refresh every lobby query at once. */
 export const lobbyKeys = {
@@ -15,6 +15,7 @@ export const lobbyKeys = {
   availabilities: ["me", "availabilities"] as const,
   requests: ["me", "match-requests"] as const,
   owned: ["me", "matches"] as const,
+  notifications: ["me", "notifications"] as const,
 };
 
 /** Re-fetch on every visit: the cached data shows instantly, then updates in the background. */
@@ -71,6 +72,27 @@ export function useUpcomingMatches(enabled: boolean) {
     queryFn: () => api.myMatches(),
     select: upcoming,
     ...ON_VISIT,
+  });
+}
+
+export function useNotifications(enabled = true) {
+  return useQuery({
+    enabled,
+    queryKey: lobbyKeys.notifications,
+    queryFn: () => api.notifications(),
+    ...ON_VISIT,
+  });
+}
+
+/** Zeroes the counter but keeps each item's `unread` flag so the list can still highlight them. */
+export function useMarkNotificationsRead() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: () => api.markNotificationsRead(),
+    onSuccess: () =>
+      queryClient.setQueryData<NotificationInbox>(lobbyKeys.notifications, (inbox) =>
+        inbox ? { ...inbox, unreadCount: 0 } : inbox,
+      ),
   });
 }
 

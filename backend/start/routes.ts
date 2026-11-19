@@ -13,6 +13,7 @@ import {
 } from '#start/limiter'
 
 const BranchSuggestionsController = () => import('#controllers/branch_suggestions_controller')
+const NotificationsController = () => import('#controllers/notifications_controller')
 const AuthController = () => import('#controllers/auth_controller')
 const MeController = () => import('#controllers/me_controller')
 const BranchesController = () => import('#controllers/branches_controller')
@@ -79,6 +80,9 @@ router
         router.patch('match-requests/:id', [MatchRequestsController, 'update']).use(writeThrottle)
 
         router.post('branch-suggestions', [BranchSuggestionsController, 'store']).use(writeThrottle)
+
+        router.get('notifications', [NotificationsController, 'index'])
+        router.post('notifications/read', [NotificationsController, 'markRead']).use(writeThrottle)
 
         router.post('push-subscriptions', [PushSubscriptionsController, 'store']).use(writeThrottle)
         router

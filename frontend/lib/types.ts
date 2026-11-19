@@ -145,3 +145,39 @@ export interface ApiFieldError {
   field?: string;
   message: string;
 }
+
+export type NotificationType =
+  | "join_requested"
+  | "invited"
+  | "request_accepted"
+  | "invitation_accepted"
+  | "request_rejected"
+  | "invitation_rejected"
+  | "player_left"
+  | "player_removed"
+  | "match_filled"
+  | "court_booked"
+  | "court_changed"
+  | "court_unbooked"
+  | "match_closed"
+  | "match_cancelled"
+  | "player_deleted";
+
+export interface InboxNotification {
+  id: number;
+  type: NotificationType;
+  createdAt: string;
+  unread: boolean;
+  match: {
+    code: string;
+    branchName: string;
+    startsAt: string;
+    maxPlayers: number;
+    courtNumber: number | null;
+  };
+}
+
+export interface NotificationInbox {
+  unreadCount: number;
+  items: InboxNotification[];
+}

@@ -14,6 +14,7 @@ export const controllers = {
   Matches: () => import('#controllers/matches_controller'),
   Me: () => import('#controllers/me_controller'),
   MyMatches: () => import('#controllers/my_matches_controller'),
+  Notifications: () => import('#controllers/notifications_controller'),
   Players: () => import('#controllers/players_controller'),
   PushSubscriptions: () => import('#controllers/push_subscriptions_controller'),
 }

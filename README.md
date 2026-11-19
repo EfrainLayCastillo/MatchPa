@@ -54,7 +54,7 @@ La cancha ya está reservada (sucursal, # de cancha, hora), el partido es de 4 y
 4. **Disponibilidad:** un jugador se postula para un día y queda visible en el pool.
 5. **Cierre:** al llenarse los puestos: **¡Match!** El organizador también puede cerrarlo antes; si no, expira a la hora del partido.
 
-Además: solicitudes y cambios en tiempo real, notificaciones push (se instala como PWA), **Mis partidas** con filtros, y registro con Google o correo verificado.
+Además: solicitudes y cambios en tiempo real, notificaciones push (se instala como PWA), bandeja de avisos en la campana del lobby, **Mis partidas** con filtros, y registro con Google o correo verificado.
 
 ## Stack
 

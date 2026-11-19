@@ -14,6 +14,7 @@ import { DeleteAccount } from "./delete-account";
 import { ProfileForm } from "./profile-form";
 import { FormAlert } from "@/components/matchpa/form-alert";
 import { forgetPushOnLogout } from "@/lib/push";
+import { BackLink } from "@/components/matchpa/back-link";
 
 type PushState = "loading" | "unsupported" | "on" | "off" | "denied";
 
@@ -30,6 +31,7 @@ export function ProfileView() {
 
   return (
     <div className="mx-auto w-full max-w-md space-y-6 px-4 pb-16 pt-6">
+      <BackLink />
       <PageTitle className="text-2xl sm:text-3xl">Mi perfil</PageTitle>
 
       {user ? <ProfileSummary user={user} /> : null}

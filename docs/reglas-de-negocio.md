@@ -31,7 +31,7 @@ Especificación de qué debe cumplir el backend y el frontend. Si el código se 
 ## Eliminar cuenta
 
 - Desde el final del perfil, escribiendo `ELIMINAR` para confirmar. No se puede deshacer.
-- Se anonimiza, no se borra la fila: nombre "Jugador eliminado", correo `deleted-<id>@matchpa.invalid`, y contraseña, Google, WhatsApp, categoría, subnivel, género y verificación en `null`. Se borran su disponibilidad, suscripciones push, códigos y sugerencias de sucursal. Se conservan la fecha y la versión de términos aceptadas, como prueba del consentimiento.
+- Se anonimiza, no se borra la fila: nombre "Jugador eliminado", correo `deleted-<id>@matchpa.invalid`, y contraseña, Google, WhatsApp, categoría, subnivel, género y verificación en `null`. Se borran su disponibilidad, suscripciones push, notificaciones, códigos y sugerencias de sucursal. Se conservan la fecha y la versión de términos aceptadas, como prueba del consentimiento.
 - Sus partidos futuros `open` o `full` se cierran y sus solicitudes pendientes se cancelan.
 - Sus solicitudes pendientes en partidos de otros se cancelan, y sus puestos aceptados en partidos futuros se liberan como si saliera (el partido vuelve a `open` si corresponde).
 - Los partidos pasados no cambian y lo muestran como "Jugador eliminado".
@@ -149,6 +149,30 @@ Sección "Sucursal" con nombre, zona y los datos que el club publique. "Cómo ll
 - Requiere sesión y correo verificado. Máximo 1 sugerencia `pending` por usuario; otra responde "Ya tienes una sugerencia en revisión".
 - Avisa por correo al dueño (`ADMIN_EMAIL`) con el nombre y correo de quien sugiere. Sin `ADMIN_EMAIL` se guarda igual, sin correo.
 - El dueño la agrega al seed a mano. Aprobar y rechazar en la app llega con el admin dashboard para empresas.
+
+## Bandeja de notificaciones
+
+- Cada aviso de la tabla de push ([tiempo-real.md](tiempo-real.md#push)) también queda en la bandeja del destinatario, tenga o no push activo. Si falla guardarlo, el push sale igual.
+- Muestra las últimas 50 de los últimos 30 días. Cada una abre `/partidos/[code]`.
+- No leída = posterior a la última apertura de la bandeja (`notifications_read_at`). Abrir `/notificaciones` las marca todas leídas, también las que llegan con la página abierta.
+- Sin avisos de partido expirado ni recordatorios: `expired` se calcula al consultar y no hay job programado que los dispare.
+
+| `type` | Destinatario | Texto |
+|---|---|---|
+| `join_requested` | Organizador | Nueva solicitud · Alguien quiere unirse a tu partido |
+| `invited` | Invitado | Ey Pa, ¿juegas? · Te invitaron a un partido |
+| `request_accepted` | Quien pidió unirse | ¡Match! · Ya estás en el partido |
+| `invitation_accepted` | Organizador | ¡Match! · Aceptaron tu invitación |
+| `request_rejected` | Quien pidió unirse | Solicitud rechazada · Esta vez no hubo lugar |
+| `invitation_rejected` | Organizador | Invitación rechazada · No pudo esta vez |
+| `player_left` | Organizador | Se salió un jugador · Hay un puesto libre |
+| `player_removed` | El jugador | Te sacaron del partido · El organizador te quitó del partido |
+| `match_filled` | Organizador y aceptados | ¡Match! · Ya están los N |
+| `court_booked` / `court_changed` | Aceptados | Cancha confirmada / Cambio de cancha · Sucursal, cancha N |
+| `court_unbooked` | Aceptados | Cancha por reservar · La cancha volvió a quedar por reservar |
+| `match_closed` | Aceptados | Partido cerrado · El organizador cerró la búsqueda |
+| `match_cancelled` | Aceptados | Partido cancelado · El organizador eliminó su cuenta |
+| `player_deleted` | Organizador | Se liberó un puesto · Un jugador eliminó su cuenta |
 
 ## Estados del jugador (UI)
 

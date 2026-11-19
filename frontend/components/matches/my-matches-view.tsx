@@ -21,6 +21,7 @@ import { api } from "@/lib/api";
 import { TYPE_LABELS } from "@/lib/format";
 import { lobbyKeys } from "@/lib/lobby-queries";
 import type { Match, MyRequest } from "@/lib/types";
+import { BackLink } from "@/components/matchpa/back-link";
 
 type SortBy = "updated" | "match";
 
@@ -61,6 +62,7 @@ export function MyMatchesView() {
 
   return (
     <>
+      <BackLink />
       <PageTitle className="text-2xl sm:text-3xl">Mis partidas</PageTitle>
 
       <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">

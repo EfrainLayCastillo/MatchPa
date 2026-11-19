@@ -45,6 +45,7 @@
 ## Beta: segunda etapa
 
 - [x] Reactivar Google y vincularlo a la cuenta con el mismo correo solo si ese correo está verificado
+- [x] Bandeja de notificaciones: campana en el lobby con no leídas en vivo y página `/notificaciones`
 
 ## Después
 
@@ -58,6 +59,7 @@
 - [ ] Chat del partido con mensajes predefinidos ("Voy en camino", "Llego 10 min tarde", "No puedo ir")
 - [ ] Avisos por WhatsApp Cloud API
 - [ ] Impulso automático de partidos en Instagram
+- [ ] Purga de notificaciones de más de 30 días
   - [ ] Job programado que detecta partidos `open` sin solicitudes ni invitaciones aceptadas después de cierto tiempo, y antes de cierta hora del partido
   - [ ] Genera la historia vertical del partido (reusa `/partidos/[code]/historia`): sucursal, hora, categoría y puestos libres, sin nombres de jugadores, con link `?utm_campaign=partido_boost`
   - [ ] Publica en la cuenta de MatchPa con la API de publicación de contenido de Instagram (cuenta profesional ligada a Facebook)

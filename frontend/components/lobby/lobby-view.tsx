@@ -38,6 +38,7 @@ import type { Availability, Match, Player } from "@/lib/types";
 import { AvailabilitySheet } from "./availability-sheet";
 import { DateStrip, stripMonth } from "./date-strip";
 import { InvitationCard } from "./invitation-card";
+import { NotificationsBell } from "./notifications-bell";
 import { MatchCard } from "./match-card";
 import { NearbyBar } from "./nearby-bar";
 import { SortMenu, type LobbySort } from "./sort-menu";
@@ -169,8 +170,11 @@ export function LobbyView() {
 
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-5 px-4 pb-44 pt-6">
-      <div className="flex items-center gap-3">
-        <PageTitle className="text-2xl sm:text-3xl">Lobby</PageTitle>
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-1">
+          <PageTitle className="text-2xl sm:text-3xl">Lobby</PageTitle>
+          {signedIn ? <NotificationsBell /> : null}
+        </div>
         <Button
           asChild
           variant="outline"

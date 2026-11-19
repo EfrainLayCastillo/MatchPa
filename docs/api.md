@@ -55,6 +55,13 @@ Base `/api`. Solo acepta JSON (`application/json`); formularios y multipart se r
 | `leave` | `accepted`, con el partido `open` | El jugador |
 | `remove` | `accepted`, con el partido `open` o `full` | El organizador |
 
+## Notificaciones
+
+| Método | Endpoint | Descripción |
+|---|---|---|
+| `GET` | `/notifications` | Bandeja: `unreadCount` y `items` (últimas 50 de 30 días, la más nueva primero), cada uno con `id`, `type`, `createdAt`, `unread` y el resumen del partido (`code`, `branchName`, `startsAt`, `maxPlayers`, `courtNumber`) |
+| `POST` | `/notifications/read` | Marca toda la bandeja como leída (`204`) |
+
 ## Push
 
 | Método | Endpoint | Descripción |

@@ -40,6 +40,7 @@ Partir el ítem del Roadmap con `/slice`. Su `slices.md` va al scratchpad de la 
 
 ## Ahorro de tokens
 
+- Respuestas en el chat: 1–3 líneas para cambios chicos (qué cambió y dónde, resultado del check). Sin explicar alternativas, riesgos ni próximos pasos salvo que bloqueen o se pidan.
 - Cambia archivos con `Edit`, solo el fragmento que cambia. Reescribir un archivo completo con `Write` solo si es nuevo.
 - Después de cambiar, corre el check mínimo del paquete tocado y reporta solo el resultado: pasa o falla, y las líneas de error relevantes. No pegues la salida completa.
 - En comandos con salida larga, limita la salida (`| tail -n 20`, `-q`, `--silent`).

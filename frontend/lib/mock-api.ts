@@ -128,6 +128,7 @@ const users: (User & { password: string })[] = [
   seedPlayer(6, "Andrés Vega", 2, "male"),
 ];
 
+let mockNotificationsRead = false;
 const availabilities = new Map<number, Availability[]>();
 const today = dateKey(new Date());
 availabilities.set(2, [{ date: today, fromTime: "18:00", toTime: "22:00", branchId: 1 }]);
@@ -589,6 +590,31 @@ export async function mockRequest<T>(method: Method, fullPath: string, body?: un
     return matches
       .filter((m) => m.organizerId === user.id || m.requests.some((r) => r.userId === user.id && r.status === "accepted"))
       .map(viewOf);
+  });
+  on(/^GET \/notifications$/, () => {
+    requireMe();
+    const types = ["join_requested", "court_booked", "match_filled", "request_rejected"] as const;
+    const items = types.map((type, index) => {
+      const match = matches[index % matches.length];
+      return {
+        id: index + 1,
+        type,
+        createdAt: new Date(Date.now() - (index + 1) * 3_600_000).toISOString(),
+        unread: index === 0 && !mockNotificationsRead,
+        match: {
+          code: match.code,
+          branchName: branches.find((c) => c.id === match.branchId)!.name,
+          startsAt: match.startsAt,
+          maxPlayers: match.maxPlayers,
+          courtNumber: match.courtNumber,
+        },
+      };
+    });
+    return { unreadCount: items.filter((i) => i.unread).length, items };
+  });
+  on(/^POST \/notifications\/read$/, () => {
+    mockNotificationsRead = true;
+    return undefined;
   });
   on(/^POST \/push-subscriptions$/, () => undefined);
   on(/^DELETE \/push-subscriptions$/, () => undefined);
