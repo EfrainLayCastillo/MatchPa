@@ -1,16 +1,10 @@
-import { PageTitle } from "@/components/matchpa/page-title";
 import { SessionGate } from "@/components/matchpa/session-gate";
-import { ProfileForm } from "@/components/profile/profile-form";
+import { OnboardingFlow } from "@/components/onboarding/onboarding-flow";
 
 export default function OnboardingPage() {
   return (
     <SessionGate requireProfile={false} verifyBanner={false}>
-      <div className="mx-auto w-full max-w-md space-y-8 px-4 py-10">
-        <PageTitle hint="Solo te lo pedimos una vez. Así los organizadores saben con quién juegan.">
-          Cuéntanos de ti
-        </PageTitle>
-        <ProfileForm mode="onboarding" />
-      </div>
+      <OnboardingFlow />
     </SessionGate>
   );
 }

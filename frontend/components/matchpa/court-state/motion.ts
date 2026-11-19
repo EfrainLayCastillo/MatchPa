@@ -85,12 +85,12 @@ const RACKET_KEYS: RacketKey[] = [
   { t: WALK_TO, hand: RACKET_HAND, dir: RACKET_UP },
 ];
 
-function racketAt(t: number) {
-  const index = Math.max(0, RACKET_KEYS.findIndex((key) => key.t > t) - 1);
-  const from = RACKET_KEYS[index]!;
-  const to = RACKET_KEYS[index + 1] ?? from;
+function racketAt(t: number, keys: RacketKey[] = RACKET_KEYS) {
+  const index = Math.max(0, keys.findIndex((key) => key.t > t) - 1);
+  const from = keys[index]!;
+  const to = keys[index + 1] ?? from;
   const raw = to === from ? 1 : window01(t, from.t, to.t);
-  const eased = to.t === HIT ? raw * raw : smooth(raw);
+  const eased = to.t === HIT || to.t === V_HIT ? raw * raw : smooth(raw);
   return { hand: lerp(from.hand, to.hand, eased), dir: unit(lerp(from.dir, to.dir, eased)) };
 }
 
@@ -165,8 +165,58 @@ export function returnPose(t: number): Pose {
   };
 }
 
+const V_HIT = 0.85;
+const V_HIT_POINT: Point3 = [32, -10, 76];
+const V_DIR = unit([0.8, 0.3, -0.15]);
+const V_FROM: Point3 = [300, 36, 150];
+const V_SHOT: Point3 = [380, -10, 90];
+const V_WALK_FROM = V_HIT + 0.05;
+const V_WALK_TO = V_WALK_FROM + 0.7;
+export const VOLLEY_END = V_WALK_TO + 1.2;
+export const VOLLEY_HIT = V_HIT;
+
+const VOLLEY_KEYS: RacketKey[] = [
+  { t: 0, hand: RACKET_HAND, dir: RACKET_UP },
+  { t: V_HIT - 0.3, hand: [-6, -32, 84], dir: [0.1, -0.5, 0.9] },
+  { t: V_HIT, hand: add(V_HIT_POINT, [-V_DIR[0] * RACKET_LENGTH, -V_DIR[1] * RACKET_LENGTH, -V_DIR[2] * RACKET_LENGTH]), dir: V_DIR },
+  { t: V_HIT + 0.22, hand: [34, -24, 80], dir: [0.7, -0.1, 0.5] },
+  { t: V_WALK_TO, hand: RACKET_HAND, dir: RACKET_UP },
+];
+
+function volleyBall(t: number): Pose["ball"] {
+  if (t < V_HIT) {
+    const u = (t - 0.1) / (V_HIT - 0.1);
+    return { at: add(lerp(V_FROM, V_HIT_POINT, u), [0, 0, 30 * Math.sin(Math.PI * u)]), squash: 0, scale: smooth(u / 0.3) };
+  }
+  const s = t - V_HIT;
+  const scale = 1 - smooth((s - 0.25) / 0.2);
+  if (scale <= 0) return null;
+  return { at: add(V_HIT_POINT, [V_SHOT[0] * s, V_SHOT[1] * s, V_SHOT[2] * s - (GRAVITY * s * s) / 2]), squash: 0, scale };
+}
+
+export function volleyPose(t: number): Pose {
+  const base = ADVANCE * smooth(window01(t, V_WALK_FROM, V_WALK_TO));
+  const racket = racketAt(t, VOLLEY_KEYS);
+  const nearHand = lerp(DRIBBLE_HAND, [30, 15, 80], smooth(t / 0.5));
+  const ball = volleyBall(t);
+  const walk = V_WALK_TO - V_WALK_FROM;
+  return {
+    base,
+    bob: t > V_WALK_TO ? readyHop(t) : 0,
+    feet: stepFeet((foot) => window01(t, V_WALK_FROM + foot * walk * 0.35, V_WALK_FROM + walk * (0.65 + foot * 0.35)), ADVANCE),
+    nearHand: add(nearHand, [base, 0, 0]),
+    racketHand: add(racket.hand, [t < V_HIT ? 0 : base, 0, 0]),
+    racketDir: racket.dir,
+    ball,
+    look: t < V_HIT + 0.3 && ball ? lookAt(ball.at[2]) : 0,
+  };
+}
+
+export const readyPose = (): Pose => ({ ...volleyPose(0), ball: null });
+
 export interface Scene {
-  mode: "dribble" | "serve" | "return";
+  mode: "dribble" | "serve" | "volley" | "return";
+  kind: "serve" | "volley";
   t: number;
   dribble: number;
   seen: number;
@@ -174,11 +224,12 @@ export interface Scene {
   pending: boolean;
 }
 
-export const startScene = (): Scene => ({ mode: "dribble", t: 0, dribble: DRIBBLE_REST, seen: dribbleAt(DRIBBLE_REST).bounces, bounces: 0, pending: false });
+export const startScene = (): Scene => ({ mode: "dribble", kind: "serve", t: 0, dribble: DRIBBLE_REST, seen: dribbleAt(DRIBBLE_REST).bounces, bounces: 0, pending: false });
 
 function nextMode(scene: Scene, waiting: boolean) {
-  if (scene.mode === "dribble" && scene.pending) return { mode: "serve" as const, t: 0, pending: false };
+  if (scene.mode === "dribble" && scene.pending) return { mode: scene.kind, t: 0, pending: false };
   if (scene.mode === "serve" && scene.t >= SERVE_END && !waiting) return { mode: "return" as const, t: 0 };
+  if (scene.mode === "volley" && scene.t >= VOLLEY_END && !waiting) return { mode: "return" as const, t: 0 };
   if (scene.mode === "return" && scene.t >= RETURN_END) return { mode: "dribble" as const, t: 0, dribble: DRIBBLE_REST, seen: dribbleAt(DRIBBLE_REST).bounces };
   return null;
 }
@@ -188,12 +239,15 @@ function countBounce(scene: Scene) {
   if (seen !== scene.seen) Object.assign(scene, { seen, bounces: scene.bounces + 1 });
 }
 
-export function advance(scene: Scene, dt: number, { serve, waiting }: { serve: boolean; waiting: boolean }): Pose {
+export function advance(scene: Scene, dt: number, { serve, waiting, kind = "serve" }: { serve: boolean; waiting: boolean; kind?: Scene["kind"] }): Pose {
+  scene.kind = kind;
   if (serve) scene.pending = true;
   Object.assign(scene, nextMode(scene, waiting));
   scene.t += dt;
   if (scene.mode === "serve") return servePose(scene.t);
+  if (scene.mode === "volley") return volleyPose(scene.t);
   if (scene.mode === "return") return returnPose(scene.t);
+  if (kind === "volley") return readyPose();
   scene.dribble += dt;
   countBounce(scene);
   return dribblePose(scene.dribble);
@@ -201,6 +255,7 @@ export function advance(scene: Scene, dt: number, { serve, waiting }: { serve: b
 
 export function sceneText(scene: Scene, readout: (bounces: number) => string) {
   if (scene.mode === "serve") return scene.t < SERVE_HIT ? "¡Saque!" : "Esperando la devolución…";
+  if (scene.mode === "volley") return scene.t < VOLLEY_HIT ? "¡Ahí viene!" : "¡Volea!";
   if (scene.mode === "return") return "No llegó. Otra vez a la línea";
   return readout(scene.bounces);
 }

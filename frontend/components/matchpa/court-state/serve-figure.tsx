@@ -4,9 +4,8 @@ import { useId, useRef } from "react";
 import { Dots, Line, Solid } from "@/components/iso/draw";
 import { useInView, useLoop, useStillness } from "@/components/iso/live";
 import { readoutOf } from "./model";
-import { DRIBBLE_REST, advance, dribblePose, sceneText, startScene } from "./motion";
+import { DRIBBLE_REST, advance, dribblePose, readyPose, sceneText, startScene } from "./motion";
 import { playerSvg } from "./pose";
-import type { Gender } from "@/lib/types";
 import { COURT, HEIGHT, WALLS, WIDTH } from "./view";
 import "@/components/iso/iso.css";
 import "./court-state.css";
@@ -73,12 +72,12 @@ const WALL_ART = (
 interface ServeFigureProps {
   serves?: number;
   waiting?: boolean;
-  gender?: Gender;
+  move?: "serve" | "volley";
   label?: string;
   onReadout?: (text: string) => void;
 }
 
-export function ServeFigure({ serves = 0, waiting = false, gender = "male", label = DEFAULT_LABEL, onReadout }: ServeFigureProps) {
+export function ServeFigure({ serves = 0, waiting = false, move = "serve", label = DEFAULT_LABEL, onReadout }: ServeFigureProps) {
   const clip = `sw-head-${useId().replace(/[^a-zA-Z0-9]/g, "")}`;
   const stage = useRef<SVGSVGElement>(null);
   const player = useRef<SVGGElement>(null);
@@ -93,8 +92,8 @@ export function ServeFigure({ serves = 0, waiting = false, gender = "male", labe
     seconds.current += dt;
     const serve = served.current !== serves;
     served.current = serves;
-    const pose = advance(scene.current, dt, { serve, waiting });
-    if (player.current) player.current.innerHTML = playerSvg(pose, seconds.current, clip, gender);
+    const pose = advance(scene.current, dt, { serve, waiting, kind: move });
+    if (player.current) player.current.innerHTML = playerSvg(pose, seconds.current, clip);
     const text = sceneText(scene.current, readoutOf);
     if (text !== spoken.current) {
       spoken.current = text;
@@ -114,7 +113,7 @@ export function ServeFigure({ serves = 0, waiting = false, gender = "male", labe
     >
       {COURT_ART}
       {WALL_ART}
-      <g ref={player} dangerouslySetInnerHTML={{ __html: playerSvg(REST_POSE, 0, clip, gender) }} />
+      <g ref={player} dangerouslySetInnerHTML={{ __html: playerSvg(move === "volley" ? readyPose() : REST_POSE, 0, clip) }} />
     </svg>
   );
 }

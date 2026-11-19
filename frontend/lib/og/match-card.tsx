@@ -6,28 +6,18 @@ import { seatsOf, type Seat } from "@/lib/seats";
 import type { Match } from "@/lib/types";
 import { OgIcon } from "./icon";
 
-type Orientation = "landscape" | "portrait";
-
-interface TicketProps {
+interface MatchCardProps {
   match: Match | null;
-  logo: string;
-  orientation: Orientation;
   /** Multiplies the app card's sizes (its time is 48px). */
   scale: number;
-  /** Page color behind the ticket, used for the perforation notches. */
-  page: string;
 }
 
-const NOTCH = 56;
-
-/** The match card from the app, as a ticket with a tear-off stub: the shared image for link previews and stories. */
-export function OgTicket({ match, logo, orientation, scale, page }: TicketProps) {
-  const landscape = orientation === "landscape";
+/** The match card from the app: the shared image for link previews and stories. */
+export function OgMatchCard({ match, scale }: MatchCardProps) {
   return (
     <div
       style={{
         display: "flex",
-        flexDirection: landscape ? "row" : "column",
         position: "relative",
         width: "100%",
         height: "100%",
@@ -42,8 +32,6 @@ export function OgTicket({ match, logo, orientation, scale, page }: TicketProps)
         <CourtLines />
         {match ? <Face match={match} scale={scale} /> : <Generic scale={scale} />}
       </div>
-      <Perforation landscape={landscape} page={page} />
-      <Stub logo={logo} landscape={landscape} scale={scale} />
     </div>
   );
 }
@@ -228,46 +216,5 @@ function CourtLines() {
       <rect x="1" y="1" width="198" height="98" />
       <path d="M30.5 1V99M169.5 1V99M30.5 50H169.5M100 1V99" />
     </svg>
-  );
-}
-
-function Perforation({ landscape, page }: { landscape: boolean; page: string }) {
-  const notch = (style: React.CSSProperties) => (
-    <div style={{ display: "flex", position: "absolute", width: NOTCH, height: NOTCH, borderRadius: 999, background: page, ...style }} />
-  );
-  return (
-    <div style={{ display: "flex", position: "relative", alignItems: "center", justifyContent: "center", ...(landscape ? { width: 2 } : { height: 2 }) }}>
-      <div
-        style={{
-          display: "flex",
-          ...(landscape
-            ? { height: "100%", borderLeft: "4px dashed rgba(245,240,240,0.35)" }
-            : { width: "100%", borderTop: "4px dashed rgba(245,240,240,0.35)" }),
-        }}
-      />
-      {landscape ? notch({ top: -NOTCH / 2, left: -NOTCH / 2 }) : notch({ left: -NOTCH / 2, top: -NOTCH / 2 })}
-      {landscape ? notch({ bottom: -NOTCH / 2, left: -NOTCH / 2 }) : notch({ right: -NOTCH / 2, top: -NOTCH / 2 })}
-    </div>
-  );
-}
-
-function Stub({ logo, landscape, scale: s }: { logo: string; landscape: boolean; scale: number }) {
-  return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: landscape ? "center" : "flex-start",
-        justifyContent: "center",
-        gap: 8 * s,
-        padding: 22 * s,
-        ...(landscape ? { width: 150 * s } : {}),
-      }}
-    >
-      {/* eslint-disable-next-line @next/next/no-img-element -- rendered by ImageResponse, not the browser */}
-      <img src={logo} alt="MatchPa" width={110 * s} height={30 * s} />
-      <div style={{ display: "flex", fontFamily: "Yellowtail", fontSize: 26 * s, lineHeight: 1, color: BRAND.lime }}>Ey Pa, ¿juegas?</div>
-      <div style={{ display: "flex", fontSize: 12 * s, fontWeight: 700, color: "rgba(245,240,240,0.8)" }}>matchpa.app</div>
-    </div>
   );
 }

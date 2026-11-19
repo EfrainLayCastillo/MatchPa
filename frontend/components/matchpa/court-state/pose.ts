@@ -1,5 +1,4 @@
 import { cameraOf, extrude, iso, solidSvg, slabOf, type Flat, type Plane, type Point3 } from "@/components/iso/iso-kit";
-import type { Gender } from "@/lib/types";
 import { BALL_R, HAND_R } from "./model";
 import type { Pose } from "./motion";
 import { K, P } from "./view";
@@ -98,11 +97,7 @@ function latitude(center: Point3, r: number, beta: number) {
   return visibleRun((t) => onSphere(center, r, t, beta), normal, back, back + Math.PI * 2, 48);
 }
 
-function ponytailSvg(head: Point3) {
-  return blobSvg([{ points: [add(head, [-HEAD_R + 2, 0, 5]), add(head, [-HEAD_R - 9, 0, -1]), add(head, [-HEAD_R - 8, 0, -17])], r: 3.6, material: "hair" }]);
-}
-
-function headSvg(head: Point3, look: number, clip: string, gender: Gender) {
+function headSvg(head: Point3, look: number, clip: string) {
   const [hx, hy] = at(head);
   const visorLow = latitude(head, HEAD_R + 0.3, 0.2).map(at);
   const visorHigh = latitude(head, HEAD_R + 0.3, 0.4).map(at).reverse();
@@ -124,7 +119,6 @@ function headSvg(head: Point3, look: number, clip: string, gender: Gender) {
   ];
   const brimZ = head[2] + (HEAD_R + 0.3) * Math.sin(0.2) - 1.1;
   return (
-    (gender === "female" ? ponytailSvg(head) : "") +
     sphereSvg(add(head, [-1, -HEAD_R + 0.5, -1]), 3.2, "skin") +
     sphereSvg(head, HEAD_R, "skin") +
     `<clipPath id="${clip}"><circle cx="${fine(hx)}" cy="${fine(hy)}" r="${fine(HEAD_R * K)}"/></clipPath>` +
@@ -283,7 +277,7 @@ function torsoSvg(body: Point3) {
   );
 }
 
-export function playerSvg(pose: Pose, seconds: number, clip: string, gender: Gender = "male") {
+export function playerSvg(pose: Pose, seconds: number, clip: string) {
   const body: Point3 = [pose.base, 0, pose.bob];
   const nearArm = armToward(add(body, [1, 16, 103]), pose.nearHand, [-0.3, 0.7, -1]);
   const farArm = armToward(add(body, [-1, -16, 103]), pose.racketHand, [-0.5, -0.6, -0.4]);
@@ -296,24 +290,10 @@ export function playerSvg(pose: Pose, seconds: number, clip: string, gender: Gen
     legs.far,
     legs.near,
     torsoSvg(body),
-    headSvg(add(body, [0, 0, 125]), pose.look, clip, gender),
+    headSvg(add(body, [0, 0, 125]), pose.look, clip),
     armSvg(nearArm),
     wristbandSvg(nearArm[1]!, pose.nearHand),
     sphereSvg(pose.nearHand, HAND_R, "skin"),
     pose.ball ? ballSvg(pose.ball, seconds) : "",
   ].join("");
-}
-
-const BUST_HALF_WIDTH = 28;
-const BUST_HALF_HEIGHT = 39;
-
-export function bustSvg(gender: Gender, clip: string) {
-  const body: Point3 = [0, 0, 0];
-  const [cx, cy] = at([0, 0, 102]);
-  const x = cx - BUST_HALF_WIDTH * K;
-  const y = cy - BUST_HALF_HEIGHT * K;
-  return {
-    viewBox: `${fine(x)} ${fine(y)} ${fine(2 * BUST_HALF_WIDTH * K)} ${fine(2 * BUST_HALF_HEIGHT * K)}`,
-    html: torsoSvg(body) + headSvg(add(body, [0, 0, 125]), 0, clip, gender),
-  };
 }
