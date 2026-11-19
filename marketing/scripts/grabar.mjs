@@ -66,6 +66,7 @@ async function run(page, step) {
   if (step.type) return void (await page.keyboard.type(step.type, { delay: step.delay ?? 140 }));
   if (step.key) return void (await page.keyboard.press(step.key));
   if (step.scroll) return void (await page.evaluate((top) => window.scrollBy({ top, behavior: "smooth" }), step.scroll));
+  if (step.scrollTo) return void (await step.scrollTo(page).evaluate((node) => node.scrollIntoView({ behavior: "smooth", block: "center" })));
   if (step.tap) {
     const target = step.tap(page);
     await target.waitFor({ state: "visible" });

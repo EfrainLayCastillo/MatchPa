@@ -169,23 +169,33 @@ const SIGNAL_COPY = {
 
 const SIGNAL_TYPES = Object.values(SIGNAL_COPY).map(({ type }) => type)
 
-/** One inbox row per match: the latest signal replaces the previous one. */
-export async function notifySignal(match: Match, sender: User, kind: SignalKind): Promise<void> {
-  const { type, label } = SIGNAL_COPY[kind]
+/** One signal row per recipient and match: the latest signal replaces the previous one. */
+async function replaceSignalRows(match: Match, userIds: number[], type: NotificationType) {
   await db.transaction(async (trx) => {
-    await trx.rawQuery('select pg_advisory_xact_lock(?, ?)', [match.id, match.organizerId])
+    await trx.rawQuery('select pg_advisory_xact_lock(?)', [match.id])
     await Notification.query({ client: trx })
-      .where('user_id', match.organizerId)
+      .whereIn('user_id', userIds)
       .where('match_id', match.id)
       .whereIn('type', SIGNAL_TYPES)
       .delete()
-    await Notification.create(
-      { userId: match.organizerId, matchId: match.id, type },
+    await Notification.createMany(
+      userIds.map((userId) => ({ userId, matchId: match.id, type })),
       { client: trx }
     )
   })
-  notificationCreated(match.organizerId)
-  await notifyUsers([match.organizerId], {
+}
+
+export async function notifySignal(
+  match: Match,
+  sender: User,
+  kind: SignalKind,
+  recipientIds: number[]
+): Promise<void> {
+  if (recipientIds.length === 0) return
+  const { type, label } = SIGNAL_COPY[kind]
+  await replaceSignalRows(match, recipientIds, type)
+  recipientIds.forEach(notificationCreated)
+  await notifyUsers(recipientIds, {
     title: `${sender.fullName} · ${label}`,
     body: match.branch.name,
     url: linkTo(match),

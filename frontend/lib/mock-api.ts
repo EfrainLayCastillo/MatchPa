@@ -114,8 +114,8 @@ let pendingSuggestionUserId: number | null = null;
 const users: (User & { password: string })[] = [
   {
     id: 1,
-    fullName: "Efrain Lay",
-    email: "efrain@matchpa.app",
+    fullName: "Carlos Batista",
+    email: "carlos@matchpa.app",
     password: "demo",
     emailVerified: true,
     category: 4,
@@ -154,7 +154,7 @@ const matches: StoredMatch[] = [
     maxPlayers: 4,
     updatedAt: new Date().toISOString(),
     closed: false,
-    guests: [{ id: 1, name: "Efrain Lay", category: 4, categoryTier: null, gender: "male" }],
+    guests: [{ id: 1, name: "Carlos Batista", category: 4, categoryTier: null, gender: "male" }],
     requests: [],
   },
   {

@@ -23,6 +23,7 @@ Transmit (SSE) para eventos con la app abierta; Web Push para avisos con la app 
 | Jugador se salió | Organizador |
 | Jugador sacado | El jugador |
 | Señal de un jugador ("Ana · Voy en camino") | Organizador |
+| Señal del organizador ("Sacha · Llego tarde") | Jugadores aceptados |
 
 Cada push también queda en la bandeja `/notificaciones` ([reglas](reglas-de-negocio.md#bandeja-de-notificaciones)) y emite `notification.created` en `users/:id`, que actualiza la campana del lobby.
 

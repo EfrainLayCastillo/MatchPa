@@ -107,7 +107,7 @@ Avisos de un toque para coordinar la llegada, sin chat libre ni teléfonos.
 - Ventana: desde 60 minutos antes de `starts_at` hasta 15 minutos después. Fuera de ella los botones no aparecen y la API responde 422.
 - Cada usuario manda cada señal una sola vez por partido. La ya usada queda marcada y deshabilitada; repetirla responde 409.
 - Se ven en "Actividad", en el detalle del partido, solo para el organizador y los aceptados: nombre, señal y hace cuánto, la más vieja primero. Se actualiza en vivo.
-- La señal de un jugador avisa al organizador (push y bandeja). En la bandeja queda una sola fila por partido: la última señal reemplaza a la anterior. La del organizador no notifica: solo aparece en Actividad.
+- La señal de un jugador avisa al organizador, y la del organizador avisa a los jugadores aceptados (push y bandeja). En la bandeja de cada uno queda una sola fila de señal por partido: la última reemplaza a la anterior.
 - Si el jugador sale o lo sacan, sus señales se quedan en Actividad.
 
 ## Link para compartir
@@ -189,7 +189,7 @@ Sección "Sucursal" con nombre, zona y los datos que el club publique. "Cómo ll
 | `match_closed` | Aceptados | Partido cerrado · El organizador cerró la búsqueda |
 | `match_cancelled` | Aceptados | Partido cancelado · El organizador eliminó su cuenta |
 | `player_deleted` | Organizador | Se liberó un puesto · Un jugador eliminó su cuenta |
-| `signal_on_the_way` / `signal_arrived` / `signal_running_late` | Organizador | Voy en camino / Ya llegué / Llego tarde · Un jugador de tu partido. El push lleva el nombre: "Ana · Voy en camino" |
+| `signal_on_the_way` / `signal_arrived` / `signal_running_late` | Organizador (si la manda un jugador) o aceptados (si la manda el organizador) | Voy en camino / Ya llegué / Llego tarde · Alguien de tu partido. El push lleva el nombre: "Ana · Voy en camino" |
 
 ## Estados del jugador (UI)
 

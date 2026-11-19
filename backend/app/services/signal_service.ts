@@ -22,6 +22,14 @@ function roleIn(match: Match, user: User): SignalRole | null {
   return accepted ? 'player' : null
 }
 
+/** A player's signal goes to the organizer; the organizer's, to the accepted players. */
+export function signalRecipients(match: Match, role: SignalRole): number[] {
+  if (role === 'player') return [match.organizerId]
+  return match.requests
+    .filter((request) => request.status === 'accepted')
+    .map((request) => request.userId)
+}
+
 /** Membership, status and window are checked under the match lock, so a concurrent close or remove cannot leave a stray signal. */
 export async function sendSignal(code: string, user: User, kind: SignalKind): Promise<SentSignal> {
   try {

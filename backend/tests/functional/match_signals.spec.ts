@@ -14,6 +14,7 @@ import {
   respondToRequest,
 } from '#services/match_service'
 import { notifySignal } from '#services/notifications'
+import { signalRecipients } from '#services/signal_service'
 
 function assertStatus(response: { assertStatus: (status: number) => void }, status: number) {
   response.assertStatus(status)
@@ -147,8 +148,8 @@ test.group('señales del partido', (group) => {
     const { organizer, player, match } = await setup()
     const loaded = await findMatchByCode(match.code)
 
-    await notifySignal(loaded, player, 'on_the_way')
-    await notifySignal(loaded, player, 'arrived')
+    await notifySignal(loaded, player, 'on_the_way', [organizer.id])
+    await notifySignal(loaded, player, 'arrived', [organizer.id])
 
     const rows = await Notification.query().where('user_id', organizer.id)
     assert.deepEqual(
@@ -157,17 +158,16 @@ test.group('señales del partido', (group) => {
     )
   })
 
-  test('la señal del organizador no notifica', async ({ client, assert }) => {
+  test('la señal del organizador avisa a los aceptados, no a él', async ({ assert }) => {
     const { organizer, player, match } = await setup()
-    await client
-      .post(`/api/matches/${match.code}/signals`)
-      .loginAs(organizer)
-      .json({ kind: 'arrived' })
+    const loaded = await findMatchByCode(match.code)
+
+    await notifySignal(loaded, organizer, 'running_late', signalRecipients(loaded, 'organizer'))
 
     const rows = await Notification.query().whereIn('user_id', [organizer.id, player.id])
-    assert.lengthOf(
-      rows.filter((row) => row.type.startsWith('signal_')),
-      0
+    assert.deepEqual(
+      rows.map((row) => [row.userId, row.type]),
+      [[player.id, 'signal_running_late']]
     )
   })
 

@@ -17,6 +17,7 @@ Contenido para Instagram (Reels, Stories y carruseles) hecho con [HyperFrames](h
 - Formato por defecto: vertical 1080×1920, 30 fps. Las Stories duran 15 s o menos; los Reels, entre 15 y 45 s.
 - Zona segura: no pongas texto ni CTA en los 250 px de arriba ni en los 340 px de abajo, porque ahí Instagram pone su propia interfaz.
 - El gancho va en los primeros 2 s.
+- **CTA unificado (Reels y carruseles):** la web y el Instagram se llaman igual, así que el cierre muestra `matchpa.app` una sola vez: "Búscanos como", la pastilla lima **matchpa.app** y dos chips debajo, globo "Úsala en la web" e ícono de Instagram "Síguenos en IG". En el Reel va directo sobre el fondo, sin tarjeta ni efecto vidrio; en el carrusel, en una tarjeta verde sólida sobre marfil. En el mismo cierre no se repite `@matchpa.app` ni va el badge "Síguenos". Referencias: el cierre de `videos/2026-11-19-voy-en-camino` y el slide 4 de `carruseles/2026-11-19-voy-en-camino`.
 - Los subtítulos van siempre, quemados en el video y en español, porque la mayoría ve sin sonido. Las reglas de subtítulos, las piezas de motion y los isométricos están en `motion.md`.
 - La app sale con grabación de pantalla del teléfono o con las capturas de `docs/marca/capturas/`, metida en un mockup de teléfono. Nunca dibujes una UI inventada.
 - La marca sale de `docs/marca/brandbook.md`: colores, tipografía, logo y tono. No uses colores sueltos.
@@ -54,14 +55,14 @@ Contenido para Instagram (Reels, Stories y carruseles) hecho con [HyperFrames](h
 ## Carruseles
 
 - Solo imágenes: un PNG por slide, sin video ni GIF. 1080×1350 (4:5), 4 slides o menos.
-- Estructura de historia: gancho (portada) → el problema que reconoce el jugador → giro → cierre corto con el logo, **matchpa.app** en pastilla lima y "Link en la bio". El cierre no lleva fondo lima ni "Guárdalo".
+- Estructura de historia: gancho (portada) → el problema que reconoce el jugador → giro → cierre corto con el CTA unificado. El cierre no lleva fondo lima ni "Guárdalo".
 - Todo en un solo `index.html`: cada slide es una `<section class="clip slide">` de 1 s y el root declara `data-slides="1,1,1,1"`. Sin animaciones: `node scripts/carrusel.mjs <slug>` toma un snapshot de cada slide.
 - Las ilustraciones salen de anatomy o de un cuadro de un reel (`npx hyperframes snapshot --at <s> --zoom 'x,y,w,h'`), no de fotos de stock. Referencia: `carruseles/2026-11-17-nadie-responde` (la grada sale del reel "Qué es MatchPa").
 - Si sale la app, se graba en modo mock (`grabar.mjs` encuentra la pieza en `carruseles/<slug>/`). No uses las capturas de `docs/marca/capturas/` ni de `assets/marca/`: muestran clubes reales.
 - El chat del problema se dibuja con burbujas en colores de la marca, sin la interfaz ni el logo de WhatsApp.
 - Footer en todos los slides, a 56 px del borde de abajo y con los mismos márgenes laterales que el texto (80 px):
   - Portada y slides intermedios: footer minimalista con el logo chico (40 px de alto, `logo.svg` sobre verde y `logo-verde.svg` sobre marfil) a la izquierda. A la derecha, "Desliza →" en lima en la portada y `@matchpa.app` al 60 % en los demás.
-  - Último slide: badge de Instagram centrado, "Síguenos pa' más contenido" y `@matchpa.app` en lima, con el ícono de Instagram.
+  - Último slide: footer minimalista con el logo a la izquierda y "Link en la bio" al 60 % a la derecha. El Instagram ya va en el CTA unificado.
 - La app sale con la pantalla completa en un teléfono, sin recortes. Para enfocar algo, se pone encima un zoom más grande con borde lima. Si el zoom queda lejos de su origen, se une con un cono de vidrio lima (punta en el elemento, base en el zoom). Referencia: `carruseles/2026-11-17-para-organizadores`.
 - En los slides de pasos, el número y el título van en la misma fila, y el título en una sola línea.
 
@@ -69,12 +70,12 @@ Contenido para Instagram (Reels, Stories y carruseles) hecho con [HyperFrames](h
 
 Lo que el video muestra de la app se graba solo, con Playwright, contra el frontend en modo mock. Es la excepción a la regla de la raíz "no corras navegador", y vale solo aquí.
 
-- **Datos:** siempre modo mock (`NEXT_PUBLIC_MOCK_API=true`), nunca el backend ni datos reales. La sesión es la de Efrain y los jugadores son de `frontend/lib/mock-api.ts`. Si una toma necesita un estado que el mock no tiene (por ejemplo, un partido abierto), se agrega ahí, como dato de desarrollo, y se commitea en el frontend.
+- **Datos:** siempre modo mock (`NEXT_PUBLIC_MOCK_API=true`), nunca el backend ni datos reales. La sesión es la de Carlos Batista, un usuario ficticio (nunca el nombre real del dueño) y los jugadores son de `frontend/lib/mock-api.ts`. Si una toma necesita un estado que el mock no tiene (por ejemplo, un partido abierto), se agrega ahí, como dato de desarrollo, y se commitea en el frontend.
   - La sucursal de las tomas es ficticia, **Pádel del Barrio** (`branchId: 1`): ninguna marca real de club sale en un video.
-  - El partido de Efrain es hoy a las 8 p. m. (`eveningOrLater`), así que la hora no depende de cuándo se grabe. Los horarios de los jugadores disponibles cubren ese partido.
+  - El partido de Carlos es hoy a las 8 p. m. (`eveningOrLater`), así que la hora no depende de cuándo se grabe. Los horarios de los jugadores disponibles cubren ese partido.
   - Con un partido abierto, la pestaña Jugadores ya viene filtrada por su sucursal: no hace falta filtrar en la toma.
 - **Localizadores:** usa el nombre accesible, por ejemplo `getByRole("button", { name: /Invitar a Sacha/ })`, y no la posición (`.first()`, `.nth()`), que se rompe cuando cambia el diseño.
-- **Pasos extra:** `scroll` (px, suave) para bajar a una lista.
+- **Pasos extra:** `scroll` (px, suave) para bajar a una lista, y `scrollTo` (un localizador) para centrar un elemento en pantalla.
 - **Tomas:** en `videos/<slug>/tomas.mjs`. Cada toma tiene:
   - `id`.
   - `video`: dónde entra en la composición. `start` es el segundo del video final; `from`–`to`, el tramo de la toma; `rate`, la velocidad.
