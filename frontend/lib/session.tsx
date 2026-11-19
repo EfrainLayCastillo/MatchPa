@@ -80,5 +80,5 @@ export function useSession(): SessionValue {
 }
 
 export function isProfileComplete(user: User): boolean {
-  return user.category !== null && user.gender !== null && user.phone !== null;
+  return user.category !== null && user.gender !== null;
 }

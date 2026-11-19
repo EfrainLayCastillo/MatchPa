@@ -9,28 +9,28 @@ Plataforma social de pádel para completar partidos y encontrar jugadores. Pensa
 ## Capturas
 
 <p align="center">
-<img src="docs/capturas/flow.gif" width="260" alt="Del lobby al detalle del partido"/><br/>
+<img src="docs/marca/capturas/flow.gif" width="260" alt="Del lobby al detalle del partido"/><br/>
 <sub>Del lobby al detalle: elegir el día, ver jugadores disponibles y revisar las solicitudes</sub>
 </p>
 
 <table>
 <tr>
-<td align="center" width="33%"><img src="docs/capturas/home.png" width="220" alt="Home"/><br/><sub><b>Home</b>: página de inicio</sub></td>
-<td align="center" width="33%"><img src="docs/capturas/lobby.png" width="220" alt="Lobby"/><br/><sub><b>Lobby</b>: tu perfil y tus próximos partidos</sub></td>
-<td align="center" width="33%"><img src="docs/capturas/matches.png" width="220" alt="Partidos del día"/><br/><sub><b>Partidos</b>: por día, sucursal y filtros</sub></td>
+<td align="center" width="33%"><img src="docs/marca/capturas/home.png" width="220" alt="Home"/><br/><sub><b>Home</b>: página de inicio</sub></td>
+<td align="center" width="33%"><img src="docs/marca/capturas/lobby.png" width="220" alt="Lobby"/><br/><sub><b>Lobby</b>: tu perfil y tus próximos partidos</sub></td>
+<td align="center" width="33%"><img src="docs/marca/capturas/matches.png" width="220" alt="Partidos del día"/><br/><sub><b>Partidos</b>: por día, sucursal y filtros</sub></td>
 </tr>
 <tr>
-<td align="center" width="33%"><img src="docs/capturas/players.png" width="220" alt="Jugadores disponibles"/><br/><sub><b>Jugadores</b>: el pool del día, con "Ey Pa, ¿juegas?"</sub></td>
-<td align="center" width="33%"><img src="docs/capturas/available.png" width="220" alt="Disponibilidad"/><br/><sub><b>Disponibilidad</b>: por día, con horario opcional</sub></td>
-<td align="center" width="33%"><img src="docs/capturas/new.png" width="220" alt="Publicar partido"/><br/><sub><b>Publicar partido</b>: con la cancha reservada o por reservar</sub></td>
+<td align="center" width="33%"><img src="docs/marca/capturas/players.png" width="220" alt="Jugadores disponibles"/><br/><sub><b>Jugadores</b>: el pool del día, con "Ey Pa, ¿juegas?"</sub></td>
+<td align="center" width="33%"><img src="docs/marca/capturas/available.png" width="220" alt="Disponibilidad"/><br/><sub><b>Disponibilidad</b>: por día, con horario opcional</sub></td>
+<td align="center" width="33%"><img src="docs/marca/capturas/new.png" width="220" alt="Publicar partido"/><br/><sub><b>Publicar partido</b>: con la cancha reservada o por reservar</sub></td>
 </tr>
 <tr>
-<td align="center" width="33%"><img src="docs/capturas/match.png" width="220" alt="Detalle del partido"/><br/><sub><b>Detalle</b>: jugadores, cómo llegar y compartir</sub></td>
-<td align="center" width="33%"><img src="docs/capturas/match-organizer.png" width="220" alt="Panel del organizador"/><br/><sub><b>Organizador</b>: aceptar solicitudes, invitar y cerrar</sub></td>
-<td align="center" width="33%"><img src="docs/capturas/my-matches.png" width="220" alt="Mis partidas"/><br/><sub><b>Mis partidas</b>: las que organizas o juegas</sub></td>
+<td align="center" width="33%"><img src="docs/marca/capturas/match.png" width="220" alt="Detalle del partido"/><br/><sub><b>Detalle</b>: jugadores, cómo llegar y compartir</sub></td>
+<td align="center" width="33%"><img src="docs/marca/capturas/match-organizer.png" width="220" alt="Panel del organizador"/><br/><sub><b>Organizador</b>: aceptar solicitudes, invitar y cerrar</sub></td>
+<td align="center" width="33%"><img src="docs/marca/capturas/my-matches.png" width="220" alt="Mis partidas"/><br/><sub><b>Mis partidas</b>: las que organizas o juegas</sub></td>
 </tr>
 <tr>
-<td align="center" width="33%"><img src="docs/capturas/story.png" width="220" alt="Imagen para historias"/><br/><sub><b>Historia</b>: imagen 1080×1920 para Instagram</sub></td>
+<td align="center" width="33%"><img src="docs/marca/capturas/story.png" width="220" alt="Imagen para historias"/><br/><sub><b>Historia</b>: imagen 1080×1920 para Instagram</sub></td>
 <td></td>
 <td></td>
 </tr>
@@ -92,7 +92,7 @@ npm install
 npm run dev
 ```
 
-Abre [http://localhost:3000](http://localhost:3000). Variables, datos de prueba y tests en [desarrollo local](docs/desarrollo-local.md).
+Abre [http://localhost:3000](http://localhost:3000). Variables, datos de prueba y tests en [desarrollo local](docs/ingenieria/desarrollo-local.md).
 
 ### Voz para los videos de marketing (opcional)
 
@@ -110,21 +110,33 @@ docker compose --profile marketing up -d --build voicebox
 
 ## Documentación
 
+**Producto (`docs/producto/`): la especificación**
+
 | Documento | Contenido |
 |---|---|
-| [Reglas de negocio](docs/reglas-de-negocio.md) | Partidos, solicitudes, disponibilidad, categorías y sucursales |
-| [Modelo de datos](docs/modelo-de-datos.md) | Tablas y columnas |
-| [API](docs/api.md) | Endpoints y acciones |
-| [Frontend](docs/frontend.md) | Mobile first y rutas |
-| [Tiempo real](docs/tiempo-real.md) | Canales Transmit, push y modal opt-in |
-| [Seguridad](docs/seguridad.md) | Datos sensibles, sesión y límites |
-| [Analítica](docs/analitica.md) | GA4 por Tag Manager y eventos del embudo |
-| [Brandbook](docs/brandbook.md) | Colores, tipografía, logo y tono |
-| [Desarrollo local](docs/desarrollo-local.md) | Instalación, datos de prueba y variables |
-| [Despliegue](docs/despliegue.md) | Vercel, Render, Neon y sus variables |
-| [Desarrollo con IA](docs/desarrollo-con-ia.md) | Agentes, skills y flujo de trabajo |
-| [Roadmap](docs/roadmap.md) | Lo hecho y lo que sigue |
-| [Arquitectura](docs/arquitectura.html) | Diagrama interactivo |
+| [Reglas de negocio](docs/producto/reglas-de-negocio.md) | Partidos, solicitudes, disponibilidad, categorías y sucursales |
+| [Modelo de datos](docs/producto/modelo-de-datos.md) | Tablas y columnas |
+| [API](docs/producto/api.md) | Endpoints y acciones |
+| [Tiempo real](docs/producto/tiempo-real.md) | Canales Transmit, push y modal opt-in |
+| [Seguridad](docs/producto/seguridad.md) | Datos sensibles, sesión y límites |
+| [Roadmap](docs/producto/roadmap.md) | Lo hecho y lo que sigue |
+
+**Ingeniería (`docs/ingenieria/`)**
+
+| Documento | Contenido |
+|---|---|
+| [Arquitectura](docs/ingenieria/arquitectura.html) | Diagrama interactivo |
+| [Frontend](docs/ingenieria/frontend.md) | Mobile first y rutas |
+| [Analítica](docs/ingenieria/analitica.md) | GA4 por Tag Manager y eventos del embudo |
+| [Desarrollo local](docs/ingenieria/desarrollo-local.md) | Instalación, datos de prueba y variables |
+| [Despliegue](docs/ingenieria/despliegue.md) | Vercel, Render, Neon y sus variables |
+| [Desarrollo con IA](docs/ingenieria/desarrollo-con-ia.md) | Agentes, skills y flujo de trabajo |
+
+**Marca (`docs/marca/`)**
+
+| Documento | Contenido |
+|---|---|
+| [Brandbook](docs/marca/brandbook.md) | Colores, tipografía, logo y tono |
 
 ## Herramientas por evaluar
 
@@ -132,8 +144,8 @@ docker compose --profile marketing up -d --build voicebox
 
 ## Estado
 
-- **Desarrollo:** MVP en curso. Lo hecho y lo pendiente está en el [roadmap](docs/roadmap.md).
-- **Despliegue:** en producción en [matchpa.app](https://matchpa.app/), con planes gratuitos (Vercel, Render y Neon) y dominio, DNS y correo entrante en Cloudflare. Ver [despliegue](docs/despliegue.md).
+- **Desarrollo:** MVP en curso. Lo hecho y lo pendiente está en el [roadmap](docs/producto/roadmap.md).
+- **Despliegue:** en producción en [matchpa.app](https://matchpa.app/), con planes gratuitos (Vercel, Render y Neon) y dominio, DNS y correo entrante en Cloudflare. Ver [despliegue](docs/ingenieria/despliegue.md).
 
 ## Contribuir y licencia
 

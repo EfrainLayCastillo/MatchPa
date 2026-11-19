@@ -67,7 +67,7 @@ Una sola figura isométrica en **SVG** (sin WebGL ni 3D), de 1080×1920 y en tem
 - El jugador **pide unirse** y el **organizador acepta**. Al llenarse los 4 puestos, el partido pasa a completo ("¡Match!").
 - La cancha puede publicarse "por reservar"; al confirmarla, los jugadores ven "Cancha N". El video muestra el caso confirmado.
 - Las pantallas de la app son capturas reales (`assets/marca/`). La cancha y los jugadores son ilustraciones.
-- El dominio es `matchpa.app` (`docs/reglas-de-negocio.md`, Link para compartir).
+- El dominio es `matchpa.app` (`docs/producto/reglas-de-negocio.md`, Link para compartir).
 
 ## Publicación
 

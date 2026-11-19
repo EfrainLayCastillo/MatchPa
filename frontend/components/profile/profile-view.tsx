@@ -40,7 +40,7 @@ export function ProfileView() {
 
       <PushToggle />
 
-      <ProfileForm mode="profile" />
+      <ProfileForm />
 
       <Button variant="outline" className="w-full" onClick={logout}>
         Cerrar sesión

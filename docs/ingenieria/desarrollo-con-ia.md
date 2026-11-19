@@ -6,7 +6,9 @@ Diagrama interactivo de la arquitectura: [`arquitectura.html`](arquitectura.html
 
 | Archivo | Responde |
 |---|---|
-| `docs/` | Qué se construye: reglas, modelo, API, rutas, despliegue |
+| `docs/producto/` | Qué se construye: reglas, modelo, API, tiempo real, seguridad, roadmap |
+| `docs/ingenieria/` | Cómo se construye y opera: arquitectura, rutas, analítica, entorno, despliegue |
+| `docs/marca/` | Brandbook y capturas |
 | `context.md` (local) | Por qué se decidió así |
 | `CLAUDE.md`, `backend/CLAUDE.md`, `frontend/CLAUDE.md` | Cómo se escribe el código en cada parte |
 
@@ -28,13 +30,13 @@ Pocos y por responsabilidad, con herramientas limitadas:
 |---|---|---|
 | `backend` | Migraciones, modelos, validators, controllers, tests Japa | Lectura, escritura, shell |
 | `frontend` | Pantallas mobile first con shadcn/ui y el brandbook | Lectura, escritura, shell |
-| `rules-reviewer` | Revisa el código contra las reglas de negocio de `docs/reglas-de-negocio.md` | Solo lectura |
+| `rules-reviewer` | Revisa el código contra las reglas de negocio de `docs/producto/reglas-de-negocio.md` | Solo lectura |
 
 ## Skills del proyecto
 
 | Skill | Hace |
 |---|---|
-| `new-endpoint` | Validator + controller + ruta + test + fila en la tabla de `docs/api.md` |
+| `new-endpoint` | Validator + controller + ruta + test + fila en la tabla de `docs/producto/api.md` |
 | `sync-docs` | Lleva una decisión nueva a `docs/` y a `context.md` |
 
 ## Skills externas
@@ -68,7 +70,7 @@ Ambos hooks no hacen nada hasta que `backend/` y `frontend/` tengan `package.jso
 
 ## Flujo por historia
 
-1. Tomar un ítem de [roadmap.md](roadmap.md) y partirlo con `/slice`.
+1. Tomar un ítem de [roadmap.md](../producto/roadmap.md) y partirlo con `/slice`.
 2. Planear con `/rpi`.
 3. Implementar con `backend` y/o `frontend`.
 4. Revisar con `rules-reviewer` y `/code-review`.

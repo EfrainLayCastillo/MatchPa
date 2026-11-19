@@ -44,7 +44,7 @@ La grada es el pool: cada jugador sentado es una disponibilidad real, con el mis
 | 9   | 26–29 s   | Saque y peloteo corto. En la grada quedan 3 con su badge lima                                                                                                                                      | —                                                  | Golpe de pelota                                    | Cámara lenta al primer golpe                                                                    |
 | 10  | 29–32 s   | La cámara se aleja; la cancha se vuelve un objeto y aparece el logo                                                                                                                                | Ponte disponible · o arma tu + logo MatchPa · Link en la bio | Voz 7                                              | `logo-sting`; `sparkle`                                                                         |
 
-Los badges son los estados reales de la app (`docs/reglas-de-negocio.md`, "Estados del jugador"): **Disponible** lima, **Buscando** blanco con borde verde azulado, **En partido** gris. No se inventan otros.
+Los badges son los estados reales de la app (`docs/producto/reglas-de-negocio.md`, "Estados del jugador"): **Disponible** lima, **Buscando** blanco con borde verde azulado, **En partido** gris. No se inventan otros.
 
 ## Grabación
 

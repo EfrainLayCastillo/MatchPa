@@ -18,9 +18,9 @@ Contenido para Instagram (Reels, Stories y carruseles) hecho con [HyperFrames](h
 - Zona segura: no pongas texto ni CTA en los 250 px de arriba ni en los 340 px de abajo, porque ahí Instagram pone su propia interfaz.
 - El gancho va en los primeros 2 s.
 - Los subtítulos van siempre, quemados en el video y en español, porque la mayoría ve sin sonido. Las reglas de subtítulos, las piezas de motion y los isométricos están en `motion.md`.
-- La app sale con grabación de pantalla del teléfono o con las capturas de `docs/capturas/`, metida en un mockup de teléfono. Nunca dibujes una UI inventada.
-- La marca sale de `docs/brandbook.md`: colores, tipografía, logo y tono. No uses colores sueltos.
-- Lo que muestra el video tiene que existir en la app (`docs/reglas-de-negocio.md`): no prometas funciones del roadmap como si ya estuvieran.
+- La app sale con grabación de pantalla del teléfono o con las capturas de `docs/marca/capturas/`, metida en un mockup de teléfono. Nunca dibujes una UI inventada.
+- La marca sale de `docs/marca/brandbook.md`: colores, tipografía, logo y tono. No uses colores sueltos.
+- Lo que muestra el video tiene que existir en la app (`docs/producto/reglas-de-negocio.md`): no prometas funciones del roadmap como si ya estuvieran.
 - Antes de escribir una composición, carga la skill `/hyperframes`. Antes de entregar, corre `npm run check` en el proyecto.
 - Textos en español panameño casual: "Ey Pa, ¿juegas?". Código y nombres de archivo en inglés o en slug sin acentos.
 
@@ -57,7 +57,7 @@ Contenido para Instagram (Reels, Stories y carruseles) hecho con [HyperFrames](h
 - Estructura de historia: gancho (portada) → el problema que reconoce el jugador → giro → cierre corto con el logo, **matchpa.app** en pastilla lima y "Link en la bio". El cierre no lleva fondo lima ni "Guárdalo".
 - Todo en un solo `index.html`: cada slide es una `<section class="clip slide">` de 1 s y el root declara `data-slides="1,1,1,1"`. Sin animaciones: `node scripts/carrusel.mjs <slug>` toma un snapshot de cada slide.
 - Las ilustraciones salen de anatomy o de un cuadro de un reel (`npx hyperframes snapshot --at <s> --zoom 'x,y,w,h'`), no de fotos de stock. Referencia: `carruseles/2026-11-17-nadie-responde` (la grada sale del reel "Qué es MatchPa").
-- Si sale la app, se graba en modo mock (`grabar.mjs` encuentra la pieza en `carruseles/<slug>/`). No uses las capturas de `docs/capturas/` ni de `assets/marca/`: muestran clubes reales.
+- Si sale la app, se graba en modo mock (`grabar.mjs` encuentra la pieza en `carruseles/<slug>/`). No uses las capturas de `docs/marca/capturas/` ni de `assets/marca/`: muestran clubes reales.
 - El chat del problema se dibuja con burbujas en colores de la marca, sin la interfaz ni el logo de WhatsApp.
 - Footer en todos los slides, a 56 px del borde de abajo y con los mismos márgenes laterales que el texto (80 px):
   - Portada y slides intermedios: footer minimalista con el logo chico (40 px de alto, `logo.svg` sobre verde y `logo-verde.svg` sobre marfil) a la izquierda. A la derecha, "Desliza →" en lima en la portada y `@matchpa.app` al 60 % en los demás.

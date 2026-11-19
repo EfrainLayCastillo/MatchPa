@@ -9,7 +9,7 @@ type AuthMethod = "email" | "google";
 type Role = "organizer" | "player" | "visitor";
 type DayBucket = "today" | "tomorrow" | "later";
 
-/** Contract with the GTM container (`docs/analitica.md`). No personal data and never a code, id, name, email or phone. `branch` is the branch slug. */
+/** Contract with the GTM container (`docs/ingenieria/analitica.md`). No personal data and never a code, id, name, email or phone. `branch` is the branch slug. */
 interface AnalyticsEvents {
   sign_up: { method: AuthMethod };
   login: { method: AuthMethod };

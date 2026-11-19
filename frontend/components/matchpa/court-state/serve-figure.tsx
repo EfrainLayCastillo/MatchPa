@@ -6,11 +6,13 @@ import { useInView, useLoop, useStillness } from "@/components/iso/live";
 import { readoutOf } from "./model";
 import { DRIBBLE_REST, advance, dribblePose, sceneText, startScene } from "./motion";
 import { playerSvg } from "./pose";
+import type { Gender } from "@/lib/types";
 import { COURT, HEIGHT, WALLS, WIDTH } from "./view";
 import "@/components/iso/iso.css";
 import "./court-state.css";
 
 const REST_POSE = dribblePose(DRIBBLE_REST);
+const DEFAULT_LABEL = "Jugador de pádel en el lado derecho de la cancha, frente al vidrio del fondo, botando la pelota mientras espera para sacar";
 
 const COURT_ART = (
   <g key="court">
@@ -71,10 +73,12 @@ const WALL_ART = (
 interface ServeFigureProps {
   serves?: number;
   waiting?: boolean;
+  gender?: Gender;
+  label?: string;
   onReadout?: (text: string) => void;
 }
 
-export function ServeFigure({ serves = 0, waiting = false, onReadout }: ServeFigureProps) {
+export function ServeFigure({ serves = 0, waiting = false, gender = "male", label = DEFAULT_LABEL, onReadout }: ServeFigureProps) {
   const clip = `sw-head-${useId().replace(/[^a-zA-Z0-9]/g, "")}`;
   const stage = useRef<SVGSVGElement>(null);
   const player = useRef<SVGGElement>(null);
@@ -90,7 +94,7 @@ export function ServeFigure({ serves = 0, waiting = false, onReadout }: ServeFig
     const serve = served.current !== serves;
     served.current = serves;
     const pose = advance(scene.current, dt, { serve, waiting });
-    if (player.current) player.current.innerHTML = playerSvg(pose, seconds.current, clip);
+    if (player.current) player.current.innerHTML = playerSvg(pose, seconds.current, clip, gender);
     const text = sceneText(scene.current, readoutOf);
     if (text !== spoken.current) {
       spoken.current = text;
@@ -105,12 +109,12 @@ export function ServeFigure({ serves = 0, waiting = false, onReadout }: ServeFig
       className="iso-svg"
       viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
       role="img"
-      aria-label="Jugador de pádel en el lado derecho de la cancha, frente al vidrio del fondo, botando la pelota mientras espera para sacar"
+      aria-label={label}
       focusable="false"
     >
       {COURT_ART}
       {WALL_ART}
-      <g ref={player} dangerouslySetInnerHTML={{ __html: playerSvg(REST_POSE, 0, clip) }} />
+      <g ref={player} dangerouslySetInnerHTML={{ __html: playerSvg(REST_POSE, 0, clip, gender) }} />
     </svg>
   );
 }

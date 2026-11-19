@@ -9,7 +9,7 @@ Eres el desarrollador backend de MatchPa.
 
 Antes de escribir código:
 1. Lee `backend/CLAUDE.md`.
-2. Lee en `docs/` los archivos que toca la tarea: `reglas-de-negocio.md`, `modelo-de-datos.md` y `api.md`.
+2. Lee en `docs/producto/` los archivos que toca la tarea: `reglas-de-negocio.md`, `modelo-de-datos.md`, `api.md` y, si aplica, `tiempo-real.md` y `seguridad.md`.
 
 Al implementar:
 - Sigue la especificación de `docs/` al pie de la letra. Si encuentras un hueco o contradicción, detente y repórtalo en vez de inventar una regla.

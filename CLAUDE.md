@@ -4,7 +4,11 @@ Plataforma de pádel para completar partidos. Monorepo: `backend/` (AdonisJS 7),
 
 ## Fuentes de verdad
 
-- `docs/`: qué se construye. `reglas-de-negocio.md`, `modelo-de-datos.md` y `api.md` son la especificación; `README.md` es la portada con el índice.
+- `docs/`: qué se construye, en dos niveles por propósito (no por paquete):
+  - `producto/`: la especificación compartida por backend y frontend (reglas, modelo, API, tiempo real, seguridad, roadmap).
+  - `ingenieria/`: cómo se construye y opera (arquitectura, rutas del frontend, analítica, desarrollo local, despliegue, desarrollo con IA).
+  - `marca/`: brandbook y capturas, compartidos por frontend y marketing.
+  - `README.md` es la portada con el índice. Lo propio de un paquete va en su `CLAUDE.md` (marketing documenta en `marketing/`).
 - `context.md` (local, en `.gitignore`): por qué se decidió así. Léelo antes de proponer cambios de producto.
 - Si el código necesita desviarse de la especificación, actualiza primero la doc correspondiente en `docs/` con la skill `sync-docs`; no dejes que diverjan.
 
@@ -36,7 +40,7 @@ Partir el ítem del Roadmap con `/slice`. Su `slices.md` va al scratchpad de la 
 - Commits en inglés con Conventional Commits (`feat(matches): ...`). Las skills globales `/commit` (Jira `COL-`) y `/create-pr` (Bitbucket) no aplican: el repo está en GitHub, usa `git` y `gh`.
 - Hora: timestamps en UTC; las reglas por día se evalúan en `America/Panama`.
 - `backend/` y `frontend/` ya contienen un `CLAUDE.md`: al generar el proyecto con `create-adonisjs` o `create-next-app`, hazlo en una carpeta temporal y mueve el resultado, porque esos CLIs rechazan carpetas con archivos.
-- Diagramas con la skill `archify`; el de arquitectura vive en `docs/arquitectura.html`.
+- Diagramas con la skill `archify`; el de arquitectura vive en `docs/ingenieria/arquitectura.html`.
 
 ## Ahorro de tokens
 
@@ -45,5 +49,5 @@ Partir el ítem del Roadmap con `/slice`. Su `slices.md` va al scratchpad de la 
 - Después de cambiar, corre el check mínimo del paquete tocado y reporta solo el resultado: pasa o falla, y las líneas de error relevantes. No pegues la salida completa.
 - En comandos con salida larga, limita la salida (`| tail -n 20`, `-q`, `--silent`).
 - No vuelvas a imprimir archivos o diffs que acabas de escribir.
-- No agregues comentarios que repitan el código, ni tests que no cubran una regla de `docs/reglas-de-negocio.md`.
+- No agregues comentarios que repitan el código, ni tests que no cubran una regla de `docs/producto/reglas-de-negocio.md`.
 - No corras navegador, capturas ni E2E: el usuario los ejecuta. Tampoco `next build` completo salvo para cerrar una entrega.

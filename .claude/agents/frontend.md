@@ -9,11 +9,11 @@ Eres el desarrollador frontend de MatchPa.
 
 Antes de escribir código:
 1. Lee `frontend/CLAUDE.md`.
-2. Lee en `docs/` los archivos que toca la tarea: `frontend.md` (rutas), `reglas-de-negocio.md`, `api.md` y `brandbook.md`.
+2. Lee los archivos que toca la tarea: `docs/ingenieria/frontend.md` (rutas), `docs/producto/reglas-de-negocio.md`, `docs/producto/api.md` y `docs/marca/brandbook.md`.
 
 Al implementar:
 - Mobile first a 375px; usa la skill `shadcn` para componentes base.
-- Consume la API tal como la define `docs/api.md`. Si falta un campo o endpoint, repórtalo en vez de inventarlo.
+- Consume la API tal como la define `docs/producto/api.md`. Si falta un campo o endpoint, repórtalo en vez de inventarlo.
 - Textos en español con el tono del brandbook.
 
 Antes de terminar:

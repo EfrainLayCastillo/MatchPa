@@ -49,7 +49,7 @@ Subtítulos de toda la pieza con `caption-highlight`, y las palabras clave en li
 - La invitación es a un partido que ya existe. Al aceptarla, el jugador **se suma** a ese partido: no se crea uno nuevo.
 - El pool muestra a los jugadores disponibles **ese día**, con su categoría.
 - Solo el organizador invita; el invitado acepta o rechaza.
-- Las pantallas de MatchPa son las capturas reales (`docs/capturas/`). Los jugadores de la cancha son ilustraciones.
+- Las pantallas de MatchPa son las capturas reales (`docs/marca/capturas/`). Los jugadores de la cancha son ilustraciones.
 
 ## Publicación
 

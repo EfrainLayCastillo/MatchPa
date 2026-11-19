@@ -44,7 +44,7 @@ export const SP = fitProjection(
   STANDS_HEIGHT,
   { pad: 12 },
 );
-const SK = cameraOf(SP).k;
+export const SK = cameraOf(SP).k;
 
 const path = (points: Point3[]) =>
   pointsAt(points, SP)
@@ -155,11 +155,16 @@ function legsOf({ plank, top }: Tier) {
   return { posts, braces, rail };
 }
 
+export function seatOrigin(tierIndex: number, seatIndex: number): Point3 {
+  const { plank, top } = TIERS[tierIndex]!;
+  return [plank.x + 13 + seatIndex * PITCH, plank.y + plank.d / 2 + 1, top + 3.4];
+}
+
 function tierArt(tier: Tier, tierIndex: number) {
   const { plank, top } = tier;
   const grooves = [0.25, 0.5, 0.75].map((t) => lineOnTop([plank.x + 1.5, plank.y + plank.d * t], [plank.x + plank.w - 1.5, plank.y + plank.d * t], top, SP)).join("");
   const seats = Array.from({ length: SEATS }, (_, index) => {
-    const cx = plank.x + 13 + index * PITCH;
+    const cx = seatOrigin(tierIndex, index)[0];
     return seatAt(cx, tier, tierIndex === LIME_SEAT.tier && index === LIME_SEAT.index);
   });
   return {

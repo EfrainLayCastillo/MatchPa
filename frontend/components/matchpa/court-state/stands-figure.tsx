@@ -24,7 +24,7 @@ function Seat({ seat }: { seat: SeatArt }) {
   );
 }
 
-const TIERS_ART = STANDS.tiers.map((tier, tierIndex) => {
+export const TIERS_ART = STANDS.tiers.map((tier, tierIndex) => {
   const posts = tier.legs.posts;
   const post = ({ foot, post }: (typeof posts)[number], index: number) => (
     <g key={index}>
@@ -61,7 +61,7 @@ const BALL_ART = (
   </g>
 );
 
-const FLOOR_ART = (
+export const FLOOR_ART = (
   <g key="floor">
     <path className="iso-halo" d={STANDS.halo} />
     {STANDS.feet.map((paths, index) => (

@@ -1,0 +1,62 @@
+.court-state [data-m="hair"] {
+  --body: var(--brand-teal);
+  --shade: color-mix(in oklab, black 32%, var(--brand-teal));
+  --shine: color-mix(in oklab, var(--brand-turquoise) 40%, var(--brand-teal));
+}
+.court-state [data-m="tee-a"] {
+  --body: var(--brand-turquoise);
+  --shade: color-mix(in oklab, var(--brand-teal) 28%, var(--brand-turquoise));
+  --shine: color-mix(in oklab, white 55%, var(--brand-turquoise));
+}
+.court-state [data-m="tee-b"] {
+  --body: var(--brand-lime);
+  --shade: color-mix(in oklab, var(--brand-teal) 24%, var(--brand-lime));
+  --shine: color-mix(in oklab, white 70%, var(--brand-lime));
+}
+.court-state [data-m="tee-c"] {
+  --body: var(--brand-ivory);
+  --shade: color-mix(in oklab, var(--brand-teal) 16%, var(--brand-ivory));
+  --shine: white;
+}
+
+.court-state .ob-tag-box {
+  fill: var(--brand-teal);
+}
+.court-state .ob-tag-text {
+  fill: var(--brand-ivory);
+  font-family: var(--font-inter), sans-serif;
+  font-size: 8px;
+  font-weight: 700;
+}
+.court-state [data-you] .ob-tag-box {
+  fill: var(--brand-lime);
+  stroke: var(--brand-teal);
+  stroke-width: 1;
+}
+.court-state [data-you] .ob-tag-text {
+  fill: var(--brand-teal);
+}
+.court-state .ob-tag-pop {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: ob-pop 0.28s ease-out;
+}
+.court-state .ob-guest {
+  animation: ob-sway 3.6s ease-in-out infinite;
+}
+
+@keyframes ob-pop {
+  from {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+}
+@keyframes ob-sway {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-0.9px);
+  }
+}

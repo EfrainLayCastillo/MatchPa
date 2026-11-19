@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import { CategoryField } from "@/components/matchpa/category-field";
 import { CategoryTierPicker } from "@/components/matchpa/category-tier-picker";
 import { FormAlert } from "@/components/matchpa/form-alert";
 import { Button } from "@/components/ui/button";
@@ -11,20 +12,14 @@ import { FieldError } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { track } from "@/lib/analytics";
 import { api } from "@/lib/api";
 import { invalidProps, toFormErrors, useFormErrors } from "@/lib/form-errors";
-import { CATEGORIES, GENDER_LABELS, shortCategory } from "@/lib/format";
+import { GENDER_LABELS } from "@/lib/format";
 import { WHITE_FIELDS } from "@/lib/field-styles";
 import { useSession } from "@/lib/session";
 import type { Category, CategoryTier, Gender } from "@/lib/types";
 
-interface ProfileFormProps {
-  mode: "onboarding" | "profile";
-}
-
-export function ProfileForm({ mode }: ProfileFormProps) {
+export function ProfileForm() {
   const router = useRouter();
   const { user, setUser } = useSession();
   const [category, setCategory] = useState<Category>(user?.category ?? 4);
@@ -42,11 +37,6 @@ export function ProfileForm({ mode }: ProfileFormProps) {
     reset();
     try {
       setUser(await api.updateMe({ category, categoryTier, gender, phone: phone.trim() }));
-      if (mode === "onboarding") {
-        track("onboarding_complete", { category });
-        router.replace("/lobby");
-        return;
-      }
       toast.success("Perfil guardado");
       router.push("/lobby");
     } catch (err) {
@@ -58,22 +48,7 @@ export function ProfileForm({ mode }: ProfileFormProps) {
 
   return (
     <form ref={formRef} onSubmit={save} noValidate className={`space-y-6 ${WHITE_FIELDS}`}>
-      <div className="space-y-1.5">
-        <Label>Categoría</Label>
-        <Select value={category.toString()} onValueChange={(value) => setCategory(Number(value) as Category)}>
-          <SelectTrigger className="w-full">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {CATEGORIES.map((value) => (
-              <SelectItem key={value} value={value.toString()}>
-                {shortCategory(value)} categoría
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <p className="text-xs text-muted-foreground">Cámbiala cuando subas de nivel.</p>
-      </div>
+      <CategoryField value={category} onChange={setCategory} hint="Cámbiala cuando subas de nivel." />
 
       <div className="space-y-1.5">
         <Label id="gender-label">Género</Label>
@@ -115,7 +90,7 @@ export function ProfileForm({ mode }: ProfileFormProps) {
       <FormAlert message={errors.form} />
 
       <Button type="submit" size="lg" className="h-12 w-full text-base font-bold" disabled={busy}>
-        {mode === "onboarding" ? "Entrar al lobby" : "Guardar cambios"}
+        Guardar cambios
       </Button>
     </form>
   );

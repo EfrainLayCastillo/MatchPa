@@ -26,7 +26,7 @@ Van siempre, quemados en el video:
 
 - El teléfono va grande: pantalla de 560 px de ancho, centrada, de `top: 190px` hasta encima de los subtítulos. Con 408 px no se leía la app.
 - Solo se muestran textos que existen en la app. Si un momento no tiene pantalla (por ejemplo, el jugador que acepta), se cuenta con gráficos (✓, cambio de badge), no con una notificación inventada. El push real al organizador cuando aceptan dice "¡Match! · Ya estás en el partido".
-- Los estados de jugador que salen como badges son los de la app: **Disponible** lima con su horario, **Buscando** marfil con borde turquesa y **En partido** gris (`docs/reglas-de-negocio.md`, "Estados del jugador").
+- Los estados de jugador que salen como badges son los de la app: **Disponible** lima con su horario, **Buscando** marfil con borde turquesa y **En partido** gris (`docs/producto/reglas-de-negocio.md`, "Estados del jugador").
 - Nunca marcas reales de clubes o sucursales, ni en la app grabada ni en los subtítulos. El mock usa una sucursal ficticia, **Pádel del Barrio** (`branchId: 1`), y el texto dice "mi sucursal" o "tu sucursal".
 
 ## Isométrico y 3D
