@@ -116,6 +116,8 @@ interface PlayerSummaryProps extends LevelProps {
   verified?: boolean;
   caption?: React.ReactNode;
   extraBadges?: React.ReactNode;
+  /** Moves gender and category under the name, with the tier. */
+  stackedBadges?: boolean;
   action?: React.ReactNode;
 }
 
@@ -129,9 +131,16 @@ export function PlayerSummary({
   tier,
   caption,
   extraBadges,
+  stackedBadges = false,
   action,
 }: PlayerSummaryProps) {
-  const hasSecondRow = tier !== null || extraBadges !== undefined;
+  const levelBadges = (
+    <>
+      <GenderBadge gender={gender} />
+      <CategoryBadge category={category} />
+    </>
+  );
+  const hasSecondRow = stackedBadges || tier !== null || extraBadges !== undefined;
   return (
     <div className="flex items-center gap-3">
       <InitialAvatar name={hidden ? "?" : name} verified={verified} />
@@ -146,13 +155,11 @@ export function PlayerSummary({
           >
             {name}
           </p>
-          <span className="flex shrink-0 gap-1">
-            <GenderBadge gender={gender} />
-            <CategoryBadge category={category} />
-          </span>
+          {stackedBadges ? null : <span className="flex shrink-0 gap-1">{levelBadges}</span>}
         </div>
         {hasSecondRow ? (
           <div className="flex flex-wrap gap-1">
+            {stackedBadges ? levelBadges : null}
             <TierBadge tier={tier} />
             {extraBadges}
           </div>

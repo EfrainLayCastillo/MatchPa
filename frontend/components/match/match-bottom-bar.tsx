@@ -6,15 +6,14 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { matchRole, track } from "@/lib/analytics";
 import { courtLabel } from "@/lib/format";
-import type { MatchImage } from "@/lib/match-images";
 import { shareUrl } from "@/lib/share-url";
 import type { Match } from "@/lib/types";
 import { directionsHref } from "./branch-contact";
 
-export function MatchBottomBar({ match, image }: { match: Match; image: MatchImage }) {
+export function MatchBottomBar({ match }: { match: Match }) {
   const directions = directionsHref(match.branch);
   const canShare = match.status === "open" || match.isOrganizer;
-  const storyImage = useStoryImage(canShare ? match.code : null, image);
+  const storyImage = useStoryImage(canShare ? match.code : null);
   if (!directions && !canShare) return null;
 
   return (
@@ -40,7 +39,7 @@ export function MatchBottomBar({ match, image }: { match: Match; image: MatchIma
           <Button
             size="lg"
             className="h-12 text-base font-bold"
-            onClick={() => shareMatch(match, storyImage, image)}
+            onClick={() => shareMatch(match, storyImage)}
           >
             <Share2Icon data-icon="inline-start" />
             Compartir
@@ -52,12 +51,12 @@ export function MatchBottomBar({ match, image }: { match: Match; image: MatchIma
 }
 
 /** Fetched ahead of the tap: iOS blocks the share sheet if the file is downloaded after the user gesture. */
-function useStoryImage(code: string | null, image: MatchImage): File | null {
+function useStoryImage(code: string | null): File | null {
   const [file, setFile] = useState<File | null>(null);
   useEffect(() => {
     if (!code || typeof navigator.canShare !== "function") return;
     let active = true;
-    fetch(`/partidos/${code}/historia?img=${image}`)
+    fetch(`/partidos/${code}/historia`)
       .then((res) => (res.ok ? res.blob() : null))
       .then((blob) => {
         if (!active || !blob) return;
@@ -70,11 +69,11 @@ function useStoryImage(code: string | null, image: MatchImage): File | null {
     return () => {
       active = false;
     };
-  }, [code, image]);
+  }, [code]);
   return file;
 }
 
-async function shareMatch(match: Match, file: File | null, image: MatchImage) {
+async function shareMatch(match: Match, file: File | null) {
   const text = `Partido de pádel en ${match.branch.name}, ${courtLabel(match).toLowerCase()}. Faltan ${match.spotsLeft} puestos.`;
   const common = {
     content_type: "match",
@@ -82,7 +81,7 @@ async function shareMatch(match: Match, file: File | null, image: MatchImage) {
     match_status: match.status,
   } as const;
   if (typeof navigator.share === "function") {
-    const url = shareUrl(match.code, file ? "story" : "link", image);
+    const url = shareUrl(match.code, file ? "story" : "link");
     const data: ShareData = file
       ? { files: [file], text: `${text}\n${url}` }
       : { title: "Partido de pádel en MatchPa", text, url };
@@ -90,7 +89,7 @@ async function shareMatch(match: Match, file: File | null, image: MatchImage) {
     if (shared) track("share", { ...common, method: file ? "story_image" : "share_sheet" });
     return;
   }
-  await navigator.clipboard.writeText(shareUrl(match.code, "copy", image));
+  await navigator.clipboard.writeText(shareUrl(match.code, "copy"));
   track("share", { ...common, method: "copy_link" });
   toast.success("Link copiado");
 }

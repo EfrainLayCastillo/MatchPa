@@ -1,0 +1,61 @@
+.ball-stamp .ball-stamp-edge {
+  fill: var(--brand-teal);
+}
+.ball-stamp .ball-stamp-body {
+  fill: color-mix(in oklab, white 18%, var(--brand-lime));
+}
+.ball-stamp .ball-stamp-shade-far {
+  fill: var(--brand-lime);
+}
+.ball-stamp .ball-stamp-shade {
+  fill: color-mix(in oklab, var(--brand-teal) 16%, var(--brand-lime));
+}
+.ball-stamp .ball-stamp-shine {
+  fill: white;
+  opacity: 0.55;
+}
+.ball-stamp .ball-stamp-seam {
+  fill: none;
+  stroke: white;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+}
+.ball-stamp .ball-stamp-date text {
+  fill: var(--brand-teal);
+  font-family: var(--font-bricolage), sans-serif;
+  font-weight: 800;
+}
+.ball-stamp .ball-stamp-weekday {
+  font-size: 9px;
+  letter-spacing: 0.08em;
+}
+.ball-stamp .ball-stamp-day {
+  font-size: 26px;
+}
+.ball-stamp .ball-stamp-month {
+  font-size: 9px;
+  letter-spacing: 0.08em;
+}
+.ball-stamp .ball-stamp-place {
+  fill: var(--brand-teal);
+  font-family: var(--font-bricolage), sans-serif;
+  font-size: 8.5px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+.dark .ball-stamp .ball-stamp-place {
+  fill: var(--brand-lime);
+}
+.ball-stamp .ball-stamp-ring {
+  transform-origin: 60px 60px;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .ball-stamp .ball-stamp-ring {
+    animation: ball-stamp-spin 24s linear infinite;
+  }
+}
+@keyframes ball-stamp-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

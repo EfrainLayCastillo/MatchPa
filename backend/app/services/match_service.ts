@@ -300,6 +300,7 @@ async function assertNoTimeConflict(
 
   const others = await Match.query({ client: trx })
     .whereIn('status', ['open', 'full'])
+    .where('starts_at', '>', DateTime.now().toSQL()!)
     .whereNot('id', match.id)
     .where((query) => {
       query.where('organizer_id', userId).orWhereHas('requests', (requests) => {

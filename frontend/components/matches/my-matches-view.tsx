@@ -14,7 +14,8 @@ import {
 import { useMemo, useState } from "react";
 import { PageTitle } from "@/components/matchpa/page-title";
 import { SectionHeading } from "@/components/matchpa/section-heading";
-import { CourtBadge, IconBadge, MatchSummaryCard } from "@/components/match/match-summary-card";
+import { BallMatchCard } from "@/components/match/ball-match-card";
+import { CourtBadge, IconBadge } from "@/components/match/match-badges";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { api } from "@/lib/api";
 import { TYPE_LABELS } from "@/lib/format";
@@ -134,9 +135,11 @@ function sorter(sortBy: SortBy) {
 
 function MatchRow({ match }: { match: Match }) {
   return (
-    <MatchSummaryCard
-      match={match}
-      image={null}
+    <BallMatchCard
+      code={match.code}
+      startsAt={match.startsAt}
+      branchName={match.branch.name}
+      locationLabel={match.branch.locationLabel}
       badges={[
         <IconBadge key="role" icon={match.isOrganizer ? CrownIcon : UserCheckIcon}>
           {match.isOrganizer ? "Organizas" : "Juegas"}
@@ -160,9 +163,10 @@ function PendingRow({ request }: { request: MyRequest }) {
   const { match } = request;
   const invited = request.kind === "invitation";
   return (
-    <MatchSummaryCard
-      match={{ ...match, branch: { name: match.branchName } }}
-      image={null}
+    <BallMatchCard
+      code={match.code}
+      startsAt={match.startsAt}
+      branchName={match.branchName}
       badges={[
         <IconBadge key="kind" icon={invited ? MailOpenIcon : SendIcon}>
           {invited ? "Te invitaron" : "Solicitud enviada"}

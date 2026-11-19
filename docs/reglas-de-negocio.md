@@ -61,7 +61,7 @@ Especificación de qué debe cumplir el backend y el frontend. Si el código se 
 - Solo el organizador confirma con "Ya reservé" y el número, en `open` o `full`, mientras el partido no haya empezado. Con el partido `closed` ya no se ofrece. Mientras está `open` también puede hacerlo desde Editar, y ahí mismo quitar la reserva.
 - Solo el organizador ve el aviso con el contacto de la sucursal para reservar. Al llenarse sin reserva, el aviso pasa a destacado.
 - Confirmar, cambiar el número o quitar la reserva avisa a los jugadores aceptados.
-- **Sin solapamientos:** un jugador no puede tener dos partidos abiertos o completos que se crucen en horario. Cuenta tanto los que organiza como los que tiene aceptados. Aplica al pedir unirse, al recibir una invitación y al aceptar.
+- **Sin solapamientos:** un jugador no puede tener dos partidos abiertos o completos que se crucen en horario. Cuenta tanto los que organiza como los que tiene aceptados. Los partidos que ya empezaron (`expired`) no cuentan. Aplica al pedir unirse, al recibir una invitación y al aceptar.
 - **Máximo 7 por día:** un jugador no puede tener más de 7 partidos el mismo día (hora de Panamá), contando los que organiza y los que tiene aceptados.
 - Un organizador con partido abierto o completo no puede sumarse a otro que se cruce en horario.
 - `updatedAt` cambia cuando cambia el partido (edición, cierre, llenado o liberación de un puesto).

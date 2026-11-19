@@ -3,7 +3,8 @@
 import { UsersIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { SectionHeading } from "@/components/matchpa/section-heading";
-import { CourtBadge, IconBadge, MatchSummaryCard } from "@/components/match/match-summary-card";
+import { CourtBadge, IconBadge } from "@/components/match/match-badges";
+import { BallMatchCard } from "@/components/match/ball-match-card";
 import {
   Carousel,
   type CarouselApi,
@@ -70,11 +71,16 @@ export function UpcomingMatches({ matches }: { matches: Match[] }) {
 
 function UpcomingMatchCard({ match }: { match: Match }) {
   return (
-    <MatchSummaryCard
-      match={match}
+    <BallMatchCard
+      code={match.code}
+      startsAt={match.startsAt}
+      branchName={match.branch.name}
+      locationLabel={match.branch.locationLabel}
       badges={[
         <CourtBadge key="court" match={match} />,
-        <IconBadge key="spots" icon={UsersIcon}>{match.spotsLeft > 0 ? `Faltan ${match.spotsLeft}` : "Completo"}</IconBadge>,
+        <IconBadge key="spots" icon={UsersIcon}>
+          {match.spotsLeft > 0 ? `Faltan ${match.spotsLeft}` : "Completo"}
+        </IconBadge>,
       ]}
     />
   );

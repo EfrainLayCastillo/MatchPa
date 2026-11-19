@@ -239,6 +239,31 @@ test.group('flujo de partidos', (group) => {
     assert.include(error.message, 'horario')
   })
 
+  test('un partido expirado no bloquea unirse a otro que se cruza en horario', async ({
+    assert,
+  }) => {
+    const { match, players, branch } = await fixtures(0)
+    const expired = await publishMatch(players[0], {
+      branchId: branch.id,
+      courtNumber: 6,
+      startsAt: DateTime.now().plus({ days: 2 }),
+      durationMinutes: 90,
+      category: 4,
+      type: 'mixed',
+      maxPlayers: 4,
+      guests: [],
+    })
+    await Match.query()
+      .where('id', expired.id)
+      .update({ starts_at: DateTime.now().minus({ minutes: 30 }).toSQL() })
+    await Match.query()
+      .where('id', match.id)
+      .update({ starts_at: DateTime.now().plus({ minutes: 30 }).toSQL() })
+
+    const request = await requestToJoin(players[0], match.code)
+    assert.equal(request.status, 'pending')
+  })
+
   test('un usuario sin verificar no puede publicar ni pedir unirse', async ({ assert }) => {
     const { match, branch } = await fixtures(0)
     const unverified = await User.create({

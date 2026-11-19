@@ -1,4 +1,5 @@
 import { GlobeIcon, MapPinIcon, PhoneIcon, type LucideIcon } from "lucide-react";
+import { BranchFigure } from "@/components/match/branch-figure/branch-figure";
 import { Card } from "@/components/ui/card";
 import type { Branch } from "@/lib/types";
 
@@ -16,6 +17,29 @@ function websiteLabel(url: string): string {
 export function BranchDetails({ branch }: { branch: Branch }) {
   return (
     <Card className="gap-2 px-4">
+      <BranchInfo branch={branch} />
+    </Card>
+  );
+}
+
+/** The branch as a small illustrated club next to its details. */
+export function BranchShowcase({ branch }: { branch: Branch }) {
+  return (
+    <Card className="flex-row items-center gap-3 px-3 py-3">
+      <div className="w-32 shrink-0 sm:w-40">
+        <BranchFigure name={branch.name} />
+      </div>
+      <div className="min-w-0 flex-1 space-y-1">
+        <BranchInfo branch={branch} />
+      </div>
+    </Card>
+  );
+}
+
+/** Name, place, phone and website of a branch, without a frame. */
+export function BranchInfo({ branch }: { branch: Branch }) {
+  return (
+    <>
       <p className="font-heading text-base font-bold leading-tight">{branch.name}</p>
       <DetailRow icon={MapPinIcon}>{branch.locationLabel}</DetailRow>
       {branch.phone ? (
@@ -37,7 +61,7 @@ export function BranchDetails({ branch }: { branch: Branch }) {
           </a>
         </DetailRow>
       ) : null}
-    </Card>
+    </>
   );
 }
 

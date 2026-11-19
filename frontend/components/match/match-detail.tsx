@@ -5,17 +5,14 @@ import { whatsappUrl } from "@/lib/whatsapp";
 import { SITE_URL } from "@/lib/config";
 import { formatDateTime } from "@/lib/panamaFormatDate";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { PushPrompt } from "@/components/matchpa/push-prompt";
 import {
   INVITE_PRIMARY,
   INVITE_SECONDARY,
   InviteSurface,
 } from "@/components/matchpa/invite-surface";
-import { PlayerSummary } from "@/components/matchpa/player-identity";
 import { SectionHeading } from "@/components/matchpa/section-heading";
 import { levelGap, matchRole, track } from "@/lib/analytics";
 import { useVerifiedAction } from "@/components/auth/verify-email-dialog";
@@ -26,7 +23,6 @@ import { canConfirmBooking, courtLabel, MAX_PLAYERS } from "@/lib/format";
 import { notifyError } from "@/lib/notify";
 import { LoadFailed } from "@/components/matchpa/load-failed";
 import { SlowLoad } from "@/components/matchpa/slow-load";
-import { toMatchImage } from "@/lib/match-images";
 import { shouldAskForPush } from "@/lib/push";
 import {
   useMatch,
@@ -36,10 +32,14 @@ import {
 import { useSession } from "@/lib/session";
 import type { Match, MatchRequest } from "@/lib/types";
 import { BookingBanner } from "./booking-banner";
-import { BranchDetails } from "./branch-contact";
+import { BranchShowcase } from "./branch-contact";
 import { MatchBottomBar } from "./match-bottom-bar";
 import { NamesHiddenCard } from "./names-hidden-card";
-import { MatchBanner, MatchHeading } from "./match-hero";
+import { PlayerRow } from "./player-row";
+import { MatchCelebration } from "./match-celebration";
+import { RequestCard } from "./request-card";
+import { StatusNote } from "./status-note";
+import { MatchHeading } from "./match-hero";
 
 export function MatchDetail({
   code,
@@ -58,7 +58,6 @@ export function MatchDetail({
   const loadError = answeredMessage(query.error);
   const [busy, setBusy] = useState(false);
   const [pushOpen, setPushOpen] = useState(false);
-  const image = toMatchImage(useSearchParams().get("img"));
   const viewTracked = useRef(false);
 
   useEffect(() => {
@@ -116,62 +115,25 @@ export function MatchDetail({
 
   return (
     <div className="mx-auto w-full max-w-2xl">
-      <MatchBanner image={image} />
-      <div className="relative -mt-6 space-y-6 rounded-t-3xl bg-background px-4 pb-32 pt-5">
+      <div className="space-y-6 px-4 pb-32 pt-5">
         <MatchHeading
           match={match}
           canEdit={personalized && match.isOrganizer && match.status === "open"}
         />
 
-        <section className="space-y-2">
-          <SectionHeading>Jugadores</SectionHeading>
-          {namesHidden ? <NamesHiddenCard code={match.code} /> : null}
-          <ul className="space-y-2">
-            {match.players.map((player, index) => (
-              <li key={`p-${player.id}`}>
-                <Card className="px-4">
-                  <PlayerSummary
-                    name={player.fullName ?? anonymousPlayerName(index)}
-                    hidden={player.fullName === null}
-                    verified={player.emailVerified}
-                    gender={player.gender}
-                    category={player.category}
-                    tier={player.categoryTier}
-                    caption={
-                      player.id === match.organizer.id ? (
-                        <RoleCaption>Organizador</RoleCaption>
-                      ) : null
-                    }
-                  />
-                </Card>
-              </li>
-            ))}
-            {match.guests.map((guest, index) => (
-              <li key={`g-${guest.id}`}>
-                <Card className="px-4">
-                  <PlayerSummary
-                    name={guest.name ?? `Invitado ${index + 1}`}
-                    hidden={guest.name === null}
-                    gender={guest.gender}
-                    category={guest.category}
-                    tier={guest.categoryTier}
-                    caption={<RoleCaption>Invitado</RoleCaption>}
-                  />
-                </Card>
-              </li>
-            ))}
-          </ul>
-        </section>
+        <PlayerRow
+          match={match}
+          busy={busy}
+          onRemove={
+            personalized && match.isOrganizer
+              ? (request) => run(() => respond(match, request.id, "remove"))
+              : undefined
+          }
+        />
+        <MatchCelebration status={match.status} maxPlayers={match.maxPlayers} />
+        {namesHidden ? <NamesHiddenCard code={match.code} /> : null}
 
-        {match.status !== "open" ? (
-          <p className="rounded-xl bg-muted p-4 text-sm">
-            {match.status === "full"
-              ? "Este partido ya está completo."
-              : match.status === "closed"
-                ? "El organizador cerró la búsqueda."
-                : "Este partido ya expiró."}
-          </p>
-        ) : null}
+        <StatusNote match={match} />
 
         {personalized ? (
           <>
@@ -240,10 +202,10 @@ export function MatchDetail({
         )}
         <section className="space-y-2">
           <SectionHeading>Sucursal</SectionHeading>
-          <BranchDetails branch={match.branch} />
+          <BranchShowcase branch={match.branch} />
         </section>
       </div>
-      <MatchBottomBar match={match} image={image} />
+      <MatchBottomBar match={match} />
       <PushPrompt
         open={pushOpen}
         onOpenChange={setPushOpen}
@@ -367,80 +329,46 @@ function OrganizerPanel({
   onClose: () => void;
   onAddSeat: () => void;
 }) {
-  const requests = match.requests ?? [];
-  const pending = requests.filter(
+  const pending = (match.requests ?? []).filter(
     (r) => r.status === "pending" && r.kind === "join_request",
   );
-  const invited = requests.filter(
-    (r) => r.status === "pending" && r.kind === "invitation",
-  );
-  const accepted = requests.filter((r) => r.status === "accepted");
-  const canRemove = match.status === "open" || match.status === "full";
 
   return (
     <section className="space-y-2">
-      <SectionHeading>Tu partido</SectionHeading>
-      <Card className="gap-4 py-4">
-        <CardContent className="space-y-4">
-          <RequestGroup
-            title="Solicitudes"
-            empty="Nadie ha pedido unirse todavía."
-          >
-            {pending.map((request) => (
-              <RequestRow key={request.id} request={request}>
-                <Button
-                  size="sm"
-                  onClick={() => onRespond(request, "accept")}
-                  disabled={busy || match.spotsLeft === 0}
-                >
-                  Aceptar
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => onRespond(request, "reject")}
-                  disabled={busy}
-                >
-                  Rechazar
-                </Button>
-              </RequestRow>
-            ))}
-          </RequestGroup>
-
-          <RequestGroup title="Invitados" empty="Todavía no invitaste a nadie.">
-            {invited.map((request) => (
-              <RequestRow key={request.id} request={request}>
-                <span className="text-xs text-muted-foreground">
-                  Esperando su respuesta
-                </span>
-              </RequestRow>
-            ))}
-          </RequestGroup>
-
-          <RequestGroup
-            title="Confirmados"
-            empty="Aún no hay jugadores confirmados."
-          >
-            {accepted.map((request) => (
-              <RequestRow key={request.id} request={request}>
-                {canRemove ? (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => onRespond(request, "remove")}
-                    disabled={busy}
-                  >
-                    Sacar
-                  </Button>
-                ) : null}
-              </RequestRow>
-            ))}
-          </RequestGroup>
+      <SectionHeading
+        trailing={
+          <span className="shrink-0 text-xs text-muted-foreground">
+            Solicitudes ({pending.length})
+          </span>
+        }
+      >
+        Tu partido
+      </SectionHeading>
+      <div className="space-y-4">
+          <div className="space-y-2">
+            {pending.length === 0 ? (
+              <p className="text-sm text-muted-foreground">Nadie ha pedido unirse todavía.</p>
+            ) : (
+              <ul className="space-y-2">
+                {pending.map((request) => (
+                  <li key={request.id}>
+                    <RequestCard
+                      match={match}
+                      request={request}
+                      busy={busy}
+                      onAccept={() => onRespond(request, "accept")}
+                      onReject={() => onRespond(request, "reject")}
+                    />
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
 
           {match.status === "open" ? (
             <Button
-              variant="outline"
-              className="w-full"
+              variant="secondary"
+              className="h-11 w-full"
               onClick={onClose}
               disabled={busy}
             >
@@ -463,65 +391,8 @@ function OrganizerPanel({
               </p>
             </div>
           ) : null}
-        </CardContent>
-      </Card>
+      </div>
     </section>
-  );
-}
-
-function RequestGroup({
-  title,
-  empty,
-  children,
-}: {
-  title: string;
-  empty: string;
-  children: React.ReactNode[];
-}) {
-  return (
-    <div className="space-y-2">
-      <h3 className="text-sm font-semibold text-muted-foreground">{title}</h3>
-      {children.length === 0 ? (
-        <p className="text-sm text-muted-foreground">{empty}</p>
-      ) : (
-        <ul className="space-y-2">
-          {children.map((child, i) => (
-            <li key={i}>{child}</li>
-          ))}
-        </ul>
-      )}
-    </div>
-  );
-}
-
-function RequestRow({
-  request,
-  children,
-}: {
-  request: MatchRequest;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="rounded-lg border border-border bg-card p-3">
-      <PlayerSummary
-        name={request.user.fullName}
-        verified={request.user.emailVerified}
-        gender={request.user.gender}
-        category={request.user.category}
-        tier={request.user.categoryTier}
-        action={
-          <div className="flex flex-col items-end gap-1.5">{children}</div>
-        }
-      />
-    </div>
-  );
-}
-
-function RoleCaption({ children }: { children: React.ReactNode }) {
-  return (
-    <p className="text-[0.6875rem] font-semibold uppercase tracking-wide text-brand-teal dark:text-brand-lime">
-      {children}
-    </p>
   );
 }
 
@@ -530,8 +401,4 @@ function organizerMessage(match: Match): string {
     `Hola, te escribo por el partido de pádel del ${formatDateTime(match.startsAt)} en ${match.branch.name}, ${courtLabel(match).toLowerCase()}.`,
     `${SITE_URL}/partidos/${match.code}`,
   ].join("\n");
-}
-
-function anonymousPlayerName(index: number): string {
-  return index === 0 ? "Organizador" : `Jugador ${index}`;
 }

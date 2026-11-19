@@ -1,7 +1,5 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
-import type { MatchImage } from "@/lib/match-images";
-import { MATCH_IMAGES } from "@/lib/match-images";
 
 const root = process.cwd();
 
@@ -27,4 +25,3 @@ export async function ogFonts() {
 
 export const ogLogo = () => dataUri("public/logo/logo.svg", "image/svg+xml");
 
-export const ogPhoto = (image: MatchImage) => dataUri(`public${MATCH_IMAGES[image]}`, "image/jpeg");

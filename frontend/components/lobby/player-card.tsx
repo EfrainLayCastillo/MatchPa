@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ClockIcon, MapPinIcon } from "lucide-react";
-import { IconBadge } from "@/components/match/match-summary-card";
+import { IconBadge } from "@/components/match/match-badges";
 import { FormAlert } from "@/components/matchpa/form-alert";
 import { InviteNotice } from "@/components/matchpa/invite-notice";
 import { PlayerSummary } from "@/components/matchpa/player-identity";

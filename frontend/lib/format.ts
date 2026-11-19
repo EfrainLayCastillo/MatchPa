@@ -82,3 +82,16 @@ export function formatAvailabilityWindow(slot: Pick<Availability, "date" | "from
   }
   return `${formatClock12(slot.fromTime.slice(0, 5))} – ${formatClock12(slot.toTime.slice(0, 5))}`;
 }
+
+export type LevelFit = { steps: number; label: string };
+
+/** How a player's level sits against the match: 0 is a fit, positive is above it (lower category number). */
+export function levelFit(
+  player: { category: Category | null; categoryTier?: CategoryTier | null },
+  match: { category: Category; categoryTier?: CategoryTier | null },
+): LevelFit | null {
+  if (player.category === null) return null;
+  const steps = Math.round(effectiveLevel(match.category, match.categoryTier) - effectiveLevel(player.category, player.categoryTier));
+  if (steps === 0) return { steps, label: "Nivel justo" };
+  return { steps, label: `${Math.abs(steps)} ${steps > 0 ? "arriba" : "abajo"}` };
+}

@@ -1,0 +1,73 @@
+.bf .bf-base {
+  --anatomy-top: color-mix(in oklab, var(--sw-glow) 9%, var(--sw-paper));
+}
+.bf .bf-house {
+  --anatomy-paper: var(--brand-ivory);
+  --anatomy-top: var(--brand-ivory);
+  --anatomy-shade-0: color-mix(in oklab, var(--brand-teal) 20%, var(--brand-ivory));
+  --anatomy-shade-1: color-mix(in oklab, var(--brand-teal) 14%, var(--brand-ivory));
+  --anatomy-shade-2: color-mix(in oklab, var(--brand-teal) 9%, var(--brand-ivory));
+  --anatomy-shade-3: color-mix(in oklab, var(--brand-teal) 5%, var(--brand-ivory));
+  --anatomy-hi: var(--brand-teal);
+}
+.bf .bf-roof {
+  --anatomy-paper: var(--brand-teal);
+  --anatomy-top: color-mix(in oklab, var(--brand-turquoise) 35%, var(--brand-teal));
+  --anatomy-shade-0: color-mix(in oklab, black 30%, var(--brand-teal));
+  --anatomy-shade-1: color-mix(in oklab, black 22%, var(--brand-teal));
+  --anatomy-shade-2: color-mix(in oklab, black 14%, var(--brand-teal));
+  --anatomy-shade-3: color-mix(in oklab, black 7%, var(--brand-teal));
+  --anatomy-hi: var(--brand-teal);
+}
+.bf .bf-sign,
+.bf .bf-lamp {
+  --anatomy-paper: var(--brand-lime);
+  --anatomy-top: color-mix(in oklab, white 30%, var(--brand-lime));
+  --anatomy-shade-0: color-mix(in oklab, var(--brand-teal) 25%, var(--brand-lime));
+  --anatomy-shade-1: color-mix(in oklab, var(--brand-teal) 18%, var(--brand-lime));
+  --anatomy-shade-2: color-mix(in oklab, var(--brand-teal) 12%, var(--brand-lime));
+  --anatomy-shade-3: color-mix(in oklab, var(--brand-teal) 6%, var(--brand-lime));
+  --anatomy-hi: var(--brand-teal);
+}
+.bf .bf-court {
+  --anatomy-paper: color-mix(in oklab, var(--brand-turquoise) 70%, var(--brand-teal));
+  --anatomy-top: color-mix(in oklab, var(--brand-turquoise) 80%, var(--brand-teal));
+}
+.bf .bf-line {
+  stroke: white;
+  stroke-width: 0.9;
+}
+.bf .bf-window {
+  fill: var(--brand-lime);
+  stroke: var(--brand-teal);
+  stroke-width: 0.6;
+}
+.bf .bf-door {
+  fill: var(--brand-teal);
+}
+.bf .bf-glass {
+  fill: color-mix(in oklab, white 35%, transparent);
+  stroke: color-mix(in oklab, white 70%, var(--brand-turquoise));
+  stroke-width: 0.6;
+}
+.bf .bf-net {
+  fill: color-mix(in oklab, var(--brand-teal) 35%, transparent);
+}
+.bf .bf-net-band {
+  fill: none;
+  stroke: white;
+  stroke-width: 1;
+}
+.bf .bf-step {
+  --anatomy-paper: color-mix(in oklab, var(--brand-teal) 12%, var(--brand-ivory));
+  --anatomy-top: color-mix(in oklab, var(--brand-teal) 6%, white);
+}
+.bf .bf-seat {
+  --anatomy-paper: var(--brand-turquoise);
+  --anatomy-top: color-mix(in oklab, white 22%, var(--brand-turquoise));
+  --anatomy-shade-0: color-mix(in oklab, var(--brand-teal) 34%, var(--brand-turquoise));
+  --anatomy-shade-1: color-mix(in oklab, var(--brand-teal) 26%, var(--brand-turquoise));
+  --anatomy-shade-2: color-mix(in oklab, var(--brand-teal) 18%, var(--brand-turquoise));
+  --anatomy-shade-3: color-mix(in oklab, var(--brand-teal) 10%, var(--brand-turquoise));
+  --anatomy-hi: var(--brand-teal);
+}

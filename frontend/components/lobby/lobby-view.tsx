@@ -48,6 +48,7 @@ import { UpcomingMatches } from "./upcoming-matches";
 const ALL_BRANCHES = "all";
 const SCROLL_LIST =
   "grid max-h-[60dvh] grid-cols-1 gap-3 overflow-x-hidden overflow-y-auto overscroll-contain p-0.5 md:grid-cols-2";
+const MATCH_LIST = `${SCROLL_LIST} lg:grid-cols-3`;
 const MY_MATCHES = "mine";
 const LOGIN_URL = "/login";
 
@@ -286,7 +287,7 @@ export function LobbyView() {
             count={sortedMatches?.length}
             empty={<CourtState variant="noMatches" />}
           >
-            <ul className={SCROLL_LIST}>
+            <ul className={MATCH_LIST}>
               {sortedMatches?.map((match) => (
                 <li key={match.id}>
                   <MatchCard

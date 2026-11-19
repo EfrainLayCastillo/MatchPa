@@ -110,3 +110,17 @@ export function formatLongDate(key: string): string {
     month: "long",
   }).format(new Date(`${key}T12:00:00${PANAMA_OFFSET}`));
 }
+
+/** Match start split for display, e.g. { day: "sáb 22 nov", time: "6:30", period: "p. m." }. */
+export function startParts(iso: string): { day: string; time: string; period: string } {
+  const [day] = formatDateTime(iso).split(" · ");
+  const [time, ...period] = formatClock12(formatClock(iso)).split(/\s/);
+  return { day: day!, time: time!, period: period.join(" ") };
+}
+
+/** Match day split for a date stamp, e.g. { weekday: "sáb", day: "22", month: "nov" }. */
+export function dateParts(iso: string): { weekday: string; day: string; month: string } {
+  const parts = new Intl.DateTimeFormat("es-PA", { timeZone: PANAMA_TZ, weekday: "short", day: "numeric", month: "short" }).formatToParts(new Date(iso));
+  const value = (type: Intl.DateTimeFormatPartTypes) => parts.find((part) => part.type === type)?.value.replace(".", "") ?? "";
+  return { weekday: value("weekday"), day: value("day"), month: value("month") };
+}
