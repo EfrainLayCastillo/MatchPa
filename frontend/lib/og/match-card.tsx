@@ -8,12 +8,13 @@ import { OgIcon } from "./icon";
 
 interface MatchCardProps {
   match: Match | null;
+  logo: string;
   /** Multiplies the app card's sizes (its time is 48px). */
   scale: number;
 }
 
 /** The match card from the app: the shared image for link previews and stories. */
-export function OgMatchCard({ match, scale }: MatchCardProps) {
+export function OgMatchCard({ match, logo, scale }: MatchCardProps) {
   return (
     <div
       style={{
@@ -30,16 +31,16 @@ export function OgMatchCard({ match, scale }: MatchCardProps) {
     >
       <div style={{ display: "flex", position: "relative", flex: 1, padding: 22 * scale }}>
         <CourtLines />
-        {match ? <Face match={match} scale={scale} /> : <Generic scale={scale} />}
+        {match ? <Face match={match} logo={logo} scale={scale} /> : <Generic scale={scale} />}
       </div>
     </div>
   );
 }
 
-function Face({ match, scale: s }: { match: Match; scale: number }) {
+function Face({ match, logo, scale: s }: { match: Match; logo: string; scale: number }) {
   const { day, time, period } = startParts(match.startsAt);
   return (
-    <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", flex: 1, gap: 14 * s }}>
+    <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", flex: 1, gap: 14 * s }}>
       <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 12 * s }}>
         <div style={{ display: "flex", flexDirection: "column", gap: 4 * s }}>
           {match.status === "open" ? null : <StatusPill status={STATUS_LABELS[match.status]} scale={s} />}
@@ -54,9 +55,13 @@ function Face({ match, scale: s }: { match: Match; scale: number }) {
           {match.status === "open" ? <Seal spots={match.spotsLeft} scale={s} /> : null}
         </div>
       </div>
-      <div style={{ display: "flex", flexDirection: "column", gap: 6 * s }}>
-        <div style={{ display: "flex", fontSize: 30 * s, fontWeight: 800, lineHeight: 1.1 }}>{match.branch.name}</div>
-        <Details match={match} scale={s} />
+      <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 12 * s }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6 * s }}>
+          <div style={{ display: "flex", fontSize: 30 * s, fontWeight: 800, lineHeight: 1.1 }}>{match.branch.name}</div>
+          <Details match={match} scale={s} />
+        </div>
+        {/* eslint-disable-next-line @next/next/no-img-element -- rendered by ImageResponse, not the browser */}
+        <img src={logo} alt="MatchPa" width={88 * s} height={24 * s} />
       </div>
     </div>
   );
